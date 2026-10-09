@@ -1,0 +1,51 @@
+name: Deploy WeChat Miniprogram
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number'
+        required: true
+        default: '2.0.0'
+      desc:
+        description: 'Version description'
+        required: true
+        default: 'UI redesign with Claymorphism style'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install Dependencies
+        run: |
+          npm install -g wechat-miniprogram-ci
+          
+      - name: Deploy to WeChat
+        run: |
+          wechat-miniprogram-ci upload \
+            --appid ${{ secrets.WECHAT_APPID }} \
+            --private-key '${{ secrets.WECHAT_PRIVATE_KEY }}' \
+            --version ${{ github.event.inputs.version || '2.0.0' }} \
+            --desc '${{ github.event.inputs.desc || 'UI redesign with Claymorphism style' }}' \
+            --project ./miniprogram
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          
+      - name: Summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ github.event.inputs.version || '2.0.0' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Description: ${{ github.event.inputs.desc || 'UI redesign with Claymorphism style' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Workflow: ${{ workflow }}" >> $GITHUB_STEP_SUMMARY
