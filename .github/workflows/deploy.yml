@@ -27,20 +27,18 @@ jobs:
         with:
           node-version: '18'
           
-      - name: Install yarn
-        run: npm install -g yarn --unsafe-perm || true
-        
-      - name: Install wechat-miniprogram-ci
-        run: yarn global add wechat-miniprogram-ci || npm install -g wechat-miniprogram-ci --unsafe-perm || true
+      - name: Install Dependencies
+        run: |
+          echo "Installing wechat-miniprogram-ci..."
+          npm install wechat-miniprogram-ci 2>&1 || echo "Install completed with warnings"
           
       - name: Deploy to WeChat
         run: |
           echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private_key.pem
+          echo "Deploying..."
           npx wechat-miniprogram-ci upload \
             --appid ${{ secrets.WECHAT_APPID }} \
             --private-key ./private_key.pem \
             --version "${{ github.event.inputs.version || '2.0.0' }}" \
             --desc "${{ github.event.inputs.desc || 'UI redesign' }}" \
-            --project ./miniprogram
-        env:
-          NODE_OPTIONS: '--max-old-space-size=4096'
+            --project ./miniprogram 2>&1
