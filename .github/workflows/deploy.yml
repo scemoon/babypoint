@@ -28,16 +28,15 @@ jobs:
           node-version: '18'
           
       - name: Install Dependencies
-        run: |
-          npm install -g wechat-miniprogram-ci
+        run: npm install -g wechat-miniprogram-ci --unsafe-perm || true
           
       - name: Deploy to WeChat
         run: |
-          wechat-miniprogram-ci upload \
+          npx wechat-miniprogram-ci upload \
             --appid ${{ secrets.WECHAT_APPID }} \
-            --private-key '${{ secrets.WECHAT_PRIVATE_KEY }}' \
-            --version ${{ github.event.inputs.version || '2.0.0' }} \
-            --desc '${{ github.event.inputs.desc || 'UI redesign with Claymorphism style' }}' \
+            --private-key "${{ secrets.WECHAT_PRIVATE_KEY }}" \
+            --version "${{ github.event.inputs.version || '2.0.0' }}" \
+            --desc "${{ github.event.inputs.desc || 'UI redesign' }}" \
             --project ./miniprogram
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
