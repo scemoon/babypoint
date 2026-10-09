@@ -26,15 +26,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          registry-url: 'https://registry.npmjs.org/'
           
-      - name: Install wechat-miniprogram-ci
-        run: npm install wechat-miniprogram-ci --registry=https://registry.npmjs.org/
+      - name: Install yarn
+        run: npm install -g yarn --unsafe-perm || true
         
+      - name: Install wechat-miniprogram-ci
+        run: yarn global add wechat-miniprogram-ci || npm install -g wechat-miniprogram-ci --unsafe-perm || true
+          
       - name: Deploy to WeChat
         run: |
           echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private_key.pem
-          node node_modules/wechat-miniprogram-ci/bin/upload.js \
+          npx wechat-miniprogram-ci upload \
             --appid ${{ secrets.WECHAT_APPID }} \
             --private-key ./private_key.pem \
             --version "${{ github.event.inputs.version || '2.0.0' }}" \
