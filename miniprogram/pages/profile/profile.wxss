@@ -1,5 +1,5 @@
-/* pages/profile/profile.wxss | 个人中心页样式 v3.0 */
-/* Flat Design - 扁平化设计 */
+/* pages/profile/profile.wxss | 个人中心页样式 v4.0 */
+/* Friendly Flat Design */
 
 /* ==================== 容器 ==================== */
 .container {
@@ -15,8 +15,6 @@
   padding: 40rpx 32rpx;
   color: #FFFFFF;
   margin-bottom: 32rpx;
-  position: relative;
-  overflow: hidden;
 }
 
 .child-header {
@@ -24,12 +22,9 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 32rpx;
-  position: relative;
-  z-index: 1;
 }
 
 .avatar-wrap {
-  position: relative;
   margin-bottom: 20rpx;
 }
 
@@ -81,8 +76,6 @@
   margin: 24rpx 0;
   background: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-md);
-  position: relative;
-  z-index: 1;
 }
 
 .stat-item {
@@ -96,6 +89,7 @@
   display: block;
   line-height: 1;
   margin-bottom: 8rpx;
+  color: #FFFFFF;
 }
 
 .stat-num.available {
@@ -124,12 +118,10 @@
   padding: 24rpx;
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: #FFFFFF;
   font-size: 30rpx;
   font-weight: 600;
-  position: relative;
-  z-index: 1;
 }
 
 .manage-btn::after {
@@ -138,6 +130,10 @@
 
 .manage-btn:active {
   background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-icon {
+  font-size: 32rpx;
 }
 
 /* ==================== 菜单卡片 ==================== */
@@ -157,21 +153,25 @@
 }
 
 .menu-item:active {
-  background: #F8FAFC;
+  background: var(--color-surface-hover);
 }
 
 .menu-icon-wrap {
   width: 72rpx;
   height: 72rpx;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 24rpx;
 }
 
+.menu-emoji {
+  font-size: 36rpx;
+}
+
 .history-icon {
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(249, 115, 22, 0.1);
 }
 
 .reward-icon {
@@ -191,6 +191,11 @@
 
 .menu-arrow {
   padding: 8rpx;
+}
+
+.arrow-icon {
+  font-size: 36rpx;
+  color: var(--color-text-tertiary);
 }
 
 .menu-divider {

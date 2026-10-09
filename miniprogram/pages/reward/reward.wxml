@@ -1,4 +1,4 @@
-<!--pages/reward/reward.wxml-->
+<!--pages/reward/reward.wxml | 奖励页 v4.0-->
 <view class="container">
   <!-- 顶部孩子选择器 + 积分显示 -->
   <view class="child-bar">
@@ -23,7 +23,7 @@
     <!-- 积分显示条 -->
     <view class="points-strip" wx:if="{{selectedChild}}">
       <view class="points-info">
-        <icon name="star" size="36" color="#FFD93D"/>
+        <text class="points-star">⭐</text>
         <text class="points-num">{{(selectedChild.totalPoints || 0) - (selectedChild.redeemedPoints || 0)}}</text>
       </view>
       <text class="points-label">可用积分</text>
@@ -47,7 +47,7 @@
         bindtap="onCategoryChange" 
         data-index="{{index}}"
       >
-        <icon name="{{item.iconType || 'gift'}}" size="32" color="{{currentCategory === item.key ? '#FFFFFF' : item.color || '#666'}}"/>
+        <text class="cat-emoji">{{item.emoji || '🎁'}}</text>
         <text>{{item.name}}</text>
       </view>
     </view>
@@ -56,16 +56,13 @@
   <!-- 奖励网格 -->
   <scroll-view scroll-y class="reward-grid" wx:if="{{!loading}}">
     <view class="reward-card" wx:for="{{rewards}}" wx:key="_id" bindtap="onRewardTap" data-reward="{{item}}">
-      <view class="reward-icon-wrap" style="background: linear-gradient(145deg, {{item.iconBg || '#FFF0E8'}} 0%, {{item.iconBgEnd || '#FFE4D6'}} 100%);">
-        <icon name="{{item.iconType || 'gift'}}" size="56" color="{{item.iconColor || '#FF8B45'}}"/>
+      <view class="reward-icon-wrap">
+        <text class="reward-emoji">{{item.emoji || '🎁'}}</text>
       </view>
       <text class="reward-name">{{item.name}}</text>
       <text class="reward-desc">{{item.description}}</text>
       <view class="reward-footer">
-        <view class="reward-points-wrap">
-          <icon name="star" size="28" color="#FFD93D"/>
-          <text class="reward-points">{{item.points}}</text>
-        </view>
+        <text class="reward-points">⭐ {{item.points}}</text>
         <text class="reward-unit">积分</text>
       </view>
       <!-- 可兑换标识 -->
@@ -76,7 +73,7 @@
     
     <!-- 空状态 -->
     <view class="empty-state" wx:if="{{rewards.length === 0}}">
-      <icon name="gift" size="120" color="#E5E7EB"/>
+      <text class="empty-icon">🎁</text>
       <text class="empty-text">暂无奖励</text>
       <text class="empty-hint">点击下方按钮添加新奖励</text>
     </view>
@@ -89,6 +86,6 @@
 
   <!-- 浮动添加按钮 -->
   <view class="fab" bindtap="onAddReward">
-    <icon name="plus" size="56" color="#FFFFFF"/>
+    <text class="fab-icon">+</text>
   </view>
 </view>

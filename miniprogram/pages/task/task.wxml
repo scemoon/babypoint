@@ -1,4 +1,4 @@
-<!--pages/task/task.wxml-->
+<!--pages/task/task.wxml | 任务页 v4.0-->
 <view class="container">
   <!-- 孩子选择标签栏 -->
   <scroll-view scroll-x class="child-selector">
@@ -35,10 +35,9 @@
         wx:key="key" 
         bindtap="onCategoryChange" 
         data-index="{{index}}"
-        style="--cat-color: {{item.color}}"
       >
         <view class="cat-icon-wrap">
-          <icon name="{{item.iconType || 'list'}}" size="32" color="{{item.color || '#666'}}"/>
+          <text class="cat-emoji">{{item.emoji || '📋'}}</text>
         </view>
         <text>{{item.name}}</text>
       </view>
@@ -48,14 +47,14 @@
   <!-- 任务列表 -->
   <scroll-view scroll-y class="task-list" wx:if="{{!loading}}">
     <view class="task-card" wx:for="{{tasks}}" wx:key="_id" bindtap="onTaskTap" data-task="{{item}}">
-      <view class="task-icon-wrap" style="background: linear-gradient(145deg, {{item.iconBg || '#FFF0E8'}} 0%, {{item.iconBgEnd || '#FFE4D6'}} 100%);">
-        <icon name="{{item.iconType || 'star'}}" size="48" color="{{item.iconColor || '#FF8B45'}}"/>
+      <view class="task-icon-wrap">
+        <text class="task-emoji">{{item.emoji || '📋'}}</text>
       </view>
       <view class="task-content">
         <text class="task-name">{{item.name}}</text>
         <text class="task-desc">{{item.description}}</text>
         <view class="task-meta">
-          <view class="tag tag-primary">{{item.categoryName || '日常'}}</view>
+          <view class="tag tag-secondary">{{item.categoryName || '日常'}}</view>
         </view>
       </view>
       <view class="task-points">
@@ -66,7 +65,7 @@
     
     <!-- 空状态 -->
     <view class="empty-state" wx:if="{{tasks.length === 0}}">
-      <icon name="list" size="120" color="#E5E7EB"/>
+      <text class="empty-icon">📋</text>
       <text class="empty-text">暂无任务</text>
       <text class="empty-hint">点击下方按钮添加新任务</text>
     </view>
@@ -79,6 +78,6 @@
 
   <!-- 浮动添加按钮 -->
   <view class="fab" bindtap="onAddTask">
-    <icon name="plus" size="56" color="#FFFFFF"/>
+    <text class="fab-icon">+</text>
   </view>
 </view>

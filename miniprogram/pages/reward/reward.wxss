@@ -1,10 +1,9 @@
-/* pages/reward/reward.wxss | 奖励列表页样式 v3.0 */
-/* Flat Design - 扁平化设计 */
+/* pages/reward/reward.wxss | 奖励列表页样式 v4.0 */
+/* Friendly Flat Design */
 
 /* ==================== 顶部栏 ==================== */
 .child-bar {
   background: var(--color-surface);
-  padding: 20rpx 0;
   border-bottom: 1rpx solid var(--color-border);
 }
 
@@ -23,7 +22,7 @@
   align-items: center;
   padding: 12rpx 28rpx;
   margin-right: 16rpx;
-  background: #F1F5F9;
+  background: var(--color-surface-hover);
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
 }
@@ -36,7 +35,7 @@
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  background: rgba(14, 165, 233, 0.1);
+  background: rgba(59, 130, 246, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,7 +72,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 20rpx 24rpx 0;
+  margin: 16rpx 24rpx;
   padding: 20rpx 28rpx;
   background: rgba(245, 158, 11, 0.1);
   border-radius: var(--radius-md);
@@ -84,11 +83,15 @@
   align-items: center;
 }
 
+.points-star {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
 .points-info .points-num {
   font-size: 44rpx;
   font-weight: 800;
   color: var(--color-accent);
-  margin-left: 12rpx;
 }
 
 .points-strip .points-label {
@@ -113,7 +116,7 @@
   align-items: center;
   padding: 14rpx 28rpx;
   margin-right: 16rpx;
-  background: #F1F5F9;
+  background: var(--color-surface-hover);
   border-radius: var(--radius-full);
   font-size: 28rpx;
   color: var(--color-text-secondary);
@@ -124,6 +127,11 @@
 .category-item.active {
   background: var(--color-primary);
   color: #FFFFFF;
+}
+
+.cat-emoji {
+  font-size: 28rpx;
+  margin-right: 8rpx;
 }
 
 /* ==================== 奖励网格 ==================== */
@@ -139,7 +147,7 @@
 .reward-card {
   background: var(--color-surface);
   border-radius: var(--radius-md);
-  padding: 28rpx 20rpx 20rpx;
+  padding: 32rpx 20rpx 24rpx;
   border: 1rpx solid var(--color-border);
   position: relative;
   display: flex;
@@ -149,17 +157,23 @@
 }
 
 .reward-card:active {
-  background: #F8FAFC;
+  background: var(--color-surface-hover);
+  transform: scale(0.98);
 }
 
 .reward-icon-wrap {
   width: 120rpx;
   height: 120rpx;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
+  background: rgba(249, 115, 22, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 20rpx;
+}
+
+.reward-emoji {
+  font-size: 60rpx;
 }
 
 .reward-name {
@@ -189,26 +203,20 @@
 
 .reward-footer {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
 }
 
-.reward-points-wrap {
-  display: flex;
-  align-items: center;
-}
-
 .reward-points {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 700;
-  color: var(--color-primary);
-  margin-left: 6rpx;
+  color: var(--color-accent);
 }
 
 .reward-unit {
   font-size: 22rpx;
   color: var(--color-text-tertiary);
-  margin-left: 4rpx;
+  margin-left: 6rpx;
 }
 
 /* 可兑换标识 */
@@ -234,11 +242,16 @@
   padding: 120rpx 40rpx;
 }
 
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
 .empty-state .empty-text {
   font-size: 32rpx;
   font-weight: 600;
   color: var(--color-text-primary);
-  margin-top: 24rpx;
   margin-bottom: 8rpx;
 }
 
@@ -254,4 +267,33 @@
   justify-content: center;
   padding: 80rpx;
   color: var(--color-text-tertiary);
+}
+
+/* ==================== 浮动按钮 ==================== */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 160rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(59, 130, 246, 0.4);
+  z-index: 100;
+  transition: all var(--transition-fast);
+}
+
+.fab:active {
+  transform: scale(0.92);
+  background: var(--color-primary-dark);
+}
+
+.fab-icon {
+  font-size: 64rpx;
+  font-weight: 300;
+  color: #FFFFFF;
+  line-height: 1;
 }
