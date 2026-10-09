@@ -8,11 +8,11 @@ on:
       version:
         description: 'Version number'
         required: true
-        default: '2.0.0'
+        default: '2.0.1'
       desc:
         description: 'Version description'
         required: true
-        default: 'UI redesign with Claymorphism style'
+        default: 'Bug fix - remove wx.getUserProfile'
 
 jobs:
   deploy:
@@ -28,17 +28,14 @@ jobs:
           node-version: '18'
           
       - name: Install Dependencies
-        run: |
-          cd miniprogram
-          npm install miniprogram-ci --registry=https://registry.npmjs.org/
+        run: npm install miniprogram-ci --registry=https://registry.npmjs.org/
           
       - name: Deploy to WeChat
         run: |
-          cd miniprogram
           echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private_key.pem
           npx miniprogram-ci upload \
             --appid ${{ secrets.WECHAT_APPID }} \
             --private-key ./private_key.pem \
-            --version "${{ github.event.inputs.version || '2.0.0' }}" \
-            --desc "${{ github.event.inputs.desc || 'UI redesign' }}" \
-            --project .
+            --version "${{ github.event.inputs.version || '2.0.1' }}" \
+            --desc "${{ github.event.inputs.desc || 'Bug fix' }}" \
+            --project ./miniprogram
