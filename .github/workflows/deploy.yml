@@ -27,26 +27,16 @@ jobs:
         with:
           node-version: '18'
           
-      - name: Install Dependencies
-        run: npm install -g wechat-miniprogram-ci --unsafe-perm || true
+      - name: Install wechat-miniprogram-ci
+        run: |
+          npm install wechat-miniprogram-ci --unsafe-perm
           
       - name: Deploy to WeChat
         run: |
           echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private_key.pem
-          npx wechat-miniprogram-ci upload \
+          node node_modules/wechat-miniprogram-ci/bin/upload.js \
             --appid ${{ secrets.WECHAT_APPID }} \
             --private-key ./private_key.pem \
             --version "${{ github.event.inputs.version || '2.0.0' }}" \
             --desc "${{ github.event.inputs.desc || 'UI redesign' }}" \
-            --project ./miniprogram 2>&1
-        env:
-          NODE_OPTIONS: '--max-old-space-size=4096'
-          
-      - name: Summary
-        run: |
-          echo "### Deployment Summary" >> $GITHUB_OUTPUT
-          echo "version=${{ github.event.inputs.version || '2.0.0' }}" >> $GITHUB_OUTPUT
-          echo "desc=${{ github.event.inputs.desc || 'UI redesign' }}" >> $GITHUB_OUTPUT
-          echo "- Version: ${{ github.event.inputs.version || '2.0.0' }}"
-          echo "- Description: ${{ github.event.inputs.desc || 'UI redesign' }}"
-          echo "- Commit: ${{ github.sha }}"
+            --project ./miniprogram
