@@ -1,0 +1,253 @@
+/* pages/profile/profile.wxss | 个人中心页样式 v2.0 */
+
+/* ==================== 容器 ==================== */
+.container {
+  min-height: 100vh;
+  background: var(--color-background);
+  padding: 24rpx;
+}
+
+/* ==================== 孩子卡片 ==================== */
+.child-card {
+  background: var(--color-primary-gradient);
+  border-radius: var(--radius-xl);
+  padding: 40rpx 32rpx;
+  color: #FFFFFF;
+  margin-bottom: 32rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.child-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 200rpx;
+  height: 200rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.child-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -20%;
+  width: 180rpx;
+  height: 180rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.child-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.avatar-wrap {
+  position: relative;
+  margin-bottom: 20rpx;
+}
+
+.child-avatar {
+  width: 140rpx;
+  height: 140rpx;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid rgba(255, 255, 255, 0.4);
+}
+
+.avatar-text {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.avatar-img {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+}
+
+.avatar-glow {
+  position: absolute;
+  bottom: -10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160rpx;
+  height: 40rpx;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  filter: blur(10rpx);
+}
+
+.child-info {
+  text-align: center;
+}
+
+.child-name {
+  font-size: 40rpx;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.child-grade {
+  font-size: 26rpx;
+  opacity: 0.85;
+}
+
+/* ==================== 统计区域 ==================== */
+.child-stats {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 28rpx 0;
+  margin: 24rpx 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  position: relative;
+  z-index: 1;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-num {
+  font-size: 48rpx;
+  font-weight: 800;
+  display: block;
+  line-height: 1;
+  margin-bottom: 8rpx;
+}
+
+.stat-num.available {
+  color: var(--color-accent);
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.85;
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ==================== 管理按钮 ==================== */
+.manage-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  width: 100%;
+  margin-top: 24rpx;
+  padding: 24rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: var(--radius-full);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+.manage-btn::after {
+  border: none;
+}
+
+.manage-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.98);
+}
+
+/* ==================== 菜单卡片 ==================== */
+.menu-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: 32rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 28rpx;
+  transition: background var(--transition-fast);
+}
+
+.menu-item:active {
+  background: #F9FAFB;
+}
+
+.menu-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+}
+
+.history-icon {
+  background: linear-gradient(145deg, #FFF0E8 0%, #FFE4D6 100%);
+}
+
+.reward-icon {
+  background: linear-gradient(145deg, #E8FAF8 0%, #D1F0EC 100%);
+}
+
+.calendar-icon {
+  background: linear-gradient(145deg, #FFF9E6 0%, #FFF3CC 100%);
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.menu-arrow {
+  padding: 8rpx;
+}
+
+.menu-divider {
+  height: 1rpx;
+  background: var(--color-border);
+  margin: 0 28rpx;
+}
+
+/* ==================== 应用信息 ==================== */
+.app-info {
+  text-align: center;
+  padding: 32rpx;
+}
+
+.app-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.app-version {
+  font-size: 24rpx;
+  color: var(--color-text-tertiary);
+}

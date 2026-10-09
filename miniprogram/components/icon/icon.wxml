@@ -1,0 +1,13 @@
+<!-- components/icon/icon.wxml -->
+<svg 
+  class="icon-svg {{class}}"
+  style="width: {{size}}rpx; height: {{size}}rpx;"
+  viewBox="0 0 24 24" 
+  fill="{{iconData.fill}}" 
+  stroke="{{color}}" 
+  stroke-width="2" 
+  stroke-linecap="round" 
+  stroke-linejoin="round"
+>
+  <path d="{{iconData.path}}" />
+</svg>

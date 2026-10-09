@@ -1,0 +1,42 @@
+<!-- components/icons/icons.wxml -->
+<!-- 图标组件 - 使用 WeChat 内置 icon + 语义化命名 -->
+
+<!-- 箭头向右 -->
+<template name="iconArrowRight">
+  <icon type="arrow_right" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>
+
+<!-- 勾选 -->
+<template name="iconCheck">
+  <icon type="success" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>
+
+<!-- 加号 -->
+<template name="iconPlus">
+  <icon type="add" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>
+
+<!-- 关闭 -->
+<template name="iconClose">
+  <icon type="clear" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>
+
+<!-- 前进箭头 -->
+<template name="iconChevronRight">
+  <icon type="chevron_right" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>
+
+<!-- 警告 -->
+<template name="iconWarn">
+  <icon type="warn" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>
+
+<!-- 搜索 -->
+<template name="iconSearch">
+  <icon type="search" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>
+
+<!-- 暂无图标时使用 -->
+<template name="iconPlaceholder">
+  <icon type="waiting" class="{{class}}" size="{{size}}" color="{{color}}"/>
+</template>

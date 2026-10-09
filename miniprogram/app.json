@@ -1,0 +1,48 @@
+{
+  "pages": [
+    "pages/onboard/onboard",
+    "pages/index/index",
+    "pages/task/task",
+    "pages/task-complete/task-complete",
+    "pages/task-add/task-add",
+    "pages/reward/reward",
+    "pages/reward-detail/reward-detail",
+    "pages/reward-add/reward-add",
+    "pages/profile/profile",
+    "pages/child-list/child-list",
+    "pages/calendar/calendar",
+    "pages/history/history"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FF8B45",
+    "navigationBarTitleText": "宝贝积分",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF8B45",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/task/task",
+        "text": "任务"
+      },
+      {
+        "pagePath": "pages/reward/reward",
+        "text": "奖励"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

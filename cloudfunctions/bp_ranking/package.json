@@ -1,0 +1,9 @@
+{
+  "name": "bp_ranking",
+  "version": "1.0.0",
+  "description": "bp_ranking 云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,188 @@
+/* pages/child-list/child-list.wxss */
+.container {
+  padding: 20rpx;
+  min-height: 100vh;
+  background: #F7F7F7;
+}
+
+.child-list {
+  margin-bottom: 30rpx;
+}
+
+.child-item {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.child-item.current {
+  border: 2rpx solid #FF8B45;
+}
+
+.child-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  background: #FFE4D6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+}
+
+.child-avatar text {
+  font-size: 40rpx;
+  color: #FF8B45;
+  font-weight: bold;
+}
+
+.child-info {
+  flex: 1;
+}
+
+.child-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.child-grade {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.child-points {
+  text-align: right;
+  margin-left: 20rpx;
+}
+
+.child-points .points {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FF8B45;
+  display: block;
+}
+
+.child-points .label {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.child-actions {
+  width: 100%;
+  display: flex;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.action-btn {
+  font-size: 28rpx;
+  color: #4A90D9;
+  margin-right: 30rpx;
+}
+
+.action-btn.delete {
+  color: #FF6B6B;
+}
+
+.current-tag {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  background: #FF8B45;
+  color: #fff;
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}
+
+.add-btn {
+  background: #FF8B45;
+  color: #fff;
+  border-radius: 50rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+}
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  width: 600rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  display: block;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 15rpx;
+}
+
+.input {
+  border: 2rpx solid #eee;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 30rpx;
+}
+
+.picker-value {
+  border: 2rpx solid #eee;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 30rpx;
+}
+
+.gender-group {
+  display: flex;
+}
+
+.gender-group label {
+  margin-right: 40rpx;
+}
+
+.submit-btn {
+  background: #FF8B45;
+  color: #fff;
+  border-radius: 50rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  margin-top: 20rpx;
+}

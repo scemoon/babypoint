@@ -1,0 +1,124 @@
+/* pages/reward-detail/reward-detail.wxss */
+.container {
+  padding: 30rpx;
+  min-height: 100vh;
+  background: #F7F7F7;
+}
+
+.reward-card {
+  background: linear-gradient(135deg, #FF8B45 0%, #FF6B35 100%);
+  border-radius: 24rpx;
+  padding: 60rpx;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 30rpx;
+}
+
+.reward-icon {
+  font-size: 100rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.reward-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 15rpx;
+}
+
+.reward-desc {
+  font-size: 28rpx;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 30rpx;
+}
+
+.reward-points {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+}
+
+.points-num {
+  font-size: 72rpx;
+  font-weight: bold;
+}
+
+.points-unit {
+  font-size: 28rpx;
+  margin-left: 10rpx;
+}
+
+.child-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.card-title {
+  font-size: 26rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 15rpx;
+}
+
+.child-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.child-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.child-points {
+  text-align: right;
+}
+
+.child-points .avail {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FF8B45;
+  display: block;
+}
+
+.child-points .label {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.tips {
+  background: #FFF8F0;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
+.tip-icon {
+  margin-right: 15rpx;
+}
+
+.tip-text {
+  font-size: 26rpx;
+  color: #996633;
+}
+
+.redeem-btn {
+  background: #FF8B45;
+  color: #fff;
+  border-radius: 50rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 32rpx;
+}
+
+.redeem-btn.disabled {
+  background: #ccc;
+}

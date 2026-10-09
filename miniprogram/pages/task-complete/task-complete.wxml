@@ -1,0 +1,52 @@
+<!--pages/task-complete/task-complete.wxml-->
+<view class="container">
+  <view class="task-card">
+    <view class="task-icon-wrap">
+      <icon name="{{iconType || 'star'}}" size="64" color="#FF8B45"/>
+    </view>
+    <text class="task-name">{{taskName}}</text>
+    <view class="base-points-wrap">
+      <icon name="star" size="28" color="#FFD93D"/>
+      <text class="base-points">基础积分 +{{basePoints}}</text>
+    </view>
+  </view>
+  
+  <view class="section">
+    <text class="section-title">选择孩子</text>
+    <view class="child-list">
+      <view class="child-item {{item._id === selectedChild._id ? 'active' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
+        <view class="child-avatar">
+          <text wx:if="{{!item.avatar}}">{{item.name[0]}}</text>
+          <image wx:else src="{{item.avatar}}"/>
+        </view>
+        <text class="child-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="section">
+    <text class="section-title">完成度</text>
+    <view class="level-list">
+      <view class="level-item {{selectedLevel === item.key ? 'active' : ''}}" wx:for="{{levels}}" wx:key="key" bindtap="onLevelChange" data-index="{{index}}">
+        <view class="level-header">
+          <text class="level-name">{{item.name}}</text>
+          <view class="level-tag {{item.key}}">
+            <text>{{item.ratio * 100}}%</text>
+          </view>
+        </view>
+        <text class="level-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="preview-card">
+    <text class="preview-label">获得积分</text>
+    <view class="preview-points-wrap">
+      <icon name="star" size="36" color="#FFD93D"/>
+      <text class="preview-points">+{{actualPoints}}</text>
+    </view>
+    <text class="preview-ratio">({{ratio * 100}}%)</text>
+  </view>
+  
+  <button class="submit-btn" bindtap="onSubmit" loading="{{loading}}">确认完成</button>
+</view>

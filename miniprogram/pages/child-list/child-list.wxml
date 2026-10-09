@@ -1,0 +1,63 @@
+<!--pages/child-list/child-list.wxml-->
+<view class="container">
+  <view class="child-list">
+    <view class="child-item {{item._id === currentChildId ? 'current' : ''}}"
+          wx:for="{{children}}" wx:key="_id"
+          bindtap="onSelectChild" data-id="{{item._id}}">
+      <view class="child-avatar">
+        <text>{{item.name[0]}}</text>
+      </view>
+      <view class="child-info">
+        <text class="child-name">{{item.name}}</text>
+        <text class="child-grade">{{item.schoolStage === 'kindergarten' ? '幼儿园' : item.schoolStage === 'primary' ? '小学' : '初中'}}{{(item.gradeLevel % 3) || 3}}年级</text>
+      </view>
+      <view class="child-points">
+        <text class="points">{{item.totalPoints || 0}}</text>
+        <text class="label">积分</text>
+      </view>
+      <view class="child-actions">
+        <text class="action-btn" bindtap="onEditChild" data-child="{{item}}">编辑</text>
+        <text class="action-btn delete" bindtap="onDeleteChild" data-child="{{item}}">删除</text>
+      </view>
+      <text class="current-tag" wx:if="{{item._id === currentChildId}}">当前</text>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{children.length === 0}}">
+    <text>暂无孩子，点击下方添加</text>
+  </view>
+
+  <button class="add-btn" bindtap="onShowAddModal">+ 添加孩子</button>
+
+  <!-- 添加/编辑弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="onHideModal">
+    <view class="modal-content">
+      <text class="modal-title">{{editingChild ? '编辑孩子' : '添加孩子'}}</text>
+      
+      <view class="form-item">
+        <text class="label">姓名</text>
+        <input class="input" placeholder="请输入孩子姓名" bindinput="onNameInput" value="{{formData.name}}"/>
+      </view>
+
+      <view class="form-item">
+        <text class="label">年级</text>
+        <picker mode="selector" range="{{grades}}" range-key="name" bindchange="onGradeChange">
+          <view class="picker-value">
+            {{selectedGradeName || '请选择年级'}}
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="label">性别</text>
+        <radio-group bindchange="onGenderChange" class="gender-group">
+          <label><radio value="male" checked="{{formData.gender === 'male'}}"/> 男</label>
+          <label><radio value="female" checked="{{formData.gender === 'female'}}"/> 女</label>
+          <label><radio value="other" checked="{{formData.gender === 'other'}}"/> 其他</label>
+        </radio-group>
+      </view>
+
+      <button class="submit-btn" bindtap="onSubmit" loading="{{loading}}">保存</button>
+    </view>
+  </view>
+</view>

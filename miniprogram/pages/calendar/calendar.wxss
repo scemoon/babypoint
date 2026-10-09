@@ -1,0 +1,183 @@
+/* pages/calendar/calendar.wxss */
+.container {
+  min-height: 100vh;
+  background: #F7F7F7;
+}
+
+.child-bar {
+  background: #fff;
+  padding: 20rpx;
+  white-space: nowrap;
+}
+
+.child-list {
+  display: flex;
+  flex-direction: row;
+}
+
+.child-item {
+  padding: 16rpx 32rpx;
+  background: #f5f5f5;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+}
+
+.child-item.active {
+  background: #FF8B45;
+  color: #fff;
+}
+
+.month-nav {
+  background: #fff;
+  padding: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-btn {
+  font-size: 50rpx;
+  color: #FF8B45;
+  padding: 0 30rpx;
+}
+
+.month-label {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.month-stats {
+  background: linear-gradient(135deg, #FF8B45 0%, #FF6B35 100%);
+  padding: 30rpx;
+  display: flex;
+  justify-content: space-around;
+  color: #fff;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 48rpx;
+  font-weight: bold;
+  display: block;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+.calendar {
+  background: #fff;
+  padding: 20rpx;
+  margin: 20rpx;
+  border-radius: 20rpx;
+}
+
+.weekday-row {
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.weekday-row text {
+  width: 80rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.days-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 10rpx;
+}
+
+.day-cell {
+  width: 14.28%;
+  height: 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-num {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.day-cell.active .day-num {
+  color: #FF8B45;
+  font-weight: bold;
+}
+
+.day-cell.selected .day-num {
+  background: #FF8B45;
+  color: #fff;
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-dot {
+  font-size: 16rpx;
+  color: #FF8B45;
+  margin-top: 5rpx;
+}
+
+.day-details {
+  background: #fff;
+  margin: 20rpx;
+  padding: 30rpx;
+  border-radius: 20rpx;
+}
+
+.detail-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.detail-section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 26rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 15rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.points {
+  color: #FF8B45;
+  font-weight: bold;
+}
+
+.points.spend {
+  color: #4A90D9;
+}
+
+.empty-tip {
+  color: #999;
+  text-align: center;
+  padding: 30rpx;
+}

@@ -1,0 +1,43 @@
+<!--pages/reward-detail/reward-detail.wxml-->
+<view class="container" wx:if="{{reward && child}}">
+  <view class="reward-card">
+    <view class="reward-icon-wrap">
+      <icon name="{{reward.iconType || 'gift'}}" size="80" color="#FF8B45"/>
+    </view>
+    <text class="reward-name">{{reward.name}}</text>
+    <text class="reward-desc">{{reward.description}}</text>
+    <view class="reward-points">
+      <icon name="star" size="36" color="#FFD93D"/>
+      <text class="points-num">{{reward.points}}</text>
+      <text class="points-unit">积分</text>
+    </view>
+  </view>
+
+  <view class="child-card">
+    <text class="card-title">兑换给</text>
+    <view class="child-info">
+      <view class="child-avatar">
+        <text wx:if="{{!child.avatar}}">{{child.name[0]}}</text>
+        <image wx:else src="{{child.avatar}}"/>
+      </view>
+      <view class="child-detail">
+        <text class="child-name">{{child.name}}</text>
+        <view class="child-points">
+          <text class="avail">{{child.availablePoints}}</text>
+          <text class="label">可用积分</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tips">
+    <icon name="info" size="36" color="#3B82F6"/>
+    <text class="tip-text">确认兑换后，积分将立即从孩子账户扣除</text>
+  </view>
+
+  <button class="redeem-btn {{child.availablePoints < reward.points ? 'disabled' : ''}}" 
+          bindtap="onRedeem" loading="{{loading}}"
+          disabled="{{child.availablePoints < reward.points}}">
+    {{child.availablePoints >= reward.points ? '确认兑换' : '积分不足'}}
+  </button>
+</view>

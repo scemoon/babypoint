@@ -28,14 +28,17 @@ jobs:
           node-version: '18'
           
       - name: Install Dependencies
-        run: npm install miniprogram-ci --registry=https://registry.npmjs.org/
+        run: |
+          cd miniprogram
+          npm install miniprogram-ci --registry=https://registry.npmjs.org/
           
       - name: Deploy to WeChat
         run: |
+          cd miniprogram
           echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private_key.pem
           npx miniprogram-ci upload \
             --appid ${{ secrets.WECHAT_APPID }} \
             --private-key ./private_key.pem \
             --version "${{ github.event.inputs.version || '2.0.0' }}" \
             --desc "${{ github.event.inputs.desc || 'UI redesign' }}" \
-            --project ./miniprogram
+            --project ./

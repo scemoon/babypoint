@@ -1,0 +1,28 @@
+<!--pages/reward-add/reward-add.wxml-->
+<view class="container">
+  <view class="form-item">
+    <text class="label">奖励名称</text>
+    <input class="input" placeholder="如：看动画片1小时" bindinput="onNameInput" value="{{formData.name}}"/>
+  </view>
+
+  <view class="form-item">
+    <text class="label">分类</text>
+    <picker mode="selector" range="{{categories}}" range-key="name" bindchange="onCategoryChange">
+      <view class="picker-value">
+        {{selectedCategoryName || '请选择分类'}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-item">
+    <text class="label">所需积分 (1-1000)</text>
+    <input class="input" type="number" placeholder="50" bindinput="onPointsInput" value="{{formData.points}}"/>
+  </view>
+
+  <view class="form-item">
+    <text class="label">描述</text>
+    <textarea class="textarea" placeholder="奖励的详细描述" bindinput="onDescInput" value="{{formData.description}}"/>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit" loading="{{loading}}">创建奖励</button>
+</view>

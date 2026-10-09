@@ -1,0 +1,9 @@
+{
+  "name": "bp_reward",
+  "version": "1.0.0",
+  "description": "bp_reward 云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

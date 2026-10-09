@@ -1,0 +1,6 @@
+{
+  "envId": "cloud1-2gavd8kj8a1ce021",
+  "region": "ap-shanghai",
+  "hosting": [],
+  "$schema": "https://raw.githubusercontent.com/TencentCloudBase/cloudbase-framework/master/schema/cloudbaserc.json"
+}

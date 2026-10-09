@@ -1,0 +1,105 @@
+/* pages/history/history.wxss */
+.container {
+  min-height: 100vh;
+  background: #F7F7F7;
+}
+
+.child-bar {
+  background: #fff;
+  padding: 20rpx;
+  white-space: nowrap;
+}
+
+.child-list {
+  display: flex;
+  flex-direction: row;
+}
+
+.child-item {
+  padding: 16rpx 32rpx;
+  background: #f5f5f5;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+}
+
+.child-item.active {
+  background: #FF8B45;
+  color: #fff;
+}
+
+.record-list {
+  padding: 20rpx;
+}
+
+.record-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 25rpx;
+  margin-bottom: 15rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.record-left {
+  display: flex;
+  align-items: center;
+}
+
+.record-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.record-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.record-name {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.record-time {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 5rpx;
+}
+
+.record-right {
+  text-align: right;
+}
+
+.points {
+  font-size: 36rpx;
+  font-weight: bold;
+  display: block;
+}
+
+.points.earn {
+  color: #FF8B45;
+}
+
+.points.spend {
+  color: #4A90D9;
+}
+
+.level-tag {
+  font-size: 22rpx;
+  color: #999;
+  background: #f5f5f5;
+  padding: 4rpx 12rpx;
+  border-radius: 10rpx;
+  display: inline-block;
+  margin-top: 5rpx;
+}
+
+.loading-tip, .empty-tip, .no-more {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+  font-size: 26rpx;
+}

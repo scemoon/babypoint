@@ -1,0 +1,94 @@
+<!--pages/reward/reward.wxml-->
+<view class="container">
+  <!-- 顶部孩子选择器 + 积分显示 -->
+  <view class="child-bar">
+    <scroll-view scroll-x class="child-selector">
+      <view class="child-list">
+        <view 
+          class="child-tab {{item._id === selectedChild._id ? 'active' : ''}}" 
+          wx:for="{{children}}" 
+          wx:key="_id" 
+          bindtap="onSelectChild" 
+          data-id="{{item._id}}"
+        >
+          <view class="tab-avatar">
+            <text wx:if="{{!item.avatar}}">{{item.name[0]}}</text>
+            <image wx:else src="{{item.avatar}}"/>
+          </view>
+          <text class="tab-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+    
+    <!-- 积分显示条 -->
+    <view class="points-strip" wx:if="{{selectedChild}}">
+      <view class="points-info">
+        <icon name="star" size="36" color="#FFD93D"/>
+        <text class="points-num">{{(selectedChild.totalPoints || 0) - (selectedChild.redeemedPoints || 0)}}</text>
+      </view>
+      <text class="points-label">可用积分</text>
+    </view>
+  </view>
+
+  <!-- 分类标签栏 -->
+  <scroll-view scroll-x class="category-bar">
+    <view class="category-list">
+      <view 
+        class="category-item {{currentCategory === '' ? 'active' : ''}}" 
+        bindtap="onCategoryChange" 
+        data-index="-1"
+      >
+        <text>全部</text>
+      </view>
+      <view 
+        class="category-item {{currentCategory === item.key ? 'active' : ''}}" 
+        wx:for="{{categories}}" 
+        wx:key="key" 
+        bindtap="onCategoryChange" 
+        data-index="{{index}}"
+      >
+        <icon name="{{item.iconType || 'gift'}}" size="32" color="{{currentCategory === item.key ? '#FFFFFF' : item.color || '#666'}}"/>
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 奖励网格 -->
+  <scroll-view scroll-y class="reward-grid" wx:if="{{!loading}}">
+    <view class="reward-card" wx:for="{{rewards}}" wx:key="_id" bindtap="onRewardTap" data-reward="{{item}}">
+      <view class="reward-icon-wrap" style="background: linear-gradient(145deg, {{item.iconBg || '#FFF0E8'}} 0%, {{item.iconBgEnd || '#FFE4D6'}} 100%);">
+        <icon name="{{item.iconType || 'gift'}}" size="56" color="{{item.iconColor || '#FF8B45'}}"/>
+      </view>
+      <text class="reward-name">{{item.name}}</text>
+      <text class="reward-desc">{{item.description}}</text>
+      <view class="reward-footer">
+        <view class="reward-points-wrap">
+          <icon name="star" size="28" color="#FFD93D"/>
+          <text class="reward-points">{{item.points}}</text>
+        </view>
+        <text class="reward-unit">积分</text>
+      </view>
+      <!-- 可兑换标识 -->
+      <view class="redeemable-badge" wx:if="{{selectedChild && (selectedChild.totalPoints - selectedChild.redeemedPoints) >= item.points}}">
+        <text>可兑换</text>
+      </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{rewards.length === 0}}">
+      <icon name="gift" size="120" color="#E5E7EB"/>
+      <text class="empty-text">暂无奖励</text>
+      <text class="empty-hint">点击下方按钮添加新奖励</text>
+    </view>
+  </scroll-view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 浮动添加按钮 -->
+  <view class="fab" bindtap="onAddReward">
+    <icon name="plus" size="56" color="#FFFFFF"/>
+  </view>
+</view>

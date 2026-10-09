@@ -1,0 +1,80 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 孩子信息卡片 -->
+  <view class="child-card" wx:if="{{currentChild}}">
+    <view class="child-header">
+      <view class="avatar-wrap">
+        <view class="child-avatar">
+          <text class="avatar-text" wx:if="{{!currentChild.avatar}}">{{currentChild.name[0]}}</text>
+          <image wx:else src="{{currentChild.avatar}}" class="avatar-img"/>
+        </view>
+        <view class="avatar-glow"></view>
+      </view>
+      <view class="child-info">
+        <text class="child-name">{{currentChild.name}}</text>
+        <text class="child-grade">{{currentChild.gradeLevel || currentChild.grade}}年级</text>
+      </view>
+    </view>
+    
+    <view class="child-stats">
+      <view class="stat-item">
+        <text class="stat-num">{{currentChild.totalPoints || 0}}</text>
+        <text class="stat-label">累计积分</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num available">{{(currentChild.totalPoints || 0) - (currentChild.redeemedPoints || 0)}}</text>
+        <text class="stat-label">可用积分</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-num">{{currentChild.redeemedPoints || 0}}</text>
+        <text class="stat-label">已兑换</text>
+      </view>
+    </view>
+    
+    <button class="manage-btn" bindtap="onChildManage">
+      <icon name="user" size="36" color="#FFFFFF"/>
+      <text>管理孩子</text>
+    </button>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-card">
+    <view class="menu-item" bindtap="onTaskHistory">
+      <view class="menu-icon-wrap history-icon">
+        <icon name="list" size="40" color="#FF8B45"/>
+      </view>
+      <text class="menu-text">任务记录</text>
+      <view class="menu-arrow">
+        <icon name="arrowRight" size="40" color="#CCCCCC"/>
+      </view>
+    </view>
+    <view class="menu-divider"></view>
+    <view class="menu-item" bindtap="onRewardHistory">
+      <view class="menu-icon-wrap reward-icon">
+        <icon name="gift" size="40" color="#4ECDC4"/>
+      </view>
+      <text class="menu-text">兑换记录</text>
+      <view class="menu-arrow">
+        <icon name="arrowRight" size="40" color="#CCCCCC"/>
+      </view>
+    </view>
+    <view class="menu-divider"></view>
+    <view class="menu-item" bindtap="onCalendar">
+      <view class="menu-icon-wrap calendar-icon">
+        <icon name="calendar" size="40" color="#FFD93D"/>
+      </view>
+      <text class="menu-text">积分日历</text>
+      <view class="menu-arrow">
+        <icon name="arrowRight" size="40" color="#CCCCCC"/>
+      </view>
+    </view>
+  </view>
+
+  <!-- 应用信息 -->
+  <view class="app-info">
+    <text class="app-name">宝贝积分</text>
+    <text class="app-version">v1.0.0</text>
+  </view>
+</view>

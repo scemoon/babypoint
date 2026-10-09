@@ -1,0 +1,78 @@
+<!--pages/onboard/onboard.wxml-->
+<view class="container">
+  <block wx:if="{{step === 1}}">
+    <view class="logo-area">
+      <text class="logo-text">🏠</text>
+      <text class="title">宝贝积分</text>
+      <text class="subtitle">用积分激励孩子成长</text>
+    </view>
+
+    <view class="form-area">
+      <view class="form-item avatar-item">
+        <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image wx:if="{{avatar}}" src="{{avatar}}" class="avatar-img"/>
+          <view wx:else class="avatar-placeholder">
+            <text class="avatar-icon">+</text>
+          </view>
+        </button>
+        <text class="avatar-tip">点击选择头像</text>
+      </view>
+
+      <view class="form-item">
+        <text class="label">您的昵称</text>
+        <input type="nickname" class="input" placeholder="请输入昵称" bindinput="onNicknameInput" value="{{nickname}}"/>
+      </view>
+    </view>
+
+    <button class="btn-primary" bindtap="onNext">下一步</button>
+  </block>
+
+  <block wx:if="{{step === 2}}">
+    <view class="header">
+      <text class="step-title">添加孩子信息</text>
+      <text class="step-desc">让我们了解小朋友</text>
+    </view>
+
+    <view class="form-area">
+      <view class="form-item">
+        <text class="label">孩子姓名</text>
+        <input class="input" placeholder="请输入孩子的名字" bindinput="onChildNameInput"/>
+      </view>
+
+      <view class="form-item">
+        <text class="label">年级</text>
+        <picker mode="selector" range="{{grades}}" range-key="name" bindchange="onGradeChange">
+          <view class="picker-view">
+            <text class="{{selectedGradeName ? '' : 'placeholder'}}">{{selectedGradeName || '请选择年级'}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="label">性别</text>
+        <view class="gender-group">
+          <view class="gender-item {{gender === 'male' ? 'active' : ''}}" bindtap="onGenderSelect" data-gender="male">
+            <text class="gender-icon">👦</text>
+            <text class="gender-text">男孩</text>
+          </view>
+          <view class="gender-item {{gender === 'female' ? 'active' : ''}}" bindtap="onGenderSelect" data-gender="female">
+            <text class="gender-icon">👧</text>
+            <text class="gender-text">女孩</text>
+          </view>
+          <view class="gender-item {{gender === 'other' ? 'active' : ''}}" bindtap="onGenderSelect" data-gender="other">
+            <text class="gender-icon">👶</text>
+            <text class="gender-text">其他</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="info-box">
+        <text class="info-icon">💡</text>
+        <text class="info-text">年级会在每年9月1日自动升级，也可以手动修改</text>
+      </view>
+    </view>
+
+    <button class="btn-primary" bindtap="onNext" loading="{{loading}}">完成注册</button>
+  </block>
+</view>

@@ -1,0 +1,28 @@
+<!--pages/task-add/task-add.wxml-->
+<view class="container">
+  <view class="form-item">
+    <text class="label">任务名称</text>
+    <input class="input" placeholder="如：练习钢琴" bindinput="onNameInput" value="{{formData.name}}"/>
+  </view>
+
+  <view class="form-item">
+    <text class="label">分类</text>
+    <picker mode="selector" range="{{categories}}" range-key="name" bindchange="onCategoryChange">
+      <view class="picker-value">
+        {{selectedCategoryName || '请选择分类'}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-item">
+    <text class="label">基础积分 (1-100)</text>
+    <input class="input" type="number" placeholder="10" bindinput="onPointsInput" value="{{formData.basePoints}}"/>
+  </view>
+
+  <view class="form-item">
+    <text class="label">描述</text>
+    <textarea class="textarea" placeholder="任务的详细描述" bindinput="onDescInput" value="{{formData.description}}"/>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit" loading="{{loading}}">创建任务</button>
+</view>

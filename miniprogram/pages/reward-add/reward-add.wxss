@@ -1,0 +1,47 @@
+/* pages/reward-add/reward-add.wxss */
+.container {
+  padding: 30rpx;
+  min-height: 100vh;
+  background: #F7F7F7;
+}
+
+.form-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 15rpx;
+}
+
+.input {
+  font-size: 30rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.picker-value {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.textarea {
+  font-size: 30rpx;
+  width: 100%;
+  min-height: 150rpx;
+  box-sizing: border-box;
+}
+
+.submit-btn {
+  background: #FF8B45;
+  color: #fff;
+  border-radius: 50rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin-top: 40rpx;
+}
