@@ -32,12 +32,13 @@ jobs:
           
       - name: Deploy to WeChat
         run: |
+          echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private_key.pem
           npx wechat-miniprogram-ci upload \
             --appid ${{ secrets.WECHAT_APPID }} \
-            --private-key "${{ secrets.WECHAT_PRIVATE_KEY }}" \
+            --private-key ./private_key.pem \
             --version "${{ github.event.inputs.version || '2.0.0' }}" \
             --desc "${{ github.event.inputs.desc || 'UI redesign' }}" \
-            --project ./miniprogram
+            --project ./miniprogram 2>&1
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
           
