@@ -1,4 +1,5 @@
-/* pages/reward/reward.wxss | 奖励列表页样式 v2.0 */
+/* pages/reward/reward.wxss | 奖励列表页样式 v3.0 */
+/* Flat Design - 扁平化设计 */
 
 /* ==================== 顶部栏 ==================== */
 .child-bar {
@@ -22,21 +23,20 @@
   align-items: center;
   padding: 12rpx 28rpx;
   margin-right: 16rpx;
-  background: #F3F4F6;
+  background: #F1F5F9;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
 }
 
 .child-tab.active {
-  background: var(--color-primary-gradient);
-  box-shadow: 0 4rpx 16rpx rgba(255, 139, 69, 0.3);
+  background: var(--color-primary);
 }
 
 .tab-avatar {
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  background: rgba(255, 139, 69, 0.15);
+  background: rgba(14, 165, 233, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,9 +75,8 @@
   justify-content: space-between;
   margin: 20rpx 24rpx 0;
   padding: 20rpx 28rpx;
-  background: linear-gradient(145deg, #FFF9E6 0%, #FFF3CC 100%);
+  background: rgba(245, 158, 11, 0.1);
   border-radius: var(--radius-md);
-  box-shadow: 0 2rpx 8rpx rgba(255, 217, 61, 0.2);
 }
 
 .points-info {
@@ -88,13 +87,13 @@
 .points-info .points-num {
   font-size: 44rpx;
   font-weight: 800;
-  color: #B8860B;
+  color: var(--color-accent);
   margin-left: 12rpx;
 }
 
 .points-strip .points-label {
   font-size: 26rpx;
-  color: #B8860B;
+  color: var(--color-accent);
 }
 
 /* ==================== 分类标签栏 ==================== */
@@ -114,7 +113,7 @@
   align-items: center;
   padding: 14rpx 28rpx;
   margin-right: 16rpx;
-  background: #F3F4F6;
+  background: #F1F5F9;
   border-radius: var(--radius-full);
   font-size: 28rpx;
   color: var(--color-text-secondary);
@@ -125,7 +124,6 @@
 .category-item.active {
   background: var(--color-primary);
   color: #FFFFFF;
-  box-shadow: 0 4rpx 12rpx rgba(255, 139, 69, 0.25);
 }
 
 /* ==================== 奖励网格 ==================== */
@@ -140,9 +138,9 @@
 
 .reward-card {
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 28rpx 20rpx 20rpx;
-  box-shadow: var(--shadow-card);
+  border: 1rpx solid var(--color-border);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -151,14 +149,13 @@
 }
 
 .reward-card:active {
-  transform: scale(0.96);
-  box-shadow: var(--shadow-sm);
+  background: #F8FAFC;
 }
 
 .reward-icon-wrap {
   width: 120rpx;
   height: 120rpx;
-  border-radius: 32rpx;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;

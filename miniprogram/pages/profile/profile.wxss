@@ -1,4 +1,5 @@
-/* pages/profile/profile.wxss | 个人中心页样式 v2.0 */
+/* pages/profile/profile.wxss | 个人中心页样式 v3.0 */
+/* Flat Design - 扁平化设计 */
 
 /* ==================== 容器 ==================== */
 .container {
@@ -9,35 +10,13 @@
 
 /* ==================== 孩子卡片 ==================== */
 .child-card {
-  background: var(--color-primary-gradient);
-  border-radius: var(--radius-xl);
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
   padding: 40rpx 32rpx;
   color: #FFFFFF;
   margin-bottom: 32rpx;
   position: relative;
   overflow: hidden;
-}
-
-.child-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -30%;
-  width: 200rpx;
-  height: 200rpx;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-}
-
-.child-card::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -20%;
-  width: 180rpx;
-  height: 180rpx;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
 }
 
 .child-header {
@@ -57,7 +36,7 @@
 .child-avatar {
   width: 140rpx;
   height: 140rpx;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -75,18 +54,6 @@
   width: 140rpx;
   height: 140rpx;
   border-radius: 50%;
-}
-
-.avatar-glow {
-  position: absolute;
-  bottom: -10rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 160rpx;
-  height: 40rpx;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  filter: blur(10rpx);
 }
 
 .child-info {
@@ -157,7 +124,7 @@
   padding: 24rpx;
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   color: #FFFFFF;
   font-size: 30rpx;
   font-weight: 600;
@@ -171,14 +138,13 @@
 
 .manage-btn:active {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(0.98);
 }
 
 /* ==================== 菜单卡片 ==================== */
 .menu-card {
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
+  border: 1rpx solid var(--color-border);
   overflow: hidden;
   margin-bottom: 32rpx;
 }
@@ -191,13 +157,13 @@
 }
 
 .menu-item:active {
-  background: #F9FAFB;
+  background: #F8FAFC;
 }
 
 .menu-icon-wrap {
   width: 72rpx;
   height: 72rpx;
-  border-radius: 20rpx;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,15 +171,15 @@
 }
 
 .history-icon {
-  background: linear-gradient(145deg, #FFF0E8 0%, #FFE4D6 100%);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .reward-icon {
-  background: linear-gradient(145deg, #E8FAF8 0%, #D1F0EC 100%);
+  background: rgba(16, 185, 129, 0.1);
 }
 
 .calendar-icon {
-  background: linear-gradient(145deg, #FFF9E6 0%, #FFF3CC 100%);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .menu-text {

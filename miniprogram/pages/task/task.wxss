@@ -1,4 +1,5 @@
-/* pages/task/task.wxss | 任务列表页样式 v2.0 */
+/* pages/task/task.wxss | 任务列表页样式 v3.0 */
+/* Flat Design - 扁平化设计 */
 
 /* ==================== 孩子选择器 ==================== */
 .child-selector {
@@ -18,21 +19,20 @@
   align-items: center;
   padding: 12rpx 28rpx;
   margin-right: 16rpx;
-  background: #F3F4F6;
+  background: #F1F5F9;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
 }
 
 .child-tab.active {
-  background: var(--color-primary-gradient);
-  box-shadow: 0 4rpx 16rpx rgba(255, 139, 69, 0.3);
+  background: var(--color-primary);
 }
 
 .tab-avatar {
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  background: rgba(255, 139, 69, 0.15);
+  background: rgba(14, 165, 233, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +81,7 @@
   align-items: center;
   padding: 14rpx 28rpx;
   margin-right: 16rpx;
-  background: #F3F4F6;
+  background: #F1F5F9;
   border-radius: var(--radius-full);
   font-size: 28rpx;
   color: var(--color-text-secondary);
@@ -92,7 +92,6 @@
 .category-item.active {
   background: var(--color-primary);
   color: #FFFFFF;
-  box-shadow: 0 4rpx 12rpx rgba(255, 139, 69, 0.25);
 }
 
 .cat-icon-wrap {
@@ -112,22 +111,21 @@
   display: flex;
   align-items: center;
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 28rpx;
   margin-bottom: 20rpx;
-  box-shadow: var(--shadow-card);
+  border: 1rpx solid var(--color-border);
   transition: all var(--transition-fast);
 }
 
 .task-card:active {
-  transform: scale(0.98);
-  box-shadow: var(--shadow-sm);
+  background: #F8FAFC;
 }
 
 .task-icon-wrap {
   width: 96rpx;
   height: 96rpx;
-  border-radius: 24rpx;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;

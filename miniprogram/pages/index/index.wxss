@@ -1,13 +1,13 @@
-/* pages/index/index.wxss | 首页样式 v2.0 */
+/* pages/index/index.wxss | 首页样式 v3.0 */
+/* Flat Design - 扁平化设计 */
 
 /* ==================== 顶部导航栏 ==================== */
 .header-bar {
-  background: var(--color-primary-gradient);
+  background: var(--color-primary);
   padding: 24rpx 32rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: 0 0 40rpx 40rpx;
   min-height: 120rpx;
 }
 
@@ -20,7 +20,7 @@
   width: 80rpx;
   height: 80rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,7 +70,8 @@
   margin: 24rpx;
   padding: 32rpx;
   background: var(--color-surface);
-  position: relative;
+  border-radius: var(--radius-md);
+  border: 1rpx solid var(--color-border);
 }
 
 .points-main {
@@ -87,11 +88,10 @@
   width: 100rpx;
   height: 100rpx;
   border-radius: 50%;
-  background: linear-gradient(145deg, #FFE4D6 0%, #FFD4C4 100%);
+  background: rgba(14, 165, 233, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(255, 139, 69, 0.2);
 }
 
 .avatar-main {
@@ -133,15 +133,14 @@
   flex-direction: column;
   align-items: center;
   padding: 16rpx 24rpx;
-  background: linear-gradient(145deg, #FFF9E6 0%, #FFF3CC 100%);
-  border-radius: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(255, 217, 61, 0.25);
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: var(--radius-sm);
 }
 
 .rank-badge .rank-num {
   font-size: 24rpx;
   font-weight: 600;
-  color: #B8860B;
+  color: var(--color-accent);
   margin-top: 4rpx;
 }
 
@@ -189,24 +188,23 @@
 .action-card {
   flex: 1;
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 24rpx 16rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: var(--shadow-md);
+  border: 1rpx solid var(--color-border);
   transition: all var(--transition-fast);
 }
 
 .action-card:active {
-  transform: scale(0.96);
-  box-shadow: var(--shadow-sm);
+  background: #F1F5F9;
 }
 
 .action-icon-wrap {
   width: 88rpx;
   height: 88rpx;
-  border-radius: 24rpx;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -214,15 +212,15 @@
 }
 
 .calendar-icon {
-  background: linear-gradient(145deg, #E8FAF8 0%, #D1F0EC 100%);
+  background: rgba(14, 165, 233, 0.1);
 }
 
 .history-icon {
-  background: linear-gradient(145deg, #FFF0E8 0%, #FFE4D6 100%);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .ranking-icon {
-  background: linear-gradient(145deg, #FFF9E6 0%, #FFF3CC 100%);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .action-text {
@@ -235,8 +233,8 @@
 .section-card {
   margin: 0 24rpx 24rpx;
   background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
+  border: 1rpx solid var(--color-border);
   overflow: hidden;
 }
 
@@ -271,7 +269,7 @@
 }
 
 .ranking-item:active {
-  background: #F9FAFB;
+  background: #F1F5F9;
 }
 
 .rank-left {
@@ -287,22 +285,19 @@
   align-items: center;
   justify-content: center;
   margin-right: 20rpx;
-  background: #F3F4F6;
+  background: #F1F5F9;
 }
 
 .rank-medal.medal-1 {
-  background: linear-gradient(145deg, #FFF9E6 0%, #FFE066 100%);
-  box-shadow: 0 2rpx 12rpx rgba(255, 217, 61, 0.4);
+  background: rgba(245, 158, 11, 0.15);
 }
 
 .rank-medal.medal-2 {
-  background: linear-gradient(145deg, #F5F5F5 0%, #E5E5E5 100%);
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  background: #F1F5F9;
 }
 
 .rank-medal.medal-3 {
-  background: linear-gradient(145deg, #FFF5E6 0%, #FFE0C0 100%);
-  box-shadow: 0 2rpx 8rpx rgba(255, 179, 71, 0.3);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .rank-number {
@@ -356,14 +351,14 @@
 }
 
 .recent-item:active {
-  background: #F9FAFB;
+  background: #F1F5F9;
 }
 
 .recent-icon-wrap {
   width: 64rpx;
   height: 64rpx;
-  border-radius: 16rpx;
-  background: linear-gradient(145deg, #FFF0E8 0%, #FFE4D6 100%);
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -421,7 +416,7 @@
 .picker-sheet {
   width: 100%;
   background: var(--color-surface);
-  border-radius: 32rpx 32rpx 0 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   max-height: 70vh;
   overflow: hidden;
   transform: translateY(100%);
@@ -462,20 +457,20 @@
   padding: 24rpx;
   border-radius: var(--radius-md);
   margin-bottom: 16rpx;
-  background: #F9FAFB;
+  background: #F8FAFC;
   transition: all var(--transition-fast);
 }
 
 .picker-item.active {
-  background: linear-gradient(145deg, #FFF5F0 0%, #FFE8E0 100%);
-  border: 2rpx solid var(--color-primary);
+  background: rgba(14, 165, 233, 0.1);
+  border: 1rpx solid var(--color-primary);
 }
 
 .picker-avatar {
   width: 80rpx;
   height: 80rpx;
   border-radius: 50%;
-  background: linear-gradient(145deg, #FFE4D6 0%, #FFD4C4 100%);
+  background: rgba(14, 165, 233, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
