@@ -26,11 +26,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          registry-url: 'https://registry.npmjs.org/'
           
       - name: Install wechat-miniprogram-ci
-        run: |
-          npm install wechat-miniprogram-ci --unsafe-perm
-          
+        run: npm install wechat-miniprogram-ci --registry=https://registry.npmjs.org/
+        
       - name: Deploy to WeChat
         run: |
           echo "${{ secrets.WECHAT_PRIVATE_KEY }}" > private_key.pem
@@ -40,3 +40,5 @@ jobs:
             --version "${{ github.event.inputs.version || '2.0.0' }}" \
             --desc "${{ github.event.inputs.desc || 'UI redesign' }}" \
             --project ./miniprogram
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
