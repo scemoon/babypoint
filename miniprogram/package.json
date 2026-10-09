@@ -1,5 +1,5 @@
 {
-  "name": "宝贝积分小程序",
+  "name": "baby-points-miniprogram",
   "version": "2.0.0",
   "description": "用积分激励孩子成长的微信小程序",
   "main": "app.js",
