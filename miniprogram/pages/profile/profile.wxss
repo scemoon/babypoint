@@ -1,224 +1,208 @@
-/* pages/profile/profile.wxss | 个人中心页样式 v4.0 */
-/* Friendly Flat Design */
+/* profile.wxss - 我的页 */
+.profile-page { padding-top: 24rpx; }
 
-/* ==================== 容器 ==================== */
-.container {
-  min-height: 100vh;
-  background: var(--color-background);
-  padding: 24rpx;
+.parent-card {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 18rpx;
+  padding: 20rpx;
+  border-radius: var(--radius-md);
+  background: var(--soft-water);
 }
-
-/* ==================== 孩子卡片 ==================== */
-.child-card {
-  background: var(--color-primary);
-  border-radius: var(--radius-lg);
-  padding: 40rpx 32rpx;
-  color: #FFFFFF;
-  margin-bottom: 32rpx;
+.parent-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76rpx;
+  height: 76rpx;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--water);
+  color: #FFF;
+  font-size: 30rpx;
+  font-weight: 700;
 }
+.parent-avatar image { width: 100%; height: 100%; }
+.parent-copy { display: flex; flex-direction: column; gap: 4rpx; }
+.parent-name { color: var(--ink); font-size: 27rpx; font-weight: 700; }
+.parent-caption { color: var(--muted); font-size: 20rpx; }
+.eyebrow { color: var(--muted); font-size: 22rpx; font-weight: 500; }
 
-.child-header {
+/* ========== 个人资料卡片 ==========
+   与首页 .score-panel 保持一致：同一套渐变、同样的装饰（柔光圆 + 底部嫩黄绿高光线）、
+   同一套文字令牌（大数字 --sun / 标签 --on-dark-faint），字号与字体栈也对齐，
+   避免两页的积分卡片看起来像两个产品。*/
+.profile-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 28rpx;
+  border-radius: var(--radius-md) var(--radius-lg) var(--radius-sm) var(--radius-lg);
+  background: var(--grad-water);
+  color: #FFF;
+}
+.profile-hero::before {
+  content: '';
+  position: absolute;
+  top: -60rpx; right: -40rpx;
+  width: 200rpx; height: 200rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  pointer-events: none;
+}
+.profile-hero::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3rpx;
+  background: linear-gradient(90deg, transparent 0%, var(--lime) 50%, transparent 100%);
+}
+.profile-person { display: flex; align-items: center; gap: 14rpx; }
+.profile-avatar, .person-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.profile-avatar { width: 72rpx; height: 72rpx; }
+.profile-avatar image { width: 100%; height: 100%; }
+.profile-person > view:last-child { display: flex; flex-direction: column; gap: 3rpx; }
+.profile-name { font-size: 30rpx; font-weight: 700; }
+.profile-grade { color: var(--on-dark-faint); font-size: 24rpx; }
+.profile-total {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-top: 18rpx;
+  color: var(--on-dark-faint);
+  font-size: 24rpx;
+}
+.total-number {
+  color: var(--sun);
+  font-family: 'DIN Alternate', 'PingFang SC', sans-serif;
+  font-size: 112rpx;
+  line-height: 1.1;
+  font-weight: 700;
+}
+/* 分割线：等价于首页的 .score-divider，这里用 border-top 实现，避免多一个空元素 */
+.profile-balance {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid var(--line-strong);
+  color: var(--on-dark-faint);
+  font-size: 21rpx;
+}
+.profile-balance text:last-child { color: #FFF; font-weight: 700; }
+
+/* ========== 设置列表 ========== */
+.settings-label { margin: 30rpx 0 12rpx; color: var(--muted); font-size: 22rpx; }
+.settings-list { border-top: 1rpx solid var(--line); }
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  min-height: 100rpx;
+  border-bottom: 1rpx solid var(--line);
+  transition: opacity .12s ease;
+}
+.settings-row:active { opacity: .66; }
+.settings-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54rpx;
+  height: 54rpx;
+  border-radius: var(--radius-sm);
+}
+.settings-icon.cyan { background: var(--soft-water); }
+.settings-icon.lime { background: var(--soft-lime); }
+.settings-icon.coral { background: var(--soft-coral); }
+.settings-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3rpx;
+  color: var(--ink);
+  font-size: 25rpx;
+  font-weight: 650;
+}
+.settings-copy text:last-child { color: var(--muted); font-size: 20rpx; font-weight: 400; }
+.settings-arrow { color: var(--hint); font-size: 36rpx; }
+
+/* ========== 页脚 ========== */
+.profile-foot {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 32rpx;
+  gap: 4rpx;
+  margin-top: 34rpx;
+  color: var(--hint);
+  font-size: 20rpx;
 }
 
-.avatar-wrap {
-  margin-bottom: 20rpx;
-}
-
-.child-avatar {
-  width: 140rpx;
-  height: 140rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
+/* ========== 联系方式弹层 ========== */
+.contact-mask {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 4rpx solid rgba(255, 255, 255, 0.4);
+  padding: 40rpx;
+  background: rgba(25,54,66,.55);
 }
-
-.avatar-text {
-  font-size: 56rpx;
-  font-weight: 700;
-  color: #FFFFFF;
-}
-
-.avatar-img {
-  width: 140rpx;
-  height: 140rpx;
-  border-radius: 50%;
-}
-
-.child-info {
-  text-align: center;
-}
-
-.child-name {
-  font-size: 40rpx;
-  font-weight: 700;
-  display: block;
-  margin-bottom: 6rpx;
-}
-
-.child-grade {
-  font-size: 26rpx;
-  opacity: 0.85;
-}
-
-/* ==================== 统计区域 ==================== */
-.child-stats {
+.contact-dialog {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 28rpx 0;
-  margin: 24rpx 0;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-md);
-}
-
-.stat-item {
-  text-align: center;
-  flex: 1;
-}
-
-.stat-num {
-  font-size: 48rpx;
-  font-weight: 800;
-  display: block;
-  line-height: 1;
-  margin-bottom: 8rpx;
-  color: #FFFFFF;
-}
-
-.stat-num.available {
-  color: var(--color-accent);
-}
-
-.stat-label {
-  font-size: 24rpx;
-  opacity: 0.85;
-}
-
-.stat-divider {
-  width: 1rpx;
-  height: 60rpx;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ==================== 管理按钮 ==================== */
-.manage-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
+  flex-direction: column;
   width: 100%;
-  margin-top: 24rpx;
-  padding: 24rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: var(--radius-sm);
-  color: #FFFFFF;
+  padding: 32rpx 26rpx 24rpx;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  box-sizing: border-box;
+}
+.contact-title {
+  color: var(--ink);
   font-size: 30rpx;
-  font-weight: 600;
-}
-
-.manage-btn::after {
-  border: none;
-}
-
-.manage-btn:active {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.btn-icon {
-  font-size: 32rpx;
-}
-
-/* ==================== 菜单卡片 ==================== */
-.menu-card {
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  border: 1rpx solid var(--color-border);
-  overflow: hidden;
-  margin-bottom: 32rpx;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  padding: 32rpx 28rpx;
-  transition: background var(--transition-fast);
-}
-
-.menu-item:active {
-  background: var(--color-surface-hover);
-}
-
-.menu-icon-wrap {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: var(--radius-xs);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 24rpx;
-}
-
-.menu-emoji {
-  font-size: 36rpx;
-}
-
-.history-icon {
-  background: rgba(249, 115, 22, 0.1);
-}
-
-.reward-icon {
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.calendar-icon {
-  background: rgba(245, 158, 11, 0.1);
-}
-
-.menu-text {
-  flex: 1;
-  font-size: 32rpx;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-.menu-arrow {
-  padding: 8rpx;
-}
-
-.arrow-icon {
-  font-size: 36rpx;
-  color: var(--color-text-tertiary);
-}
-
-.menu-divider {
-  height: 1rpx;
-  background: var(--color-border);
-  margin: 0 28rpx;
-}
-
-/* ==================== 应用信息 ==================== */
-.app-info {
+  font-weight: 750;
   text-align: center;
-  padding: 32rpx;
 }
-
-.app-name {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: var(--color-text-tertiary);
-  display: block;
-  margin-bottom: 4rpx;
+.contact-hint {
+  margin: 8rpx 0 22rpx;
+  color: var(--muted);
+  font-size: 21rpx;
+  text-align: center;
 }
-
-.app-version {
-  font-size: 24rpx;
-  color: var(--color-text-tertiary);
+.contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 20rpx 0;
+  border-top: 1rpx solid var(--line);
+}
+.contact-item > view { display: flex; flex-direction: column; gap: 5rpx; }
+.contact-label { color: var(--muted); font-size: 20rpx; }
+.contact-value { color: var(--ink); font-size: 25rpx; font-weight: 650; }
+.contact-copy {
+  padding: 10rpx 18rpx;
+  border-radius: var(--radius-sm);
+  background: var(--soft-water);
+  color: var(--water-lo);
+  font-size: 21rpx;
+}
+.contact-close {
+  margin-top: 20rpx;
+  padding: 18rpx;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: #FFF;
+  text-align: center;
+  font-size: 23rpx;
+  font-weight: 650;
 }

@@ -21,20 +21,20 @@
 ## 部署步骤
 
 ### 1. 配置 AppID
-编辑 miniprogram/project.config.json，将 appid 改为你小程序的 AppID。
+编辑项目根目录的 `project.config.json`，将 `appid` 改为你小程序的 AppID。
 
 ### 2. 打开项目
 1. 下载并安装微信开发者工具
 2. 打开微信开发者工具
 3. 选择 "导入项目"
 4. 选择 miniprogram 目录
-5. 填入 AppID
+5. 选择项目根目录（其中包含 `project.config.json`），并确认 AppID
 
 ### 3. 配置云开发环境
 在微信开发者工具中点击右上角 "云开发"，开通云开发服务。
 
 ### 4. 编译运行
-点击 "编译" 然后 "预览"
+点击“编译”然后“预览”。本项目的小程序前端没有 NPM 依赖，无需执行“构建 NPM”；云函数依赖在各自的 `cloudfunctions/*/package.json` 中单独安装和部署。
 
 ## 注意事项
 

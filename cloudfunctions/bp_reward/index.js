@@ -81,7 +81,7 @@ exports.main = async (event, context) => {
         }
         const childRes = await childrenCol.doc(childId).get();
         const child = childRes.data;
-        if (!child || child.parentId !== openid) return { success: false, error: '孩子不存在' };
+        if (!child || child._openid !== openid) return { success: false, error: '孩子不存在' };
         const availablePoints = (child.totalPoints || 0) - (child.redeemedPoints || 0);
         if (availablePoints < reward.points) return { success: false, error: '积分不足，继续努力哦~' };
         if (reward.limitPerChild && reward.limitPerChild > 0) {
@@ -91,7 +91,7 @@ exports.main = async (event, context) => {
         const redemptionId = generateId();
         const now = Date.now();
         await redemptionsCol.add({
-          data: { _id: redemptionId, rewardId, rewardName: reward.name, rewardIcon: reward.icon, childId, parentId: openid, pointsSpent: reward.points, remark: remark || '', redeemedAt: now, createdAt: now }
+          data: { _id: redemptionId, rewardId, rewardName: reward.name, rewardIcon: reward.icon, childId, parentId: openid, pointsSpent: reward.points, pointsRequired: reward.points, remark: remark || '', redeemedAt: now, createdAt: now }
         });
         await childrenCol.doc(childId).update({ data: { redeemedPoints: _.inc(reward.points), updatedAt: now } });
         await pointsTxCol.add({

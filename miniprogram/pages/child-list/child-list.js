@@ -1,7 +1,8 @@
 // pages/child-list/child-list.js
 const app = getApp();
+const { keyboardAvoid } = require('../../utils/keyboard');
 
-Page({
+Page(keyboardAvoid({
   data: {
     children: [],
     currentChildId: '',
@@ -58,6 +59,8 @@ Page({
   onHideModal() {
     this.setData({ showAddModal: false });
   },
+
+  stopPropagation() {},
 
   onNameInput(e) {
     const formData = this.data.formData;
@@ -165,4 +168,4 @@ Page({
       }
     });
   }
-});
+}));

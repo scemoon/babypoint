@@ -5,11 +5,38 @@ Page({
   data: {
     reward: null,
     child: null,
-    loading: false
+    loading: false,
+    // 页面状态：loading 显示骨架，failed 显示重试，避免白屏
+    failed: false,
+    // 兑换券的余额变化：够不够、兑换后还剩多少 / 还差多少
+    enough: false,
+    afterPoints: 0,
+    shortBy: 0,
+    // 主操作等页面推进动画走完再渲染，避免切换过程中按钮先出现 / 盖住页面
+    ctaVisible: false
   },
 
   onLoad(options) {
     this.setData({ rewardId: options.rewardId, childId: options.childId });
+    this.loadData();
+  },
+
+  onReady() {
+    this.ctaTimer = setTimeout(() => {
+      this.ctaTimer = null;
+      this.setData({ ctaVisible: true });
+    }, 320);
+  },
+
+  onUnload() {
+    if (this.ctaTimer) {
+      clearTimeout(this.ctaTimer);
+      this.ctaTimer = null;
+    }
+  },
+
+  onRetry() {
+    this.setData({ failed: false });
     this.loadData();
   },
 
@@ -23,11 +50,23 @@ Page({
 
       if (rewardRes.success && childRes.success) {
         const child = childRes.child;
+        const reward = rewardRes.reward;
         child.availablePoints = (child.totalPoints || 0) - (child.redeemedPoints || 0);
-        this.setData({ reward: rewardRes.reward, child });
+        const cost = Number(reward.points) || 0;
+        this.setData({
+          reward,
+          child,
+          failed: false,
+          enough: child.availablePoints >= cost,
+          afterPoints: Math.max(0, child.availablePoints - cost),
+          shortBy: Math.max(0, cost - child.availablePoints)
+        });
+      } else {
+        this.setData({ failed: true });
       }
     } catch (e) {
       console.error(e);
+      this.setData({ failed: true });
     }
   },
 

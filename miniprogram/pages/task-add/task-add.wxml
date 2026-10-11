@@ -1,28 +1,9 @@
-<!--pages/task-add/task-add.wxml-->
-<view class="container">
-  <view class="form-item">
-    <text class="label">任务名称</text>
-    <input class="input" placeholder="如：练习钢琴" bindinput="onNameInput" value="{{formData.name}}"/>
-  </view>
-
-  <view class="form-item">
-    <text class="label">分类</text>
-    <picker mode="selector" range="{{categories}}" range-key="name" bindchange="onCategoryChange">
-      <view class="picker-value">
-        {{selectedCategoryName || '请选择分类'}}
-      </view>
-    </picker>
-  </view>
-
-  <view class="form-item">
-    <text class="label">基础积分 (1-100)</text>
-    <input class="input" type="number" placeholder="10" bindinput="onPointsInput" value="{{formData.basePoints}}"/>
-  </view>
-
-  <view class="form-item">
-    <text class="label">描述</text>
-    <textarea class="textarea" placeholder="任务的详细描述" bindinput="onDescInput" value="{{formData.description}}"/>
-  </view>
-
-  <button class="submit-btn" bindtap="onSubmit" loading="{{loading}}">创建任务</button>
+<view class="container edit-page">
+  <view class="edit-intro"><view class="edit-badge"><icon name="check" size="38" color="#14343D"/></view><text class="eyebrow">家庭任务设置</text><text class="page-title">新建任务</text><text class="intro-hint">把希望养成的习惯，写成清楚可完成的一件事。</text></view>
+  <view class="form-section"><view class="form-item"><text class="label">任务名称</text><input class="input" placeholder="例如：整理书桌" bindinput="onNameInput" value="{{formData.name}}" cursor-spacing="24"/></view><view class="form-item"><text class="label">任务分类</text><picker mode="selector" range="{{categories}}" range-key="name" bindchange="onCategoryChange"><view class="picker-value">{{selectedCategoryName || '选择最合适的分类'}}<text>⌄</text></view></picker></view><view class="form-item"><text class="label">任务周期</text><view class="period-options"><view wx:for="{{periods}}" wx:key="key" class="period-chip {{formData.periodType === item.key ? 'active' : ''}}" data-type="{{item.key}}" bindtap="onPeriodTap">{{item.name}}</view></view></view><view class="form-item" wx:if="{{formData.periodType === 'custom'}}"><text class="label">每隔几天</text><view class="points-input"><input class="input" type="number" placeholder="例如 3" value="{{formData.periodDays}}" data-field="periodDays" bindinput="onNumberInput" cursor-spacing="24"/><text>天</text></view></view><view class="form-item"><text class="label">补充说明 <text class="optional">选填</text></text><textarea class="textarea" placeholder="描述一下怎样才算完成" bindinput="onDescInput" value="{{formData.description}}" cursor-spacing="24"/></view></view>
+  <view class="score-analysis"><view class="score-analysis-copy"><text class="score-analysis-label">系统智能评估</text><text class="score-analysis-reason">{{scoreReason}}</text></view><view class="score-analysis-points"><text>{{scorePreview}}</text><text>积分/次</text></view></view>
+  <view class="form-hint"><icon name="info" size="28" color="#2A808A"/><text>积分根据任务分类、要求和预计投入统一评估，创建后不可手动修改；相同规则对所有任务一致。</text></view>
+  <button class="save-button" bindtap="onSubmit" loading="{{loading}}">创建任务</button>
+  <!-- 键盘占位：撑出可滚动余量，把输入框推到键盘之上（收起时高度为 0） -->
+  <view class="keyboard-spacer" style="height: {{keyboardHeight}}px"></view>
 </view>

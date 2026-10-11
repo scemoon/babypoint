@@ -1,52 +1,67 @@
-<!--pages/task-complete/task-complete.wxml-->
-<view class="container">
-  <view class="task-card">
-    <view class="task-icon-wrap">
-      <icon name="{{iconType || 'star'}}" size="64" color="#FF8B45"/>
+<view class="container complete-page">
+  <!-- 小红花奖状：居中证书式排版
+       印章 → 任务名 → 领域/周期 → 本次可得（唯一的大数字）→ 撕口 → 盖章选完成度 -->
+  <view class="diploma">
+    <view class="diploma-seal"><text>{{icon || '📝'}}</text></view>
+    <text class="diploma-title">{{taskName}}</text>
+    <text class="diploma-meta" wx:if="{{metaLine}}">{{metaLine}}</text>
+
+    <view class="diploma-points">
+      <text class="diploma-value {{pointsPulse ? 'pulse' : ''}}">+{{actualPoints}}</text>
+      <text class="diploma-value-label">本次可得</text>
     </view>
-    <text class="task-name">{{taskName}}</text>
-    <view class="base-points-wrap">
-      <icon name="star" size="28" color="#FFD93D"/>
-      <text class="base-points">基础积分 +{{basePoints}}</text>
+
+    <view class="diploma-perf">
+      <view class="perf-notch left"></view>
+      <view class="perf-notch right"></view>
+    </view>
+
+    <view class="stamp-row">
+      <view class="stamp {{selectedLevel === item.key ? 'on' : ''}}" wx:for="{{levels}}" wx:key="key" bindtap="onLevelChange" data-index="{{index}}">
+        <view class="stamp-circle"><text class="stamp-ratio">{{item.ratio * 100}}%</text></view>
+        <text class="stamp-name">{{item.short}}</text>
+      </view>
+    </view>
+    <text class="stamp-hint">{{selectedLevelDesc}}</text>
+  </view>
+
+  <!-- 颁发给 -->
+  <view class="section-header">
+    <text class="section-title">颁发给</text>
+  </view>
+  <view class="child-chips" wx:if="{{ready}}">
+    <view class="child-chip {{item._id === selectedChild._id ? 'active' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
+      <view class="chip-avatar"><text wx:if="{{!item.avatar}}">{{item.name[0]}}</text><image wx:else src="{{item.avatar}}" mode="aspectFill"/></view>
+      <text>{{item.name}}</text>
     </view>
   </view>
-  
-  <view class="section">
-    <text class="section-title">选择孩子</text>
-    <view class="child-list">
-      <view class="child-item {{item._id === selectedChild._id ? 'active' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
-        <view class="child-avatar">
-          <text wx:if="{{!item.avatar}}">{{item.name[0]}}</text>
-          <image wx:else src="{{item.avatar}}"/>
-        </view>
-        <text class="child-name">{{item.name}}</text>
+  <view class="child-chips" wx:else>
+    <view class="child-chip skeleton-chip" wx:for="{{[1, 2]}}" wx:key="*this">
+      <view class="chip-avatar skeleton-block"></view>
+      <view class="skeleton-line"></view>
+    </view>
+  </view>
+
+  <!-- 主操作：
+       ① 页面私有类名（不叫 .confirm-button，避开 app.wxss 里那条 position:fixed 的共用规则）
+       ② 切换动画结束后才渲染 —— 切换过程中它根本不在页面上，不可能遮挡 / 先于内容出现
+       ③ 仍在文档流内由 flex 顶到屏幕底部，不是固定定位，不产生独立合成层 -->
+  <button class="submit-cta" wx:if="{{ready && ctaVisible}}" bindtap="onSubmit" loading="{{loading}}">确认完成</button>
+
+  <!-- 家长确认码弹窗：mask 按键盘高度留出 padding，弹层整体被顶到键盘之上 -->
+  <view class="pin-mask" wx:if="{{showPinModal}}" bindtap="onCancelPin" style="padding-bottom: {{keyboardHeight}}px">
+    <view class="pin-dialog {{keyboardHeight ? 'kb-open' : ''}}" catchtap="stopPropagation">
+      <view class="pin-header">
+        <text class="pin-title">家长确认</text>
+      </view>
+      <text class="pin-hint">输入6位确认码完成验证</text>
+
+      <input class="pin-input" type="number" password maxlength="6" focus="{{showPinModal}}" placeholder="请输入确认码" value="{{confirmationCode}}" bindinput="onConfirmationCodeInput" adjust-position="{{false}}" cursor-spacing="24"/>
+
+      <view class="pin-actions">
+        <view class="pin-cancel" bindtap="onCancelPin">取消</view>
+        <view class="pin-confirm" bindtap="onConfirmWithPin">确认记分</view>
       </view>
     </view>
   </view>
-  
-  <view class="section">
-    <text class="section-title">完成度</text>
-    <view class="level-list">
-      <view class="level-item {{selectedLevel === item.key ? 'active' : ''}}" wx:for="{{levels}}" wx:key="key" bindtap="onLevelChange" data-index="{{index}}">
-        <view class="level-header">
-          <text class="level-name">{{item.name}}</text>
-          <view class="level-tag {{item.key}}">
-            <text>{{item.ratio * 100}}%</text>
-          </view>
-        </view>
-        <text class="level-desc">{{item.desc}}</text>
-      </view>
-    </view>
-  </view>
-  
-  <view class="preview-card">
-    <text class="preview-label">获得积分</text>
-    <view class="preview-points-wrap">
-      <icon name="star" size="36" color="#FFD93D"/>
-      <text class="preview-points">+{{actualPoints}}</text>
-    </view>
-    <text class="preview-ratio">({{ratio * 100}}%)</text>
-  </view>
-  
-  <button class="submit-btn" bindtap="onSubmit" loading="{{loading}}">确认完成</button>
 </view>

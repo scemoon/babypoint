@@ -9,11 +9,16 @@ exports.main = async (event, context) => {
   const db = cloud.database();
   const usersCol = db.collection('bp_users');
 
+  function toPublicUserInfo(user) {
+    const { completionPinHash, completionPinSalt, completionPinIterations, completionPinFailCount, completionPinLockedUntil, ...publicInfo } = user;
+    return publicInfo;
+  }
+
   try {
     const existing = await usersCol.doc(openid).get().catch(() => null);
     if (existing && existing.data) {
       await usersCol.doc(openid).update({ data: { lastActiveAt: Date.now() } });
-      return { success: true, isNew: false, openid, unionid, userInfo: existing.data };
+      return { success: true, isNew: false, openid, unionid, userInfo: toPublicUserInfo(existing.data) };
     }
     return { success: true, isNew: true, openid, unionid, userInfo: null };
   } catch (e) {

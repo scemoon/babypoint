@@ -28,3 +28,7 @@ npm-debug.log*
 
 # CloudBase
 .cloudbaserc.local
+
+# Local environment
+.env.local
+.env.*.local

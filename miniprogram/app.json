@@ -1,8 +1,9 @@
 {
   "pages": [
-    "pages/onboard/onboard",
     "pages/index/index",
+    "pages/onboard/onboard",
     "pages/task/task",
+    "pages/publish/publish",
     "pages/task-complete/task-complete",
     "pages/task-add/task-add",
     "pages/reward/reward",
@@ -11,36 +12,26 @@
     "pages/profile/profile",
     "pages/child-list/child-list",
     "pages/calendar/calendar",
-    "pages/history/history"
+    "pages/history/history",
+    "pages/security/security"
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#3B82F6",
+    "navigationBarBackgroundColor": "#12807A",
     "navigationBarTitleText": "宝贝积分",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
-    "color": "#94A3B8",
-    "selectedColor": "#3B82F6",
+    "color": "#4A6469",
+    "selectedColor": "#12807A",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
-      {
-        "pagePath": "pages/index/index",
-        "text": "首页"
-      },
-      {
-        "pagePath": "pages/task/task",
-        "text": "任务"
-      },
-      {
-        "pagePath": "pages/reward/reward",
-        "text": "奖励"
-      },
-      {
-        "pagePath": "pages/profile/profile",
-        "text": "我的"
-      }
+      { "pagePath": "pages/index/index", "text": "首页", "iconPath": "assets/icons/home-4a6469.png", "selectedIconPath": "assets/icons/home-12807a.png" },
+      { "pagePath": "pages/task/task", "text": "任务", "iconPath": "assets/icons/list-4a6469.png", "selectedIconPath": "assets/icons/list-12807a.png" },
+      { "pagePath": "pages/publish/publish", "text": "发布", "iconPath": "assets/icons/check-4a6469.png", "selectedIconPath": "assets/icons/check-12807a.png" },
+      { "pagePath": "pages/reward/reward", "text": "奖励", "iconPath": "assets/icons/gift-4a6469.png", "selectedIconPath": "assets/icons/gift-12807a.png" },
+      { "pagePath": "pages/profile/profile", "text": "我的", "iconPath": "assets/icons/user-4a6469.png", "selectedIconPath": "assets/icons/user-12807a.png" }
     ]
   },
   "style": "v2",

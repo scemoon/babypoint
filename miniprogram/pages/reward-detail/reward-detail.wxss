@@ -1,124 +1,174 @@
-/* pages/reward-detail/reward-detail.wxss */
-.container {
-  padding: 30rpx;
+/* reward-detail.wxss —— 「兑换券」兑换奖励页
+   排版：竖版票 —— 上半奖励身份（居中），虚线撕口以下是三联账目
+   （现在可用 / 花费 / 兑换后），最后是主操作。
+   色板只用项目令牌：花费走珊瑚（支出语义），兑换后走嫩黄绿 + 积分金文字（收益语义）。
+   主操作在文档流内（flex 顶到底部）而非 fixed —— 页面切换动画中不会先于内容冒出来。 */
+
+.redeem-page {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background: #F7F7F7;
+  padding-top: 24rpx;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
-.reward-card {
-  background: linear-gradient(135deg, #FF8B45 0%, #FF6B35 100%);
-  border-radius: 24rpx;
-  padding: 60rpx;
-  text-align: center;
-  color: #fff;
-  margin-bottom: 30rpx;
+/* ========== 兑换券（竖版票）========== */
+.coupon {
+  display: flex; flex-direction: column;
+  margin: 0 2rpx 24rpx;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
 }
 
-.reward-icon {
-  font-size: 100rpx;
-  display: block;
-  margin-bottom: 20rpx;
+/* 上半：奖励身份，居中 */
+.coupon-head {
+  display: flex; flex-direction: column; align-items: center; gap: 6rpx;
+  padding: 32rpx 30rpx 26rpx;
 }
-
-.reward-name {
-  font-size: 40rpx;
-  font-weight: bold;
-  display: block;
-  margin-bottom: 15rpx;
+.coupon-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 96rpx; height: 96rpx; margin-bottom: 6rpx;
+  border-radius: 28rpx 28rpx 8rpx 28rpx;
+  background: var(--soft-lime);
 }
+.coupon-title { color: var(--ink); font-size: 40rpx; font-weight: 750; line-height: 1.25; text-align: center; }
+.coupon-desc { color: var(--hint); font-size: 22rpx; text-align: center; }
 
-.reward-desc {
-  font-size: 28rpx;
-  opacity: 0.9;
-  display: block;
-  margin-bottom: 30rpx;
+/* 横向虚线撕口：左右两端各一个与页面底色同色的缺口 */
+.coupon-perf {
+  position: relative;
+  height: 0;
+  border-top: 2rpx dashed var(--line);
 }
-
-.reward-points {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
+.perf-notch {
+  position: absolute; top: -14rpx;
+  width: 26rpx; height: 26rpx;
+  border-radius: 50%;
+  background: var(--mist);
 }
+.perf-notch.left { left: -13rpx; }
+.perf-notch.right { right: -13rpx; }
 
-.points-num {
-  font-size: 72rpx;
-  font-weight: bold;
+/* ========== 三联账目：现在可用 / 花费 / 兑换后 ========== */
+.ledger { display: flex; align-items: stretch; }
+.ledger-cell {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 2rpx;
+  padding: 18rpx 10rpx 22rpx;
+  border-right: 1rpx solid var(--line);
 }
+.ledger-cell:last-child { border-right: 0; }
 
-.points-unit {
-  font-size: 28rpx;
-  margin-left: 10rpx;
+.ledger-head,
+.ledger-who {
+  display: flex; align-items: center; justify-content: center; gap: 8rpx;
+  min-height: 46rpx; max-width: 100%;
+  color: var(--muted); font-size: 20rpx;
 }
-
-.child-card {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 30rpx;
-  margin-bottom: 30rpx;
+.ledger-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ledger-avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 42rpx; height: 42rpx; flex-shrink: 0; overflow: hidden;
+  border-radius: 50%;
+  background: var(--soft-water);
+  color: var(--ink); font-size: 20rpx; font-weight: 700;
 }
-
-.card-title {
-  font-size: 26rpx;
-  color: #999;
-  display: block;
-  margin-bottom: 15rpx;
+.ledger-avatar image { width: 100%; height: 100%; }
+.ledger-label { color: var(--muted); font-size: 19rpx; }
+.ledger-value {
+  font-family: 'DIN Alternate', sans-serif;
+  color: var(--ink); font-size: 44rpx; font-weight: 800; line-height: 1.15;
 }
+.ledger-value.coral { color: var(--coral-text); }
 
-.child-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* 结果格：够兑换＝嫩黄绿底 + 积分金文字；不够＝珊瑚底 + 珊瑚文字 */
+.ledger-cell.result {
+  background: var(--soft-lime);
+  border-radius: 0 0 var(--radius-lg) 0;
 }
+.ledger-cell.result .ledger-value { color: var(--gold-text); }
+.ledger-cell.result.short { background: var(--soft-coral); }
+.ledger-cell.result.short .ledger-head,
+.ledger-cell.result.short .ledger-label,
+.ledger-cell.result.short .ledger-value { color: var(--coral-text); }
 
-.child-name {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-}
+/* 积分不够：券的标题一并弱化 */
+.coupon.short .coupon-title { color: var(--muted); }
 
-.child-points {
-  text-align: right;
-}
-
-.child-points .avail {
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #FF8B45;
-  display: block;
-}
-
-.child-points .label {
-  font-size: 22rpx;
-  color: #999;
-}
-
-.tips {
-  background: #FFF8F0;
+/* ========== 说明条 ========== */
+.redeem-note {
+  display: flex; align-items: center; gap: 10rpx;
+  margin: 0 2rpx 28rpx; padding: 16rpx;
   border-radius: 12rpx;
-  padding: 20rpx;
-  display: flex;
-  align-items: center;
-  margin-bottom: 40rpx;
+  background: var(--soft-water); color: var(--muted);
+  font-size: 21rpx;
 }
 
-.tip-icon {
-  margin-right: 15rpx;
+/* ========== 主操作 ==========
+   与完成任务页同一套处理，避免页面切换时按钮先出现：
+   ① 类名私有（.redeem-cta），不匹配 app.wxss 里 `.save-button, .confirm-button, .redeem-button`
+      那条 position: fixed 的共用规则 —— 靠同优先级覆盖 position 并不可靠；
+   ② position: relative + margin-top: auto：留在文档流内由 flex 顶到底部，不产生独立合成层。 */
+.redeem-cta {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; margin: auto 0 0;
+  padding: 0 28rpx;
+  height: 96rpx;
+  border-radius: var(--radius-md);
+  background: var(--lime); color: var(--ink);
+  font-size: 30rpx; font-weight: 750;
+  box-shadow: var(--shadow-fab);
+  /* 只做透明度淡入，不 fill-forwards，避免盖住 :active 的按压缩放 */
+  animation: cta-in .18s ease;
+}
+@keyframes cta-in { from { opacity: 0; } }
+.redeem-cta:active { transform: scale(.98); opacity: .9; }
+.redeem-cta.disabled { background: var(--line); color: var(--muted); box-shadow: none; }
+
+/* ========== 首屏骨架：尺寸与真实内容一致，加载完成不跳动 ========== */
+.skeleton-coupon {
+  display: flex; flex-direction: column; align-items: center; gap: 10rpx;
+  margin: 0 2rpx; padding: 32rpx 30rpx 0;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+.sk-icon {
+  width: 96rpx; height: 96rpx; margin-bottom: 6rpx;
+  border-radius: 28rpx 28rpx 8rpx 28rpx;
+  background: var(--line);
+  animation: sk-pulse 1.1s ease-in-out infinite;
+}
+.sk-line { height: 24rpx; border-radius: 8rpx; background: var(--line); animation: sk-pulse 1.1s ease-in-out infinite; }
+.sk-w60 { width: 60%; }
+.sk-w40 { width: 40%; }
+.sk-ledger { display: flex; align-self: stretch; margin-top: 24rpx; border-top: 2rpx dashed var(--line); }
+.sk-cell {
+  flex: 1; height: 150rpx;
+  border-right: 1rpx solid var(--line);
+  background: var(--paper);
+  animation: sk-pulse 1.1s ease-in-out infinite;
+}
+.sk-cell:last-child { border-right: 0; }
+.sk-cell-result { background: var(--soft-lime); border-radius: 0 0 var(--radius-lg) 0; }
+@keyframes sk-pulse {
+  0%, 100% { opacity: .5; }
+  50% { opacity: 1; }
 }
 
-.tip-text {
-  font-size: 26rpx;
-  color: #996633;
+/* ========== 加载失败 ========== */
+.load-failed {
+  display: flex; flex-direction: column; align-items: center; gap: 10rpx;
+  margin: auto 0; padding: 40rpx 24rpx; text-align: center;
 }
-
-.redeem-btn {
-  background: #FF8B45;
-  color: #fff;
-  border-radius: 50rpx;
-  height: 88rpx;
-  line-height: 88rpx;
-  font-size: 32rpx;
-}
-
-.redeem-btn.disabled {
-  background: #ccc;
+.failed-title { color: var(--ink); font-size: 30rpx; font-weight: 750; }
+.failed-copy { color: var(--muted); font-size: 23rpx; }
+.failed-button {
+  min-width: 240rpx; height: 84rpx; margin-top: 18rpx;
+  border-radius: var(--radius-pill);
+  background: var(--water); color: #FFF;
+  font-size: 26rpx; font-weight: 700;
 }

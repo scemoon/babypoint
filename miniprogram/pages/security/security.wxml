@@ -1,0 +1,12 @@
+<view class="container security-page">
+  <view class="security-intro"><text class="eyebrow">家庭积分安全</text><text class="page-title">任务确认码</text><text class="intro-copy">每次任务记入积分前，都需要输入这组确认码。请由家长设置并妥善保管。</text></view>
+  <view class="security-form">
+    <view class="form-item" wx:if="{{configured}}"><text class="field-label">当前确认码</text><input class="security-input" type="number" password maxlength="6" placeholder="输入当前6位确认码" value="{{currentPin}}" data-field="currentPin" bindinput="onInput" cursor-spacing="24"/></view>
+    <view class="form-item"><text class="field-label">{{configured ? '新确认码' : '设置确认码'}}</text><input class="security-input" type="number" password maxlength="6" placeholder="设置6位数字" value="{{newPin}}" data-field="newPin" bindinput="onInput" cursor-spacing="24"/></view>
+    <view class="form-item"><text class="field-label">再次输入</text><input class="security-input" type="number" password maxlength="6" placeholder="再次输入确认码" value="{{confirmPin}}" data-field="confirmPin" bindinput="onInput" cursor-spacing="24"/></view>
+  </view>
+  <view class="security-note"><text class="note-title">安全说明</text><text>确认码经过加盐加密后保存在云端，不会以明文保存。连续输错5次后将锁定10分钟。</text></view>
+  <button class="save-button" bindtap="onSubmit" loading="{{loading}}">{{configured ? '修改确认码' : '设置确认码'}}</button>
+  <!-- 键盘占位：撑出可滚动余量，把输入框推到键盘之上（收起时高度为 0） -->
+  <view class="keyboard-spacer" style="height: {{keyboardHeight}}px"></view>
+</view>

@@ -5,7 +5,13 @@ App({
   globalData: {
     envId: 'cloud1-2gavd8kj8a1ce021',
     openid: '',
-    currentChildId: ''
+    currentChildId: '',
+    parentInfo: null,
+    loginChecked: false,
+    isNewUser: false,
+    // 孩子列表缓存：任务页已取过一次，任务确认页可直接同步渲染，
+    // 避免进入确认页时先闪出底部「确认完成」按钮、内容随后才补齐
+    childrenCache: null
   },
 
   onLaunch() {
@@ -62,5 +68,15 @@ App({
   saveCurrentChildId(childId) {
     this.globalData.currentChildId = childId;
     wx.setStorageSync('currentChildId', childId);
+  },
+
+  // 缓存孩子列表（内存级，仅用于页面间首屏直出）
+  setChildrenCache(list) {
+    if (Array.isArray(list)) this.globalData.childrenCache = list;
+  },
+
+  getChildrenCache() {
+    const list = this.globalData.childrenCache;
+    return Array.isArray(list) && list.length > 0 ? list : null;
   }
 });

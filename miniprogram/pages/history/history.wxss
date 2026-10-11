@@ -1,105 +1,171 @@
-/* pages/history/history.wxss */
-.container {
-  min-height: 100vh;
-  background: #F7F7F7;
-}
+/* history.wxss - 记录页 */
+.history-page { padding-top: 24rpx; }
 
-.child-bar {
-  background: #fff;
-  padding: 20rpx;
-  white-space: nowrap;
+/* 孩子切换器 */
+.child-strip { width: calc(100% + 56rpx); margin: 0 0 12rpx -28rpx; white-space: nowrap; }
+.child-strip-inner { display: flex; gap: 10rpx; padding: 8rpx 28rpx; }
+.child-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 14rpx 8rpx 8rpx;
+  border-radius: 999rpx;
+  background: var(--paper);
+  border: 1rpx solid var(--line);
+  color: var(--muted);
+  font-size: 22rpx;
+  transition: all .15s ease;
 }
-
-.child-list {
+.child-pill.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #FFF;
+}
+.tiny-avatar {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--soft-gold);
+  color: var(--ink);
+  font-weight: 700;
 }
+.tiny-avatar image { width: 100%; height: 100%; }
 
-.child-item {
-  padding: 16rpx 32rpx;
-  background: #f5f5f5;
-  border-radius: 40rpx;
-  font-size: 28rpx;
-  margin-right: 20rpx;
+/* 日历区块 */
+.calendar-section {
+  padding: 0 16rpx 14rpx;
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  border: 1rpx solid var(--line);
+  box-shadow: var(--shadow-card);
 }
-
-.child-item.active {
-  background: #FF8B45;
-  color: #fff;
-}
-
-.record-list {
-  padding: 20rpx;
-}
-
-.record-item {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 25rpx;
-  margin-bottom: 15rpx;
+.month-heading {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+  padding: 14rpx 0;
+  color: var(--ink);
+  font-size: 30rpx;
+  font-weight: 700;
 }
-
-.record-left {
+.month-control {
   display: flex;
   align-items: center;
-}
-
-.record-icon {
+  justify-content: center;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: var(--radius-sm);
+  background: var(--soft-water);
+  color: var(--ink);
   font-size: 40rpx;
-  margin-right: 20rpx;
+  transition: opacity .12s ease;
 }
+.month-control:active { opacity: .72; }
+.month-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 12rpx;
+  padding: 17rpx 8rpx;
+  border-radius: var(--radius-sm) var(--radius-md) var(--radius-sm) var(--radius-sm);
+  background: var(--grad-water);
+  color: #FFF;
+}
+.month-stats view { display: flex; flex-direction: column; align-items: center; gap: 4rpx; }
+.stat-number { color: var(--sun); font-family: 'DIN Alternate', sans-serif; font-size: 32rpx; font-weight: 700; }
+.stat-caption { color: var(--on-dark-faint); font-size: 19rpx; }
 
-.record-info {
+/* 日历网格 */
+.calendar-board { padding: 8rpx 0 4rpx; }
+.weekday-row, .days-grid { display: flex; flex-wrap: wrap; }
+.weekday-row text, .day-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14.285%;
+  box-sizing: border-box;
+}
+.weekday-row text { height: 42rpx; color: var(--muted); font-size: 19rpx; }
+.day-cell {
+  position: relative;
+  flex-direction: column;
+  height: 82rpx;
+  gap: 1rpx;
+  border-radius: 10rpx;
+  color: var(--ink);
+  font-size: 19rpx;
+}
+.day-cell.day-empty { pointer-events: none; }
+.day-number { font-size: 21rpx; line-height: 24rpx; }
+.day-earned { color: var(--water-lo); font-size: 16rpx; line-height: 19rpx; }
+.day-zero { color: var(--hint); font-size: 16rpx; line-height: 19rpx; }
+.day-cell.selected {
+  background: var(--soft-water);
+  box-shadow: inset 0 0 0 2rpx var(--water);
+}
+.calendar-hint { padding: 6rpx 0 2rpx; color: var(--hint); text-align: center; font-size: 20rpx; }
+
+/* 记录列表 */
+.records-heading { margin: 28rpx 2rpx 12rpx; }
+.section-title { color: var(--ink); font-size: 29rpx; font-weight: 700; }
+.record-switch {
+  display: flex;
+  padding: 5rpx;
+  border-radius: var(--radius-sm);
+  background: var(--line);
+}
+.record-switch view {
+  flex: 1;
+  padding: 14rpx;
+  border-radius: 10rpx;
+  color: var(--muted);
+  text-align: center;
+  font-size: 24rpx;
+  transition: all .15s ease;
+}
+.record-switch view.active {
+  background: var(--ink);
+  color: #FFF;
+  font-weight: 700;
+}
+.record-list { margin-top: 16rpx; border-top: 1rpx solid var(--line); }
+.record-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  min-height: 112rpx;
+  padding: 6rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.record-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: var(--radius-sm);
+}
+.record-symbol.earned { background: var(--soft-water); }
+.record-symbol.spent { background: var(--soft-coral); }
+.record-main { display: flex; flex: 1; flex-direction: column; gap: 3rpx; }
+.record-name { color: var(--ink); font-size: 25rpx; font-weight: 650; }
+.record-time, .record-level { color: var(--muted); font-size: 20rpx; }
+.record-points { font-family: 'DIN Alternate', sans-serif; font-size: 29rpx; font-weight: 700; }
+.record-points.plus { color: var(--water-lo); }
+.record-points.minus { color: var(--coral-text); }
+
+.loading { padding: 22rpx 0; color: var(--muted); text-align: center; font-size: 22rpx; }
+.empty-state {
   display: flex;
   flex-direction: column;
-}
-
-.record-name {
-  font-size: 30rpx;
-  color: #333;
-  font-weight: bold;
-}
-
-.record-time {
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 5rpx;
-}
-
-.record-right {
-  text-align: right;
-}
-
-.points {
-  font-size: 36rpx;
-  font-weight: bold;
-  display: block;
-}
-
-.points.earn {
-  color: #FF8B45;
-}
-
-.points.spend {
-  color: #4A90D9;
-}
-
-.level-tag {
-  font-size: 22rpx;
-  color: #999;
-  background: #f5f5f5;
-  padding: 4rpx 12rpx;
-  border-radius: 10rpx;
-  display: inline-block;
-  margin-top: 5rpx;
-}
-
-.loading-tip, .empty-tip, .no-more {
+  align-items: center;
+  gap: 10rpx;
+  padding: 56rpx 20rpx;
   text-align: center;
-  padding: 40rpx;
-  color: #999;
-  font-size: 26rpx;
 }
+.empty-text { color: var(--ink); font-size: 26rpx; font-weight: 650; }
+.empty-hint { color: var(--muted); font-size: 22rpx; line-height: 1.5; }
+.no-more { padding: 30rpx 0; color: var(--hint); text-align: center; font-size: 22rpx; }

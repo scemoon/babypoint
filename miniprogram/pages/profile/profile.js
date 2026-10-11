@@ -5,7 +5,9 @@ Page({
   data: {
     children: [],
     currentChild: null,
-    showChildPicker: false
+    showChildPicker: false,
+    showCustomerContact: false,
+    parentInfo: app.globalData.parentInfo || {}
   },
 
   onLoad() {
@@ -13,6 +15,7 @@ Page({
   },
 
   onShow() {
+    this.setData({ parentInfo: app.globalData.parentInfo || {} });
     this.loadChildren();
   },
 
@@ -42,7 +45,22 @@ Page({
     wx.navigateTo({ url: '/pages/history/history?type=reward' });
   },
 
-  onCalendar() {
-    wx.navigateTo({ url: '/pages/calendar/calendar' });
-  }
+  onCompletionPin() {
+    wx.navigateTo({ url: '/pages/security/security' });
+  },
+
+  onCustomerService() {
+    this.setData({ showCustomerContact: true });
+  },
+
+  onCopyContact(e) {
+    const value = e.currentTarget.dataset.value;
+    wx.setClipboardData({
+      data: value,
+      success: () => wx.showToast({ title: '已复制', icon: 'success' })
+    });
+  },
+
+  onCloseCustomerContact() { this.setData({ showCustomerContact: false }); },
+  stopPropagation() {}
 });

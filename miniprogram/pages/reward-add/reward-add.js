@@ -1,7 +1,8 @@
 // pages/reward-add/reward-add.js
 const app = getApp();
+const { keyboardAvoid } = require('../../utils/keyboard');
 
-Page({
+Page(keyboardAvoid({
   data: {
     categories: [
       { key: 'FOOD', name: '美食', icon: '🍔' },
@@ -69,4 +70,4 @@ Page({
       this.setData({ loading: false });
     }
   }
-});
+}));

@@ -1,63 +1,14 @@
-<!--pages/child-list/child-list.wxml-->
-<view class="container">
-  <view class="child-list">
-    <view class="child-item {{item._id === currentChildId ? 'current' : ''}}"
-          wx:for="{{children}}" wx:key="_id"
-          bindtap="onSelectChild" data-id="{{item._id}}">
-      <view class="child-avatar">
-        <text>{{item.name[0]}}</text>
-      </view>
-      <view class="child-info">
-        <text class="child-name">{{item.name}}</text>
-        <text class="child-grade">{{item.schoolStage === 'kindergarten' ? '幼儿园' : item.schoolStage === 'primary' ? '小学' : '初中'}}{{(item.gradeLevel % 3) || 3}}年级</text>
-      </view>
-      <view class="child-points">
-        <text class="points">{{item.totalPoints || 0}}</text>
-        <text class="label">积分</text>
-      </view>
-      <view class="child-actions">
-        <text class="action-btn" bindtap="onEditChild" data-child="{{item}}">编辑</text>
-        <text class="action-btn delete" bindtap="onDeleteChild" data-child="{{item}}">删除</text>
-      </view>
-      <text class="current-tag" wx:if="{{item._id === currentChildId}}">当前</text>
+<view class="container child-page">
+  <view class="page-intro"><text class="eyebrow">家庭成员</text><text class="page-title">管理孩子</text><text class="intro-hint">选择当前查看的孩子，也可以更新档案。</text></view>
+  <view class="child-list" wx:if="{{children.length}}">
+    <view class="child-entry {{item._id === currentChildId ? 'current' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
+      <view class="child-avatar"><text>{{item.name[0]}}</text></view><view class="child-info"><text class="child-name">{{item.name}}</text><text class="child-grade">{{item.schoolStage === 'kindergarten' ? '幼儿园' : item.schoolStage === 'primary' ? '小学' : '初中'}}{{(item.gradeLevel % 3) || 3}}年级</text></view><view class="child-points"><text>{{item.totalPoints || 0}}</text><text>总积分</text></view>
+      <view class="current-chip" wx:if="{{item._id === currentChildId}}">当前</view>
+      <view class="child-actions"><view catchtap="onEditChild" data-child="{{item}}">编辑档案</view><view class="delete" catchtap="onDeleteChild" data-child="{{item}}">删除</view></view>
     </view>
   </view>
-
-  <view class="empty-tip" wx:if="{{children.length === 0}}">
-    <text>暂无孩子，点击下方添加</text>
-  </view>
-
-  <button class="add-btn" bindtap="onShowAddModal">+ 添加孩子</button>
-
-  <!-- 添加/编辑弹窗 -->
-  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="onHideModal">
-    <view class="modal-content">
-      <text class="modal-title">{{editingChild ? '编辑孩子' : '添加孩子'}}</text>
-      
-      <view class="form-item">
-        <text class="label">姓名</text>
-        <input class="input" placeholder="请输入孩子姓名" bindinput="onNameInput" value="{{formData.name}}"/>
-      </view>
-
-      <view class="form-item">
-        <text class="label">年级</text>
-        <picker mode="selector" range="{{grades}}" range-key="name" bindchange="onGradeChange">
-          <view class="picker-value">
-            {{selectedGradeName || '请选择年级'}}
-          </view>
-        </picker>
-      </view>
-
-      <view class="form-item">
-        <text class="label">性别</text>
-        <radio-group bindchange="onGenderChange" class="gender-group">
-          <label><radio value="male" checked="{{formData.gender === 'male'}}"/> 男</label>
-          <label><radio value="female" checked="{{formData.gender === 'female'}}"/> 女</label>
-          <label><radio value="other" checked="{{formData.gender === 'other'}}"/> 其他</label>
-        </radio-group>
-      </view>
-
-      <button class="submit-btn" bindtap="onSubmit" loading="{{loading}}">保存</button>
-    </view>
-  </view>
+  <view class="empty-state" wx:if="{{children.length === 0}}"><icon name="user" size="58" color="#12807A"/><text class="empty-text">还没有孩子档案</text><text class="empty-hint">添加后就能为孩子建立任务和奖励。</text></view>
+  <button class="add-child-button" bindtap="onShowAddModal">＋ 添加孩子</button>
+  <!-- 添加/编辑档案弹层：mask 按键盘高度留出 padding，弹层整体被顶到键盘之上 -->
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="onHideModal" style="padding-bottom: {{keyboardHeight}}px"><view class="modal-content {{keyboardHeight ? 'kb-open' : ''}}" catchtap="stopPropagation"><view class="modal-heading"><text>{{editingChild ? '编辑档案' : '添加孩子'}}</text><text bindtap="onHideModal">关闭</text></view><view class="form-item"><text class="label">孩子姓名</text><input class="input" placeholder="输入称呼" bindinput="onNameInput" value="{{formData.name}}" adjust-position="{{false}}" cursor-spacing="24"/></view><view class="form-item"><text class="label">所在年级</text><picker mode="selector" range="{{grades}}" range-key="name" bindchange="onGradeChange"><view class="picker-value">{{selectedGradeName || '选择年级'}}<text>⌄</text></view></picker></view><view class="form-item"><text class="label">性别</text><radio-group bindchange="onGenderChange" class="gender-group"><label><radio value="male" checked="{{formData.gender === 'male'}}"/>男孩</label><label><radio value="female" checked="{{formData.gender === 'female'}}"/>女孩</label><label><radio value="other" checked="{{formData.gender === 'other'}}"/>其他</label></radio-group></view><button class="save-button" bindtap="onSubmit" loading="{{loading}}">保存档案</button></view></view>
 </view>

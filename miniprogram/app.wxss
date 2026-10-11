@@ -1,311 +1,263 @@
-/* app.wxss - 全局样式 | 宝贝积分设计系统 v4.0 */
-/* Friendly Flat Design - 温暖友好型扁平化设计 */
-
-/* ==================== 设计令牌 ==================== */
+/* 宝贝积分 - 明快活泼主题 v5
+   设计原则：
+   1) 统一色板：所有页面只用 CSS 变量，禁用硬编码颜色
+   2) 明快活泼：大色块改用明亮渐变（青碧/青绿/嫩黄绿/珊瑚粉），
+      深青墨只保留在文字与小面积徽标上，避免大面积深色的沉重感
+   3) 语义分工固定：青=结构/主色，嫩黄绿=收益/积分，珊瑚=支出/兑换
+   4) 对比度底线：正文/小字 >= 4.5:1，大数字/徽标 >= 3:1（已逐项实测）*/
 page {
-  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #F8FAFC;
-  font-size: 28rpx;
-  color: #0F172A;
-  line-height: 1.6;
-}
+  background: #F1F6F3;
+  color: #14343D;
+  font-family: 'PingFang SC', sans-serif;
+  font-size: 29rpx;
+  line-height: 1.5;
 
-/* 主题色板 */
-:root {
-  /* 主色 - 信任蓝 */
-  --color-primary: #3B82F6;
-  --color-primary-light: #60A5FA;
-  --color-primary-dark: #2563EB;
-  
-  /* 辅助色 - 活力橙 */
-  --color-secondary: #F97316;
-  --color-secondary-light: #FB923C;
-  --color-secondary-dark: #EA580C;
-  
-  /* 强调色 - 成就金 */
-  --color-accent: #F59E0B;
-  --color-accent-light: #FBBF24;
-  --color-accent-dark: #D97706;
-  
-  /* 成功色 - 成长绿 */
-  --color-success: #10B981;
-  --color-success-light: #34D399;
-  --color-success-dark: #059669;
-  
-  /* 中性色 */
-  --color-background: #F8FAFC;
-  --color-surface: #FFFFFF;
-  --color-surface-hover: #F1F5F9;
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-tertiary: #94A3B8;
-  --color-border: #E2E8F0;
-  
-  /* 功能色 */
-  --color-error: #EF4444;
-  --color-warning: #F59E0B;
-  --color-info: #3B82F6;
-  
-  /* 阴影 - 极简 */
-  --shadow-sm: 0 1rpx 2rpx rgba(0, 0, 0, 0.04);
-  --shadow-card: 0 1rpx 3rpx rgba(0, 0, 0, 0.04);
-  --shadow-modal: 0 4rpx 24rpx rgba(0, 0, 0, 0.12);
-  
-  /* 间距 */
-  --space-xs: 8rpx;
-  --space-sm: 16rpx;
-  --space-md: 24rpx;
-  --space-lg: 32rpx;
-  --space-xl: 48rpx;
-  --space-2xl: 64rpx;
-  
+  /* ========== 核心色板（统一锚点）========== */
+  /* 主文字（深青墨，取代原深蓝）*/
+  --ink: #14343D;           /* ~11.5:1 于白/页底 */
+  /* 结构/主色：青
+     注：面板渐变两端都保持「白字 >= 4.5:1」的明度带，靠色相偏移
+     （青碧→青蓝）而非明度阶梯制造渐变感 —— 明度阶梯必然让浅端白字失读 */
+  --water: #12807A;         /* 实色 CTA / 选中态，白字 4.78:1 */
+  --water-lo: #177078;      /* 浅青底上的文字，于 soft-water 4.81:1 */
+  --water-bright: #0E6B7C;  /* 渐变末端（青蓝相），白字 6.15:1 */
+  --teal-deep: #2A808A;     /* 中间档青（图标）*/
+  /* 收益/积分：嫩黄绿 + 蜜黄 */
+  --lime: #C9E85C;          /* 主按钮 / 积分底色，墨字 9.56:1 */
+  --sun: #FFD166;           /* 蜜黄：成就 / 高光，墨字 9.17:1 */
+  --lime-deep: #9BE86B;     /* 渐变用偏绿嫩芽色，墨字 8.91:1 */
+  /* 支出/兑换：珊瑚（面板/徽标用，配白字）*/
+  --coral: #D9503A;         /* 大数字 / 徽标，白字 4.07:1 */
+  --coral-text: #B93E24;    /* 浅珊瑚底上的文字，4.71:1 */
+  --coral-warm: #B93E24;    /* 渐变末端，白字 5.56:1 */
+  --coral-deep: #A8341C;    /* 按下态，白字 6.62:1 */
+  /* 青绿（奖励页专属，与青碧形成色相区分）*/
+  --mint: #127F72;
+  --mint-bright: #2F7A5C;   /* 渐变末端（青绿→叶绿），白字 5.17:1 */
+  /* 背景层 */
+  --mist: #F1F6F3;          /* 页面底色：极浅青白 */
+  --paper: #FFFFFF;         /* 卡片白 */
+  --panel: #12807A;         /* 面板（沿用变量名，含义改为青碧渐变起点）*/
+  --panel-deep: #0E6B7C;    /* 面板渐变末端 */
+  /* 次级文字（均已实测达标）*/
+  --muted: #4A6469;         /* 5.79:1 于页底 / 6.33:1 于白卡 */
+  --hint: #556B78;          /* 5.11:1 于页底 / 5.58:1 于白卡（原值仅 2.35）*/
+  --label: #3A5A62;         /* 表单标签色 */
+  /* 面板文字：面板底色最深处是 #12807A，此处白字对比度仅 4.78:1，
+     所以次级文字几乎没有透明白的余地 —— 实测 0.95 已经掉到 4.49。
+     故两者都取接近纯白，靠字重/字号而非透明度拉开层级。*/
+  --on-dark-muted: rgba(255,255,255,.98); /* 4.64:1 */
+  --on-dark-faint: rgba(255,255,255,.96); /* 4.55:1 */
+  /* 边框/分割 */
+  --line: #CFE3DB;          /* 边框/分割线 */
+  --line-strong: rgba(255,255,255,.34); /* 面板上的分割线 */
+  /* 柔和底色（配对应的深文字令牌使用）*/
+  --soft-water: #D9EEF0;    /* 浅青底 */
+  --soft-lime: #EFF5CC;     /* 浅黄绿底 */
+  --soft-coral: #FCE8E3;    /* 浅珊瑚底 */
+  /* ========== 语义别名（兼容现有代码）========== */
+  --gold: #C9E85C;          /* 积分/成就主色（= lime）*/
+  --soft-gold: #EFF5CC;     /* 积分柔和底色（与 --soft-lime 同色）*/
+  --gold-text: #8A5A00;     /* 浅黄绿底上的积分文字，5.25:1 */
+  --gold-dark: #8A5A00;     /* 别名，向后兼容 */
+  --gold-mid: #8A5A00;      /* 别名，向后兼容（原值仅 2.45:1）*/
+  /* water 色值别名（值必须与 --water 保持一致，否则会悄悄分叉）*/
+  --cyan: #12807A;          /* water 的另一个名字 */
+  --teal: #12807A;          /* tabBar 选中色（与 --water 统一）*/
+  /* disabled 状态 */
+  --disabled-bg: #E1E6D0;   /* disabled 背景 */
+  --disabled-text: #63736E; /* disabled 文字，于 disabled-bg 3.90:1 */
+  /* 警告/错误 */
+  --error-light: #F5D5CC;   /* 浅错误底 */
+  --error-text: #7A5A52;    /* 错误文字，于 soft-coral 5.21:1 */
+  --danger: #B93E24;        /* 危险/删除色 */
   /* 圆角 */
-  --radius-xs: 8rpx;
-  --radius-sm: 12rpx;
-  --radius-md: 16rpx;
-  --radius-lg: 24rpx;
-  --radius-full: 9999rpx;
-  
-  /* 动画 */
-  --transition-fast: 100ms ease;
-  --transition-normal: 200ms ease;
-  --transition-slow: 300ms ease;
+  --radius-sm: 14rpx;
+  --radius-md: 22rpx;
+  --radius-lg: 30rpx;
+  --radius-pill: 999rpx;
+  /* 阴影（改用深青墨投影，比原来更柔和自然）*/
+  --shadow-card: 0 8rpx 22rpx rgba(20,52,61,.06);
+  --shadow-fab: 0 10rpx 28rpx rgba(22,128,124,.32);
+  --shadow-pop: 0 10rpx 28rpx rgba(201,232,92,.34);
+  /* ========== 面板渐变（统一三套，禁止逐页手写）==========
+     所有面板渐变都收敛到令牌，改主题只改这里。
+     约束：白字面板的两端都必须让白字 >= 4.5:1，因此两端只能做色相偏移，
+     不能做明度阶梯（明度阶梯必然让浅端白字失读，实测 #3FB7BC 只有 2.41）。
+     嫩黄绿/蜜黄面板配深青墨字，不能配白字（白字于 #9BE86B 仅 1.48:1）。*/
+  --grad-water: linear-gradient(150deg, var(--water) 0%, var(--water-bright) 100%);
+  --grad-mint: linear-gradient(150deg, var(--mint) 0%, var(--mint-bright) 100%);
+  --grad-coral: linear-gradient(150deg, var(--coral) 0%, var(--coral-warm) 100%);
 }
 
-/* ==================== 通用布局 ==================== */
-.container {
-  min-height: 100vh;
-  background: var(--color-background);
-  padding-bottom: 140rpx;
-}
+/* ========== 容器 ========== */
+.container { min-height: 100vh; padding: 26rpx 28rpx 150rpx; box-sizing: border-box; background: var(--mist); }
 
-/* ==================== 通用卡片 ==================== */
-.card {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
-  box-shadow: var(--shadow-card);
-  border: 1rpx solid var(--color-border);
-}
+/* ========== 通用：键盘占位块 ========== */
+/* 高度由页面按键盘高度动态给（内联 px），键盘收起时是 0px，不占任何空间。
+   作用：键盘弹起时把文档撑高，页面才有余量把末尾的输入框滚到键盘之上
+   （底部留白只有 150rpx，远小于键盘高度，光靠 adjust-position 推不动）。 */
+.keyboard-spacer { width: 100%; }
 
-.card-primary {
-  background: var(--color-primary);
-  color: #FFFFFF;
+/* ========== 统一按钮 ========== */
+button {
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  min-width: 0; height: 92rpx; margin: 0; padding: 0 28rpx;
+  border: 1rpx solid transparent; border-radius: 18rpx;
+  background: var(--lime); color: var(--ink);
+  font-family: 'PingFang SC', sans-serif; font-size: 27rpx; font-weight: 700;
+  line-height: 1.2;
+  transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease;
 }
+button::after { border: 0; }
+button:not([disabled]):active { transform: scale(.985); opacity: .88; }
+button[disabled] { background: var(--disabled-bg); box-shadow: none; color: var(--disabled-text); }
 
-/* ==================== 通用按钮 ==================== */
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24rpx 48rpx;
-  border-radius: var(--radius-sm);
-  font-size: 30rpx;
-  font-weight: 600;
-  transition: all var(--transition-fast);
-  min-height: 88rpx;
+/* ========== 输入控件 ========== */
+.input, input, textarea, .picker-value, .picker-view {
+  box-sizing: border-box; border: 1rpx solid var(--line); border-radius: 16rpx;
+  background: var(--paper); color: var(--ink);
 }
+.input::placeholder, input::placeholder, textarea::placeholder { color: var(--hint); }
 
-.btn-primary {
-  background: var(--color-primary);
-  color: #FFFFFF;
-}
-
-.btn-primary:active {
-  background: var(--color-primary-dark);
-  transform: scale(0.97);
-}
-
-.btn-secondary {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1rpx solid var(--color-border);
-}
-
-.btn-secondary:active {
-  background: var(--color-surface-hover);
-  transform: scale(0.97);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--color-primary);
-}
-
-.btn-ghost:active {
-  background: rgba(59, 130, 246, 0.08);
-}
-
-/* ==================== 通用输入框 ==================== */
-.input {
-  width: 100%;
-  height: 96rpx;
-  padding: 0 var(--space-md);
-  border: 1rpx solid var(--color-border);
-  border-radius: var(--radius-xs);
-  font-size: 30rpx;
-  background: var(--color-surface);
-  box-sizing: border-box;
-  transition: all var(--transition-fast);
-}
-
-.input:focus {
-  border-color: var(--color-primary);
-}
-
-.input::placeholder {
-  color: var(--color-text-tertiary);
-}
-
-/* ==================== 通用标签 ==================== */
-.tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 6rpx 16rpx;
-  border-radius: var(--radius-full);
-  font-size: 22rpx;
-  font-weight: 500;
-}
-
-.tag-primary {
-  background: rgba(59, 130, 246, 0.12);
-  color: var(--color-primary);
-}
-
-.tag-secondary {
-  background: var(--color-surface-hover);
-  color: var(--color-text-secondary);
-}
-
-.tag-success {
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--color-success);
-}
-
-.tag-warning {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--color-accent);
-}
-
-.tag-orange {
-  background: rgba(249, 115, 22, 0.12);
-  color: var(--color-secondary);
-}
-
-/* ==================== 图标容器 ==================== */
-.icon-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-xs);
-}
-
-.icon-sm {
-  width: 48rpx;
-  height: 48rpx;
-}
-
-.icon-md {
-  width: 64rpx;
-  height: 64rpx;
-}
-
-.icon-lg {
-  width: 88rpx;
-  height: 88rpx;
-}
-
-/* ==================== 浮动按钮 (FAB) ==================== */
-.fab {
-  position: fixed;
-  right: 40rpx;
-  bottom: 160rpx;
-  width: 112rpx;
-  height: 112rpx;
-  background: var(--color-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4rpx 16rpx rgba(59, 130, 246, 0.4);
-  z-index: 100;
-  transition: all var(--transition-fast);
-}
-
-.fab:active {
-  transform: scale(0.92);
-  background: var(--color-primary-dark);
-}
-
-/* ==================== 空状态 ==================== */
-.empty-state {
+/* ========== 统一页面头：明亮青碧面板 ========== */
+.page-intro {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xl) var(--space-md);
+  gap: 6rpx;
+  margin: -26rpx -28rpx 26rpx;
+  padding: 32rpx 28rpx 26rpx;
+  background: var(--grad-water);
+  color: #FFF;
+  overflow: hidden;
 }
-
-.empty-text {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin-bottom: var(--space-xs);
+/* 活泼装饰：右上角柔光圆，提升童趣但保持低对比干扰 */
+.page-intro::before {
+  content: '';
+  position: absolute;
+  top: -70rpx; right: -50rpx;
+  width: 220rpx; height: 220rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,.13);
+  pointer-events: none;
 }
-
-.empty-hint {
-  font-size: 26rpx;
-  color: var(--color-text-tertiary);
+.page-intro::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3rpx;
+  background: linear-gradient(90deg, transparent 0%, var(--lime) 50%, transparent 100%);
+  opacity: .85;
 }
+.page-intro .eyebrow { color: var(--on-dark-faint); font-size: 21rpx; }
+.page-intro .page-title { color: #FFF; font-size: 38rpx; font-weight: 750; letter-spacing: -0.5rpx; }
+.page-intro .intro-hint { color: var(--on-dark-muted); font-size: 23rpx; margin-top: 4rpx; line-height: 1.5; }
 
-/* ==================== 加载状态 ==================== */
-.loading {
+/* 扁平页头：去掉渐变面板，只留文字层级（任务页 / 发布页在用）
+   用 .page-intro-flat 追加类，保留字号与层级，背景与文字色换成浅底深字 */
+.page-intro-flat {
+  margin: 0 2rpx 26rpx;
+  padding: 2rpx 0 0;
+  background: none;
+  color: var(--ink);
+}
+.page-intro-flat::before,
+.page-intro-flat::after { display: none; }
+.page-intro-flat .eyebrow { color: var(--muted); }
+.page-intro-flat .page-title { color: var(--ink); }
+.page-intro-flat .intro-hint { color: var(--hint); }
+
+/* ========== 通用：分段标题、卡片 ========== */
+.section-heading {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-xl);
-  color: var(--color-text-tertiary);
+  justify-content: space-between;
+  margin: 28rpx 2rpx 14rpx;
+}
+.section-copy { display: flex; flex-direction: column; gap: 2rpx; }
+.section-title { font-size: 29rpx; font-weight: 700; color: var(--ink); }
+.section-note { color: var(--hint); font-size: 21rpx; }
+
+/* ========== 通用：列表卡片 ========== */
+.list-card { padding: 22rpx 22rpx 18rpx; border: 1rpx solid var(--line); border-radius: var(--radius-md); background: var(--paper); box-shadow: var(--shadow-card); }
+
+/* ========== 通用：孩子切换 pill ========== */
+.child-strip { width: calc(100% + 56rpx); margin-left: -28rpx; white-space: nowrap; }
+.child-strip-inner { display: flex; align-items: center; gap: 10rpx; padding: 10rpx 28rpx; }
+.child-pill {
+  display: inline-flex; align-items: center; gap: 8rpx;
+  padding: 8rpx 14rpx 8rpx 8rpx; border-radius: var(--radius-pill);
+  background: var(--paper); border: 1rpx solid var(--line);
+  color: var(--muted); font-size: 22rpx; transition: all .15s ease;
+}
+.child-pill.active { background: var(--ink); border-color: var(--ink); color: #FFF; }
+.tiny-avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 40rpx; height: 40rpx; overflow: hidden; border-radius: 50%;
+  background: var(--soft-lime); color: var(--ink); font-weight: 700; font-size: 20rpx;
+}
+.tiny-avatar image { width: 100%; height: 100%; }
+
+/* ========== 通用：搜索条 ========== */
+.search-bar {
+  display: flex; align-items: center; gap: 10rpx;
+  min-height: 72rpx; padding: 0 18rpx;
+  border: 1rpx solid var(--line); border-radius: var(--radius-pill);
+  background: var(--paper);
+}
+.search-bar .search-icon { color: var(--water); font-size: 34rpx; line-height: 1; }
+.search-bar .search-input {
+  flex: 1; min-width: 0; border: 0; background: transparent;
+  font-size: 24rpx; color: var(--ink);
+}
+.search-bar .search-clear {
+  display: flex; align-items: center; justify-content: center;
+  width: 40rpx; height: 40rpx; border-radius: 50%;
+  background: var(--line); color: var(--muted); font-size: 28rpx;
 }
 
-/* ==================== 分割线 ==================== */
-.divider {
-  height: 1rpx;
-  background: var(--color-border);
-  margin: var(--space-md) 0;
+/* ========== 通用：过滤卡片 ========== */
+.filter-card {
+  margin-top: 14rpx; padding: 22rpx 22rpx 18rpx;
+  border: 1rpx solid var(--line); border-radius: var(--radius-md);
+  background: var(--paper); box-shadow: var(--shadow-card);
+}
+.filter-card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16rpx; }
+.filter-card-title { font-size: 26rpx; font-weight: 700; color: var(--ink); }
+.filter-card-hint, .filter-card-action { font-size: 22rpx; font-weight: 600; color: var(--water); }
+.filter-card-action { font-weight: 650; }
+
+/* ========== 通用：底部 CTA 按钮（fixed）========== */
+/* 注：.add-reward-button 已移除 —— 奖励页的添加入口改为搜索框同行的图标按钮 */
+.save-button, .confirm-button, .redeem-button {
+  position: fixed; right: 24rpx; left: 24rpx;
+  bottom: calc(20rpx + env(safe-area-inset-bottom));
+  z-index: 5; width: auto; height: 96rpx;
+  border-radius: var(--radius-md); box-shadow: var(--shadow-fab);
+  background: var(--lime); color: var(--ink);
+  font-size: 28rpx; font-weight: 700;
 }
 
-/* ==================== 安全区 ==================== */
-.safe-area-top {
-  padding-top: env(safe-area-inset-top);
+/* ========== 通用：浮动添加按钮（圆形 FAB）========== */
+.fab {
+  position: fixed; right: 32rpx; bottom: 120rpx;
+  display: flex; align-items: center; justify-content: center;
+  width: 96rpx; height: 96rpx; border-radius: 50%;
+  background: var(--water); color: #FFF; font-size: 52rpx; font-weight: 300;
+  box-shadow: var(--shadow-fab); transition: transform .12s ease, opacity .12s ease;
 }
+.fab:active { transform: scale(.95); opacity: .9; }
 
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
+/* ========== 通用：空状态 ========== */
+.empty-state { display: flex; align-items: flex-start; flex-direction: column; padding: 38rpx 4rpx; }
+.empty-state.center { align-items: center; padding: 70rpx 22rpx; text-align: center; }
+.empty-text { margin-top: 16rpx; color: var(--ink); font-size: 32rpx; font-weight: 700; }
+.empty-hint { margin-top: 6rpx; color: var(--muted); font-size: 25rpx; }
+.empty-button {
+  min-width: 220rpx; height: 76rpx; margin-top: 22rpx;
+  border-radius: var(--radius-pill);
+  background: var(--water); color: #FFF; font-size: 24rpx;
+  box-shadow: none;
 }
-
-/* ==================== 辅助类 ==================== */
-.text-primary { color: var(--color-text-primary); }
-.text-secondary { color: var(--color-text-secondary); }
-.text-tertiary { color: var(--color-text-tertiary); }
-.text-accent { color: var(--color-primary); }
-.text-orange { color: var(--color-secondary); }
-.text-success { color: var(--color-success); }
-
-.font-bold { font-weight: 700; }
-.font-medium { font-weight: 500; }
-
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.gap-sm { gap: var(--space-sm); }
-.gap-md { gap: var(--space-md); }
-
-.mt-sm { margin-top: var(--space-sm); }
-.mt-md { margin-top: var(--space-md); }
-.mb-sm { margin-bottom: var(--space-sm); }
-.mb-md { margin-bottom: var(--space-md); }
+.loading { padding: 50rpx 0; text-align: center; color: var(--muted); font-size: 24rpx; }

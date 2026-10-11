@@ -1,150 +1,208 @@
-/* pages/task-complete/task-complete.wxss */
-.container {
-  padding: 30rpx;
+/* task-complete.wxss —— 「小红花奖状」完成任务页
+   排版：居中式证书（印章 / 任务名 / 领域周期 / 本次可得大数字 / 撕口 / 盖章行），
+   下方一行孩子 chip，最后是主操作。
+   色板只用项目令牌：积分走 --gold-text + --soft-lime（收益语义），盖章选中走 --water（主色）。
+   主操作在文档流内（flex 顶到底部）而非 fixed —— 页面切换动画中不会先于内容冒出来。 */
+
+/* 纵向撑满一屏，让主操作自然落到屏幕底部 */
+.complete-page {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background: #F7F7F7;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
-.task-card {
-  background: linear-gradient(135deg, #FF8B45 0%, #FF6B35 100%);
-  border-radius: 24rpx;
-  padding: 50rpx;
-  text-align: center;
-  color: #fff;
-  margin-bottom: 30rpx;
+/* ========== 奖状卡 ========== */
+.diploma {
+  display: flex; flex-direction: column; align-items: center;
+  margin: 0 2rpx 6rpx;
+  padding: 34rpx 28rpx 26rpx;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
 }
-
-.task-icon {
-  font-size: 80rpx;
-  display: block;
-  margin-bottom: 20rpx;
+/* 任务印章：emoji 落在浅黄绿方章上（右下切角，像盖上去的章） */
+.diploma-seal {
+  display: flex; align-items: center; justify-content: center;
+  width: 108rpx; height: 108rpx;
+  border-radius: 32rpx 32rpx 10rpx 32rpx;
+  background: var(--soft-lime);
+  font-size: 52rpx;
 }
-
-.task-name {
-  font-size: 36rpx;
-  font-weight: bold;
-  display: block;
-  margin-bottom: 10rpx;
+.diploma-title {
+  margin-top: 16rpx;
+  color: var(--ink); font-size: 42rpx; font-weight: 750;
+  line-height: 1.25; text-align: center;
 }
+.diploma-meta { margin-top: 8rpx; color: var(--hint); font-size: 21rpx; text-align: center; }
 
-.base-points {
-  font-size: 28rpx;
-  opacity: 0.9;
+/* 本次可得：整页唯一的大数字 */
+.diploma-points { display: flex; flex-direction: column; align-items: center; margin-top: 18rpx; }
+.diploma-value {
+  font-family: 'DIN Alternate', sans-serif;
+  color: var(--gold-text); font-size: 88rpx; font-weight: 800; line-height: 1;
 }
-
-.section {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 30rpx;
-  margin-bottom: 30rpx;
+.diploma-value.pulse { animation: points-pulse .24s ease; }
+@keyframes points-pulse {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.12); }
+  100% { transform: scale(1); }
 }
+.diploma-value-label { margin-top: 6rpx; color: var(--muted); font-size: 19rpx; }
 
-.section-title {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #333;
-  display: block;
-  margin-bottom: 20rpx;
+/* 虚线撕口：两端各一个与页面底色同色的缺口
+   卡片是 align-items:center 的纵向 flex，这里必须 align-self:stretch 才能横贯整卡 */
+.diploma-perf {
+  position: relative;
+  align-self: stretch; height: 0;
+  margin: 24rpx -28rpx 22rpx;
+  border-top: 2rpx dashed var(--line);
 }
-
-.child-list {
-  display: flex;
-  flex-direction: row;
+.perf-notch {
+  position: absolute; top: -14rpx;
+  width: 26rpx; height: 26rpx;
+  border-radius: 50%;
+  background: var(--mist);
 }
+.perf-notch.left { left: -13rpx; }
+.perf-notch.right { right: -13rpx; }
 
-.child-item {
-  padding: 20rpx 40rpx;
-  background: #f5f5f5;
-  border-radius: 40rpx;
-  font-size: 28rpx;
-  margin-right: 20rpx;
-}
-
-.child-item.active {
-  background: #FF8B45;
-  color: #fff;
-}
-
-.level-list {
-  display: flex;
-  flex-direction: row;
-}
-
-.level-item {
+/* ========== 三枚印章位（完成度）========== */
+.stamp-row { display: flex; width: 100%; }
+.stamp {
   flex: 1;
-  background: #f9f9f9;
-  border-radius: 16rpx;
-  padding: 30rpx 20rpx;
-  text-align: center;
-  border: 4rpx solid transparent;
-  margin-right: 20rpx;
+  display: flex; flex-direction: column; align-items: center; gap: 10rpx;
+  padding: 6rpx 4rpx 10rpx;
+  transition: all .18s ease;
+}
+.stamp:active { transform: scale(.95); }
+.stamp-circle {
+  display: flex; align-items: center; justify-content: center;
+  width: 96rpx; height: 96rpx;
+  border: 2rpx solid var(--line);
+  border-radius: 50%;
+  color: var(--muted);
+  transition: all .18s ease;
+}
+.stamp-ratio { font-family: 'DIN Alternate', sans-serif; font-size: 26rpx; font-weight: 800; }
+.stamp-name { color: var(--muted); font-size: 22rpx; font-weight: 600; }
+
+/* 已盖章：青底白字圆章 + 内圈 + 轻微旋转 */
+.stamp.on .stamp-circle {
+  background: var(--water);
+  border-color: var(--water);
+  color: #FFF;
+  transform: rotate(-8deg) scale(1.06);
+  box-shadow: inset 0 0 0 4rpx rgba(255,255,255,.28);
+}
+.stamp.on .stamp-name { color: var(--ink); font-weight: 750; }
+
+/* 当前档位的说明，随选择变化（替代每格各写一行小字） */
+.stamp-hint { margin-top: 14rpx; color: var(--hint); font-size: 21rpx; }
+
+/* ========== 分区标题（奖状页整体居中构图）========== */
+.section-header { display: flex; justify-content: center; margin: 30rpx 0 16rpx; }
+.section-title { color: var(--ink); font-size: 28rpx; font-weight: 750; }
+
+/* ========== 孩子 chip（与任务页 .child-pill 同形制）========== */
+.child-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 12rpx; margin: 0 2rpx 28rpx; }
+.child-chip {
+  display: inline-flex; align-items: center; gap: 10rpx;
+  padding: 8rpx 20rpx 8rpx 8rpx;
+  border: 2rpx solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--muted); font-size: 24rpx;
+  transition: all .15s ease;
+}
+.child-chip:active { transform: scale(.97); }
+.child-chip.active { background: var(--ink); border-color: var(--ink); color: #FFF; font-weight: 700; }
+.chip-avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 44rpx; height: 44rpx; overflow: hidden;
+  border-radius: 50%;
+  background: var(--soft-lime);
+  color: var(--ink); font-size: 22rpx; font-weight: 700;
+}
+.chip-avatar image { width: 100%; height: 100%; }
+.child-chip.active .chip-avatar { background: rgba(255,255,255,.92); }
+
+/* 首屏骨架：尺寸与真实 chip 一致，加载完成不跳动 */
+.skeleton-chip { pointer-events: none; }
+.skeleton-block { background: var(--line); animation: skeleton-pulse 1.1s ease-in-out infinite; }
+.skeleton-line {
+  width: 72rpx; height: 22rpx; border-radius: 8rpx;
+  background: var(--line);
+  animation: skeleton-pulse 1.1s ease-in-out infinite;
+}
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: .45; }
+  50% { opacity: 1; }
 }
 
-.level-item:last-child {
-  margin-right: 0;
+/* ========== 主操作 ==========
+   两个关键点，缺一页面切换时都会先冒出按钮：
+   ① 类名是本页私有的 .submit-cta，不叫 .confirm-button —— app.wxss 里有一条
+      `.save-button, .confirm-button, .redeem-button { position: fixed; ... }` 的共用规则，
+      同优先级下靠「页面样式后加载」去覆盖 position 并不可靠（WXSS 对 position: static
+      这类默认值的处理也不保证保留），换个不匹配的类名才是确定的做法；
+   ② position: relative（不是 fixed/absolute）+ margin-top: auto：
+      留在文档流内由 flex 顶到屏幕底部，不产生独立合成层，切换动画里随页面一起滑入。 */
+.submit-cta {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; margin: auto 0 0;
+  padding: 0 28rpx;
+  height: 96rpx;
+  border-radius: var(--radius-md);
+  background: var(--lime); color: var(--ink);
+  font-size: 30rpx; font-weight: 750;
+  box-shadow: var(--shadow-fab);
+  /* 只做透明度淡入，且不 fill-forwards：避免动画的终态盖住 :active 的按压缩放 */
+  animation: cta-in .18s ease;
+}
+@keyframes cta-in { from { opacity: 0; } }
+.submit-cta:active { transform: scale(.98); opacity: .9; }
+
+/* ========== 家长确认码弹窗 ========== */
+.pin-mask {
+  position: fixed; z-index: 100; inset: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(18,39,47,.48);
+}
+.pin-dialog {
+  width: calc(100% - 48rpx); max-width: 600rpx;
+  padding: 36rpx 32rpx calc(36rpx + env(safe-area-inset-bottom));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--mist);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+/* 键盘弹起：弹层高度收敛到「键盘之上」的可见区域（mask 已按键盘高度留出 padding），
+   内容超出时弹层内部滚动，不会顶出屏幕外 */
+.pin-dialog.kb-open { max-height: 100%; overflow-y: auto; }
+
+.pin-header { margin-bottom: 8rpx; }
+.pin-title { color: var(--ink); font-size: 32rpx; font-weight: 750; }
+.pin-hint { display: block; color: var(--muted); font-size: 24rpx; margin-bottom: 24rpx; }
+
+.pin-input {
+  width: 100%; height: 100rpx; padding: 0 24rpx;
+  border-radius: 16rpx; background: var(--paper);
+  border: 2rpx solid var(--line);
+  font-size: 48rpx; letter-spacing: 16rpx; text-align: center;
+  color: var(--ink);
 }
 
-.level-item.active {
-  border-color: #FF8B45;
-  background: #FFF5F0;
+.pin-actions { display: flex; gap: 16rpx; margin-top: 24rpx; }
+.pin-cancel {
+  flex: 1; height: 96rpx; display: flex; align-items: center; justify-content: center;
+  border-radius: 16rpx; background: var(--line); color: var(--muted);
+  font-size: 28rpx; font-weight: 600;
 }
-
-.level-name {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: #333;
-  display: block;
-  margin-bottom: 10rpx;
-}
-
-.level-desc {
-  font-size: 22rpx;
-  color: #999;
-  display: block;
-  margin-bottom: 10rpx;
-}
-
-.level-ratio {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #FF8B45;
-  display: block;
-}
-
-.preview-card {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 40rpx;
-  text-align: center;
-  margin-bottom: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.preview-label {
-  font-size: 30rpx;
-  color: #666;
-}
-
-.preview-points {
-  font-size: 60rpx;
-  font-weight: bold;
-  color: #FF8B45;
-  margin-left: 20rpx;
-  margin-right: 10rpx;
-}
-
-.preview-ratio {
-  font-size: 28rpx;
-  color: #999;
-}
-
-.submit-btn {
-  background: #FF8B45;
-  color: #fff;
-  border-radius: 50rpx;
-  height: 88rpx;
-  line-height: 88rpx;
-  font-size: 32rpx;
+.pin-confirm {
+  flex: 2; height: 96rpx; display: flex; align-items: center; justify-content: center;
+  border-radius: 16rpx; background: var(--grad-water);
+  color: #FFF; font-size: 28rpx; font-weight: 750;
 }

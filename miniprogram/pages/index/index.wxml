@@ -1,180 +1,133 @@
-<!--pages/index/index.wxml | 首页 v4.0 -->
-<view class="container">
-  
-  <!-- 顶部导航栏 -->
-  <view class="nav-bar">
-    <view class="nav-left">
-      <text class="nav-title">宝贝积分</text>
+<wxs module="utils">
+module.exports = {
+  formatDate: function(timestamp) {
+    if (!timestamp) return '';
+    var d = getDate(timestamp);
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    var hour = d.getHours();
+    var min = d.getMinutes();
+    return [month, '月', day, '日'].join('') + ' ' + [hour, min].map(function(v){ return v < 10 ? '0'+v : v; }).join(':');
+  }
+}
+</wxs>
+
+<view class="container home-page">
+  <view class="welcome-row" wx:if="{{currentChild}}">
+    <view class="welcome-copy">
+      <text class="eyebrow">家庭任务板</text>
+      <text class="welcome-title">{{currentChild ? currentChild.name + '，准备出发？' : '今天一起出发'}}</text>
     </view>
-    <view class="nav-right" bindtap="onShowChildPicker">
-      <view class="nav-child-avatar">
+    <view class="child-switch" bindtap="onShowChildPicker">
+      <view class="switch-avatar">
         <text wx:if="{{!currentChild.avatar}}">{{currentChild.name[0]}}</text>
-        <image wx:else src="{{currentChild.avatar}}" />
+        <image wx:else class="avatar-image" src="{{currentChild.avatar}}" mode="aspectFill"/>
       </view>
-      <text class="nav-child-name">{{currentChild.name}}</text>
-      <text class="nav-arrow">▼</text>
+      <text class="switch-name">{{currentChild.name}}</text>
+      <text class="switch-mark">⌄</text>
     </view>
   </view>
 
-  <!-- 主要内容区域 -->
-  <view class="main-content">
-    
-    <!-- 核心积分卡片 -->
-    <view class="points-card" wx:if="{{currentChild}}">
-      <!-- 孩子信息 -->
-      <view class="card-child-info">
-        <view class="child-avatar-wrap">
-          <view class="child-avatar-circle">
-            <text wx:if="{{!currentChild.avatar}}">{{currentChild.name[0]}}</text>
-            <image wx:else src="{{currentChild.avatar}}" />
-          </view>
-        </view>
-        <view class="child-detail">
-          <text class="child-name">{{currentChild.name}}</text>
-          <text class="child-grade">{{currentChild.grade}}</text>
-        </view>
-        <view class="rank-badge" wx:if="{{currentChildRank > 0}}">
-          <text class="rank-icon">🏆</text>
-          <text class="rank-text">第{{currentChildRank}}名</text>
-        </view>
-      </view>
-      
-      <!-- 积分展示 -->
-      <view class="card-points-main">
-        <view class="points-display">
-          <text class="points-value">{{currentChild.availablePoints}}</text>
-          <text class="points-label">可用积分</text>
-        </view>
-      </view>
-      
-      <!-- 积分统计 -->
-      <view class="card-points-stats">
-        <view class="stat-item">
-          <text class="stat-label">累计积分</text>
-          <text class="stat-value">{{currentChild.totalPoints}}</text>
-        </view>
-        <view class="stat-divider"></view>
-        <view class="stat-item">
-          <text class="stat-label">已兑换</text>
-          <text class="stat-value">{{currentChild.redeemedPoints}}</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 快捷入口 -->
-    <view class="quick-actions">
-      <view class="action-item" bindtap="onViewCalendar">
-        <view class="action-icon bg-calendar">
-          <text class="action-emoji">📅</text>
-        </view>
-        <text class="action-text">积分日历</text>
-      </view>
-      <view class="action-item" bindtap="onViewHistory">
-        <view class="action-icon bg-history">
-          <text class="action-emoji">📋</text>
-        </view>
-        <text class="action-text">任务记录</text>
-      </view>
-      <view class="action-item" bindtap="onViewRanking">
-        <view class="action-icon bg-ranking">
-          <text class="action-emoji">🏅</text>
-        </view>
-        <text class="action-text">排行榜</text>
-      </view>
-    </view>
-
-    <!-- 积分排行榜 -->
-    <view class="section-card" wx:if="{{ranking.length > 0}}">
-      <view class="section-header">
-        <view class="section-title-wrap">
-          <text class="section-icon">🏆</text>
-          <text class="section-title">积分排行榜</text>
-        </view>
-        <view class="section-more">
-          <text>全部</text>
-          <text class="more-arrow">›</text>
-        </view>
-      </view>
-      <view class="ranking-list">
-        <view class="ranking-item" wx:for="{{ranking}}" wx:key="_id">
-          <view class="rank-left">
-            <view class="rank-number {{item.rank <= 3 ? 'rank-top' : ''}}">
-              <text wx:if="{{item.rank == 1}}">🥇</text>
-              <text wx:elif="{{item.rank == 2}}">🥈</text>
-              <text wx:elif="{{item.rank == 3}}">🥉</text>
-              <text wx:else>{{item.rank}}</text>
-            </view>
-            <view class="rank-info">
-              <text class="rank-name">{{item.childName}}</text>
-            </view>
-          </view>
-          <view class="rank-right">
-            <text class="rank-points">{{item.totalPoints}}</text>
-            <text class="rank-unit">积分</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 最新兑换 -->
-    <view class="section-card" wx:if="{{latestRedemptions.length > 0}}">
-      <view class="section-header">
-        <view class="section-title-wrap">
-          <text class="section-icon">🎁</text>
-          <text class="section-title">最新兑换</text>
-        </view>
-        <view class="section-more">
-          <text>全部</text>
-          <text class="more-arrow">›</text>
-        </view>
-      </view>
-      <view class="recent-list">
-        <view class="recent-item" wx:for="{{latestRedemptions}}" wx:key="_id">
-          <view class="recent-icon">
-            <text>🎁</text>
-          </view>
-          <view class="recent-info">
-            <text class="recent-name">{{item.rewardName}}</text>
-            <text class="recent-time">{{item.redeemedAt}}</text>
-          </view>
-          <view class="recent-points">
-            <text class="points-minus">-{{item.points}}</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
+  <!-- 加载占位：位置与积分卡片一致，刷新时既不闪「先添加孩子档案」，也不会有布局跳动 -->
+  <view class="score-panel score-panel-skeleton" wx:if="{{!profileReady}}">
+    <view class="score-topline"><text class="score-caption">可用积分</text></view>
+    <view class="score-number-row"><view class="skeleton-bar"></view></view>
+    <view class="score-divider"></view>
+    <view class="score-foot"><text class="score-small-label">正在加载…</text></view>
   </view>
 
-  <!-- 孩子选择器弹窗 -->
-  <view class="picker-mask {{showChildPicker ? 'show' : ''}}" wx:if="{{showChildPicker}}" bindtap="onHideChildPicker">
+  <!-- 下面两块各自独立判断（不依赖 wx:elif 链），且都以 profileReady 为前提：
+       刷新时 profileReady 还是 false，它们在结构上不可能显示，卡片就不会闪出来 -->
+  <view class="no-child-state" wx:if="{{profileReady && loadFailed && !currentChild}}">
+    <view class="no-child-icon"><icon name="info" size="48" color="#14343D"/></view>
+    <text class="no-child-title">加载失败</text>
+    <text class="no-child-copy">没能读取到家庭数据，请检查网络后重试。</text>
+    <button class="no-child-button" bindtap="onRetry">重新加载</button>
+  </view>
+
+  <view class="no-child-state" wx:if="{{profileReady && !loadFailed && !currentChild && children.length === 0}}">
+    <view class="no-child-icon"><icon name="user" size="48" color="#14343D"/></view>
+    <text class="no-child-title">先添加孩子档案</text>
+    <text class="no-child-copy">添加后即可创建专属任务、记录进步和兑换奖励。</text>
+    <button class="no-child-button" bindtap="onManageChildren">添加孩子档案</button>
+  </view>
+
+  <view wx:if="{{currentChild}}">
+  <!-- 积分面板：明亮青碧渐变 -->
+  <view class="score-panel" wx:if="{{currentChild}}">
+    <view class="score-topline">
+      <text class="score-caption">可用积分</text>
+      <view class="score-shortcut" bindtap="onViewHistory">
+        <icon name="history" size="29" color="#FFFFFF"/><text>积分记录</text>
+      </view>
+    </view>
+    <view class="score-number-row">
+      <text class="score-number">{{currentChild.availablePoints}}</text>
+      <text class="score-unit">积分</text>
+    </view>
+    <view class="score-divider"></view>
+    <view class="score-foot">
+      <view class="score-stats">
+        <view class="score-stat"><text class="score-small">{{currentChild.totalPoints || 0}}</text><text class="score-small-label">累计获得</text></view>
+        <view class="score-stat"><text class="score-small">{{currentChild.redeemedPoints || 0}}</text><text class="score-small-label">已经兑换</text></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷入口：金色主 + 青色副，活泼配色 -->
+  <view class="home-actions">
+    <view class="primary-action" bindtap="onOpenTasks">
+      <view class="action-copy"><text class="action-kicker">现在可以做</text><text class="action-title">看看任务</text></view>
+      <view class="action-symbol"><icon name="check" size="42" color="#14343D"/></view>
+    </view>
+    <view class="secondary-action" bindtap="onOpenRewards">
+      <view class="action-copy"><text class="action-kicker">积分怎么花</text><text class="action-title">挑选奖励</text></view>
+      <icon name="gift" size="40" color="#FFFFFF"/>
+    </view>
+  </view>
+
+  <!-- 最近兑换：右侧展示兑换所需积分 -->
+  <view class="section-heading redemption-heading">
+    <view class="section-copy"><text class="section-title">最近兑换</text><text class="section-note">每份奖励都有来处</text></view>
+    <view class="text-link" bindtap="onViewRewardHistory">查看记录</view>
+  </view>
+  <view class="redemption-list" wx:if="{{latestRedemptions.length > 0}}">
+    <view class="redemption-row" wx:for="{{latestRedemptions}}" wx:key="_id">
+      <view class="redemption-icon"><icon name="gift" size="34" color="#D9503A"/></view>
+      <view class="redemption-info">
+        <text class="redemption-name">{{item.rewardName}}</text>
+        <text class="redemption-date">{{utils.formatDate(item.redeemedAt)}}</text>
+      </view>
+      <view class="redemption-cost" wx:if="{{item.points > 0}}">
+        <text class="cost-value">−{{item.points}}</text>
+        <text class="cost-label">积分</text>
+      </view>
+    </view>
+  </view>
+  <view class="empty-inline" wx:else>兑换奖励后，会在这里留下记录</view>
+
+  <view class="section-heading">
+    <view class="section-copy"><text class="section-title">积分排名</text><text class="section-note">按累计获得积分排序</text></view>
+    <icon name="ranking" size="38" color="#12807A"/>
+  </view>
+  <view class="rank-list" wx:if="{{ranking.length > 0}}">
+    <view class="rank-row {{item.childId === currentChild._id ? 'rank-current' : ''}}" wx:for="{{ranking}}" wx:key="childId">
+      <view class="rank-avatar"><text wx:if="{{!item.childAvatar}}">{{item.childName[0]}}</text><image wx:else class="avatar-image" src="{{item.childAvatar}}" mode="aspectFill"/></view>
+      <view class="rank-info"><text class="rank-name">{{item.childName}}</text><text class="rank-sub">{{item.availablePoints}} 可用</text></view>
+      <view class="rank-right"><text class="rank-index">{{item.rank < 10 ? '0' + item.rank : item.rank}}</text><text class="rank-score">{{item.totalPoints}} <text class="rank-unit">分</text></text></view>
+    </view>
+  </view>
+  <view class="ranking-more" wx:if="{{rankingHasMore}}" bindtap="onLoadMoreRanking">{{rankingLoadingMore ? '正在加载…' : '查看更多 · 最多前50名'}}</view>
+
+  <view class="picker-mask" wx:if="{{showChildPicker}}" bindtap="onHideChildPicker">
     <view class="picker-sheet" catchtap="stopPropagation">
-      <view class="picker-header">
-        <text class="picker-title">选择孩子</text>
-        <view class="picker-close" bindtap="onHideChildPicker">
-          <text>✕</text>
-        </view>
-      </view>
-      <view class="picker-list">
-        <view class="picker-item {{item._id === currentChild._id ? 'active' : ''}}" 
-              wx:for="{{children}}" 
-              wx:key="_id" 
-              bindtap="onSelectChild" 
-              data-id="{{item._id}}">
-          <view class="picker-avatar">
-            <text wx:if="{{!item.avatar}}">{{item.name[0]}}</text>
-            <image wx:else src="{{item.avatar}}" />
-          </view>
-          <view class="picker-info">
-            <text class="picker-name">{{item.name}}</text>
-            <text class="picker-grade" wx:if="{{item.grade}}">{{item.grade}}</text>
-          </view>
-          <view class="picker-check" wx:if="{{item._id === currentChild._id}}">
-            <text class="check-icon">✓</text>
-          </view>
-        </view>
+      <view class="picker-head"><text>切换孩子</text><text class="picker-close" bindtap="onHideChildPicker">关闭</text></view>
+      <view class="picker-option {{item._id === currentChild._id ? 'selected' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
+        <view class="switch-avatar"><text wx:if="{{!item.avatar}}">{{item.name[0]}}</text><image wx:else class="avatar-image" src="{{item.avatar}}" mode="aspectFill"/></view>
+        <text>{{item.name}}</text><text class="option-grade">{{item.grade}}</text>
+        <icon wx:if="{{item._id === currentChild._id}}" name="check" size="32" color="#12807A"/>
       </view>
     </view>
   </view>
-
+  </view>
 </view>

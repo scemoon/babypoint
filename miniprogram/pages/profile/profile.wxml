@@ -1,79 +1,28 @@
-<!--pages/profile/profile.wxml | 我的页 v4.0-->
-<view class="container">
-  <!-- 孩子信息卡片 -->
-  <view class="child-card" wx:if="{{currentChild}}">
-    <view class="child-header">
-      <view class="avatar-wrap">
-        <view class="child-avatar">
-          <text class="avatar-text" wx:if="{{!currentChild.avatar}}">{{currentChild.name[0]}}</text>
-          <image wx:else src="{{currentChild.avatar}}" class="avatar-img"/>
-        </view>
-      </view>
-      <view class="child-info">
-        <text class="child-name">{{currentChild.name}}</text>
-        <text class="child-grade">{{currentChild.gradeLevel || currentChild.grade}}年级</text>
-      </view>
-    </view>
-    
-    <view class="child-stats">
-      <view class="stat-item">
-        <text class="stat-num">{{currentChild.totalPoints || 0}}</text>
-        <text class="stat-label">累计积分</text>
-      </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item">
-        <text class="stat-num available">{{(currentChild.totalPoints || 0) - (currentChild.redeemedPoints || 0)}}</text>
-        <text class="stat-label">可用积分</text>
-      </view>
-      <view class="stat-divider"></view>
-      <view class="stat-item">
-        <text class="stat-num">{{currentChild.redeemedPoints || 0}}</text>
-        <text class="stat-label">已兑换</text>
-      </view>
-    </view>
-    
-    <button class="manage-btn" bindtap="onChildManage">
-      <text class="btn-icon">👶</text>
-      <text>管理孩子</text>
-    </button>
+<view class="container profile-page">
+  <!-- 页面标题：扁平页头，不用渐变面板 -->
+  
+  <view class="parent-card"><view class="parent-avatar"><image wx:if="{{parentInfo.avatar}}" src="{{parentInfo.avatar}}" mode="aspectFill"/><text wx:else>{{parentInfo.nickname ? parentInfo.nickname[0] : '家'}}</text></view><view class="parent-copy"><text class="parent-name">{{parentInfo.nickname || '家长'}}</text><text class="parent-caption">微信登录 · 家庭管理员</text></view></view>
+  <view class="profile-hero" wx:if="{{currentChild}}">
+    <view class="profile-person"><view class="profile-avatar"><text wx:if="{{!currentChild.avatar}}">{{currentChild.name[0]}}</text><image wx:else src="{{currentChild.avatar}}" mode="aspectFill"/></view><view><text class="profile-name">{{currentChild.name}}</text><text class="profile-grade">{{currentChild.gradeLevel || currentChild.grade}}年级</text></view></view>
+    <view class="profile-total"><text class="total-number">{{currentChild.totalPoints || 0}}</text><text>累计获得积分</text></view>
+    <view class="profile-balance"><text>当前可用</text><text>{{(currentChild.totalPoints || 0) - (currentChild.redeemedPoints || 0)}} 分</text></view>
   </view>
-
-  <!-- 功能菜单 -->
-  <view class="menu-card">
-    <view class="menu-item" bindtap="onTaskHistory">
-      <view class="menu-icon-wrap history-icon">
-        <text class="menu-emoji">📋</text>
-      </view>
-      <text class="menu-text">任务记录</text>
-      <view class="menu-arrow">
-        <text class="arrow-icon">›</text>
-      </view>
-    </view>
-    <view class="menu-divider"></view>
-    <view class="menu-item" bindtap="onRewardHistory">
-      <view class="menu-icon-wrap reward-icon">
-        <text class="menu-emoji">🎁</text>
-      </view>
-      <text class="menu-text">兑换记录</text>
-      <view class="menu-arrow">
-        <text class="arrow-icon">›</text>
-      </view>
-    </view>
-    <view class="menu-divider"></view>
-    <view class="menu-item" bindtap="onCalendar">
-      <view class="menu-icon-wrap calendar-icon">
-        <text class="menu-emoji">📅</text>
-      </view>
-      <text class="menu-text">积分日历</text>
-      <view class="menu-arrow">
-        <text class="arrow-icon">›</text>
-      </view>
-    </view>
+  <view class="settings-label">家庭与记录</view>
+  <view class="settings-list">
+    <view class="settings-row" bindtap="onChildManage"><view class="settings-icon cyan"><icon name="user" size="34" color="#14343D"/></view><view class="settings-copy"><text>管理孩子</text><text>添加、编辑或切换家庭成员</text></view><text class="settings-arrow">›</text></view>
+    <view class="settings-row" bindtap="onTaskHistory"><view class="settings-icon lime"><icon name="check" size="34" color="#14343D"/></view><view class="settings-copy"><text>任务记录</text><text>查看每次完成和获得的积分</text></view><text class="settings-arrow">›</text></view>
+    <view class="settings-row" bindtap="onRewardHistory"><view class="settings-icon coral"><icon name="gift" size="34" color="#14343D"/></view><view class="settings-copy"><text>兑换记录</text><text>回看积分都换成了什么</text></view><text class="settings-arrow">›</text></view>
+    <view class="settings-row" bindtap="onCompletionPin"><view class="settings-icon lime"><icon name="check" size="34" color="#14343D"/></view><view class="settings-copy"><text>任务确认码</text><text>记入积分前需要家长确认</text></view><text class="settings-arrow">›</text></view>
+    <view class="settings-row" bindtap="onCustomerService"><view class="settings-icon cyan"><icon name="info" size="34" color="#14343D"/></view><view class="settings-copy"><text>联系客服</text><text>邮箱或微信联系</text></view><text class="settings-arrow">›</text></view>
   </view>
-
-  <!-- 应用信息 -->
-  <view class="app-info">
-    <text class="app-name">宝贝积分</text>
-    <text class="app-version">v2.0.0</text>
+  <view class="profile-foot"><text>宝贝积分</text><text>一起把小目标变成好习惯</text></view>
+  <view class="contact-mask" wx:if="{{showCustomerContact}}" bindtap="onCloseCustomerContact">
+    <view class="contact-dialog" catchtap="stopPropagation">
+      <text class="contact-title">联系客服</text>
+      <text class="contact-hint">选择一种方式与我们联系</text>
+      <view class="contact-item"><view><text class="contact-label">客服邮箱</text><text class="contact-value">284758933@qq.com</text></view><text class="contact-copy" data-value="284758933@qq.com" bindtap="onCopyContact">复制</text></view>
+      <view class="contact-item"><view><text class="contact-label">微信号</text><text class="contact-value">Scemoon</text></view><text class="contact-copy" data-value="Scemoon" bindtap="onCopyContact">复制</text></view>
+      <view class="contact-close" bindtap="onCloseCustomerContact">关闭</view>
+    </view>
   </view>
 </view>

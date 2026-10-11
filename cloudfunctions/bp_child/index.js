@@ -1,6 +1,34 @@
 // bp_child - 孩子档案管理
 const cloud = require('wx-server-sdk');
+const crypto = require('crypto');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
+
+const PIN_ITERATIONS = 120000;
+
+function pinHash(pin, salt) {
+  return crypto.pbkdf2Sync(pin, salt, PIN_ITERATIONS, 32, 'sha256').toString('hex');
+}
+
+function verifyPin(user, pin) {
+  if (!user || !user.completionPinHash || !user.completionPinSalt) return false;
+  const expected = Buffer.from(user.completionPinHash, 'hex');
+  const hash = crypto.pbkdf2Sync(pin, user.completionPinSalt, Number(user.completionPinIterations) || PIN_ITERATIONS, 32, 'sha256').toString('hex');
+  const actual = Buffer.from(hash, 'hex');
+  return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+}
+
+function toPublicUserInfo(user) {
+  if (!user) return user;
+  const { completionPinHash, completionPinSalt, completionPinIterations, completionPinFailCount, completionPinLockedUntil, ...publicInfo } = user;
+  return publicInfo;
+}
+
+async function registerPinFailure(usersCol, openid, user) {
+  const attempts = (Number(user.completionPinFailCount) || 0) + 1;
+  const lockedUntil = attempts >= 5 ? Date.now() + 10 * 60 * 1000 : (user.completionPinLockedUntil || 0);
+  await usersCol.doc(openid).update({ data: { completionPinFailCount: attempts >= 5 ? 0 : attempts, completionPinLockedUntil: lockedUntil, updatedAt: Date.now() } });
+  return lockedUntil > Date.now() ? '确认码错误次数过多，请10分钟后再试' : `确认码错误，还可尝试${5 - attempts}次`;
+}
 
 const GRADE_META = {
   'kindergarten_small':  { name: '幼儿园小班', level: 1,  stage: 'kindergarten' },
@@ -48,7 +76,47 @@ exports.main = async (event, context) => {
   try {
     switch (action) {
       case 'register': {
-        await createParent(openid, data.userInfo || {});
+        const existing = await usersCol.doc(openid).get().catch(() => null);
+        const profile = data.userInfo || {};
+        if (existing && existing.data) {
+          const updateData = { updatedAt: Date.now(), lastActiveAt: Date.now() };
+          if (profile.nickname) updateData.nickname = profile.nickname;
+          if (profile.avatar) updateData.avatar = profile.avatar;
+          await usersCol.doc(openid).update({ data: updateData });
+          return { success: true, userInfo: toPublicUserInfo({ ...existing.data, ...updateData }) };
+        }
+        const userInfo = await createParent(openid, profile);
+        return { success: true, userInfo };
+      }
+
+      case 'getCompletionPinStatus': {
+        const userRes = await usersCol.doc(openid).get().catch(() => null);
+        return { success: true, configured: !!(userRes && userRes.data && userRes.data.completionPinHash) };
+      }
+
+      case 'setCompletionPin': {
+        const { currentPin, newPin, confirmPin } = data;
+        if (!/^\d{6}$/.test(String(newPin || ''))) return { success: false, error: '请设置6位数字确认码' };
+        if (newPin !== confirmPin) return { success: false, error: '两次输入的确认码不一致' };
+        const userRes = await usersCol.doc(openid).get().catch(() => null);
+        if (!userRes || !userRes.data) return { success: false, error: '家长账户不存在，请重新登录' };
+        const user = userRes.data;
+        if (user.completionPinHash) {
+          if ((user.completionPinLockedUntil || 0) > Date.now()) return { success: false, error: '确认码已暂时锁定，请10分钟后再试' };
+          if (!verifyPin(user, String(currentPin || ''))) {
+            const error = await registerPinFailure(usersCol, openid, user);
+            return { success: false, error };
+          }
+        }
+        const salt = crypto.randomBytes(16).toString('hex');
+        await usersCol.doc(openid).update({ data: {
+          completionPinHash: pinHash(String(newPin), salt),
+          completionPinSalt: salt,
+          completionPinIterations: PIN_ITERATIONS,
+          completionPinFailCount: 0,
+          completionPinLockedUntil: 0,
+          updatedAt: Date.now()
+        } });
         return { success: true };
       }
 

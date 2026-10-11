@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "icon": "/components/icon/icon"
+  },
   "navigationBarTitleText": "管理孩子"
 }

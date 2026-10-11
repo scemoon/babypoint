@@ -13,13 +13,16 @@ exports.main = async (event, context) => {
   try {
     switch (action) {
       case 'getRanking': {
-        const res = await childrenCol.where({ parentId: openid, isActive: true }).orderBy('totalPoints', 'desc').get();
-        const list = (res.data || []).map((child, index) => ({
+        const requestedLimit = Number(data.limit) || 10;
+        const limit = Math.min(50, Math.max(10, Math.floor(requestedLimit)));
+        const res = await childrenCol.where({ _openid: openid }).orderBy('totalPoints', 'desc').limit(limit + 1).get();
+        const rows = res.data || [];
+        const list = rows.slice(0, limit).map((child, index) => ({
           rank: index + 1, childId: child._id, childName: child.name, childAvatar: child.avatar,
           totalPoints: child.totalPoints || 0, redeemedPoints: child.redeemedPoints || 0,
           availablePoints: (child.totalPoints || 0) - (child.redeemedPoints || 0), isCurrent: child._id === data.currentChildId
         }));
-        return { success: true, list };
+        return { success: true, list, hasMore: limit < 50 && rows.length > limit };
       }
       default:
         return { success: false, error: '未知操作' };

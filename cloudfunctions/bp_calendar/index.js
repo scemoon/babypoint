@@ -2,16 +2,35 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
+// 北京时间 (UTC+8) 的毫秒偏移量
+const CST_OFFSET = 8 * 60 * 60 * 1000;
+
+// 将时间戳转换为北京时间日期字符串 YYYY-MM-DD
 function formatDate(timestamp) {
-  const d = new Date(timestamp);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return y + '-' + m + '-' + day;
+  const d = new Date(timestamp + CST_OFFSET);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
-function getMonthStart(year, month) { return new Date(year, month - 1, 1).getTime(); }
-function getMonthEnd(year, month) { return new Date(year, month, 0, 23, 59, 59, 999).getTime(); }
+// 获取北京时间月初时间戳（毫秒）
+function getMonthStart(year, month) {
+  // 用 Date.UTC 构造 UTC 0点，再转到北京时间
+  const utcMonthStart = Date.UTC(year, month - 1, 1);
+  // 北京时间月初 = UTC 月初 + 8小时，但 setHours(0,0,0,0) 是按本地(UTC)时间
+  // 所以直接用: UTC 2026-10-01 00:00 UTC = 北京时间 2026-10-01 08:00
+  // 我们要的是北京时间 2026-10-01 00:00 = UTC 2026-09-30 16:00
+  const cstMonthStart = Date.UTC(year, month - 1, 1) - CST_OFFSET;
+  return cstMonthStart;
+}
+
+// 获取北京时间月末最后一毫秒的时间戳
+function getMonthEnd(year, month) {
+  // 北京时间月末 = 北京时间月初的下个月第0天
+  const cstNextMonthStart = Date.UTC(year, month, 1) - CST_OFFSET;
+  return cstNextMonthStart - 1;
+}
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext();
@@ -27,7 +46,10 @@ exports.main = async (event, context) => {
   try {
     if (data.childId) {
       const childRes = await childrenCol.doc(data.childId).get();
-      if (!childRes.data || childRes.data.parentId !== openid) return { success: false, error: '孩子不存在' };
+      if (!childRes.data) return { success: false, error: '孩子不存在' };
+      const child = childRes.data;
+      const ownerId = child.parentId || child._openid;
+      if (ownerId !== openid) return { success: false, error: '孩子不存在' };
     }
 
     switch (action) {
@@ -66,8 +88,11 @@ exports.main = async (event, context) => {
       case 'getDayDetails': {
         const { childId, date } = data;
         if (!childId || !date) return { success: false, error: '参数不完整' };
-        const dayStart = new Date(date + 'T00:00:00').getTime();
-        const dayEnd = new Date(date + 'T23:59:59').getTime();
+        // date 格式为 YYYY-MM-DD (北京时间)
+        // 北京时间 date 00:00 = UTC date-1 16:00
+        const [y, m, d] = date.split('-').map(Number);
+        const dayStart = Date.UTC(y, m - 1, d) - CST_OFFSET;
+        const dayEnd = dayStart + 24 * 60 * 60 * 1000 - 1;
         const completions = await completionsCol.where({ childId, completedAt: _.and(_.gte(dayStart), _.lte(dayEnd)) }).orderBy('completedAt', 'asc').get();
         const redemptions = await redemptionsCol.where({ childId, redeemedAt: _.and(_.gte(dayStart), _.lte(dayEnd)) }).orderBy('redeemedAt', 'asc').get();
         return { success: true, tasks: completions.data || [], rewards: redemptions.data || [] };
