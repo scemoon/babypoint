@@ -51,71 +51,62 @@
     </view>
   </view>
 
-  <!-- 状态分段控件（分类下方） -->
-  <view class="status-segment">
-    <view class="status-segment-item {{currentStatus === 'in_progress' ? 'active' : ''}}" data-status="in_progress" bindtap="onStatusChange">
-      <text>进行中</text>
-      <text wx:if="{{statusCounts.in_progress !== undefined}}" class="status-count">{{statusCounts.in_progress}}</text>
+  <!-- 进度分段控件：待开始 / 进行中 / 已完成 / 已逾期 -->
+  <scroll-view scroll-x class="status-scroll" enhanced show-scrollbar="{{false}}">
+    <view class="status-segment">
+      <view wx:for="{{statusTabs}}" wx:key="key" class="status-segment-item {{item.key === 'overdue' ? 'overdue' : ''}} {{currentStatus === item.key ? 'active' : ''}}" data-status="{{item.key}}" bindtap="onStatusChange">
+        <text>{{item.name}}</text>
+        <text class="status-count">{{item.count}}</text>
+      </view>
     </view>
-    <view class="status-segment-item {{currentStatus === 'completed' ? 'active' : ''}}" data-status="completed" bindtap="onStatusChange">
-      <text>已完成</text>
-      <text wx:if="{{statusCounts.completed !== undefined}}" class="status-count">{{statusCounts.completed}}</text>
-    </view>
-    <view class="status-segment-item overdue {{currentStatus === 'overdue' ? 'active' : ''}}" data-status="overdue" bindtap="onStatusChange">
-      <text>已逾期</text>
-      <text wx:if="{{statusCounts.overdue !== undefined}}" class="status-count">{{statusCounts.overdue}}</text>
-    </view>
-  </view>
+  </scroll-view>
 
   <!-- 列表标题 -->
   <view class="list-heading">
-    <text>{{displayTasks.length}} 项任务</text>
-    <text class="hint" wx:if="{{currentStatus === 'overdue'}}">⚠️ 逾期任务自动作废</text>
+    <text>{{displayTasks.length}} 个周期 · {{currentStatusLabel}}</text>
+    <text class="hint" wx:if="{{currentStatus === 'overdue'}}">⚠️ 逾期周期自动作废</text>
+    <text class="hint" wx:elif="{{currentStatus === 'pending'}}">⏳ 尚未开始，可提前完成</text>
   </view>
 
-  <!-- 任务列表 -->
+  <!-- 任务列表：每个周期一行 -->
   <view class="task-list" wx:if="{{!loading && displayTasks.length}}">
-    <view class="task-row {{item.status === 'completed' ? 'completed' : ''}} {{item.isOverdue ? 'overdue' : ''}}" wx:for="{{displayTasks}}" wx:key="_id" bindtap="onTaskTap" data-task="{{item}}">
+    <view class="task-row {{item.status === 'completed' ? 'completed' : ''}} {{item.status === 'overdue' ? 'overdue' : ''}} {{item.status === 'pending' ? 'pending' : ''}}" wx:for="{{displayTasks}}" wx:key="_id" bindtap="onTaskTap" data-task="{{item}}">
       <!-- 左侧 emoji 图标：与发布页任务模板一致 -->
       <view class="task-icon"><text>{{item.categoryIcon || '📝'}}</text></view>
       <!-- 任务主体 -->
       <view class="task-main">
         <view class="task-tags">
           <text class="tag-domain" wx:if="{{item.domainName}}">{{item.domainName}}</text>
-          <text class="tag-overdue" wx:if="{{item.isOverdue}}">已作废</text>
+          <text class="tag-status tag-status-{{item.status}}">{{item.statusLabel}}</text>
         </view>
-        <text class="task-name {{item.isOverdue ? 'overdue' : ''}}">{{item.name}}</text>
-        <text class="task-description" wx:if="{{item.description && !item.isOverdue}}">{{item.description}}</text>
-        <view class="task-meta" wx:if="{{!item.isOverdue}}">
-          <text class="task-category"><text>{{item.categoryIcon || '📝'}}</text><text>{{item.categoryName}}</text></text>
-          <text class="task-period">· {{item.periodLabel}}</text>
-          <text class="task-progress">· {{item.progress}}/{{item.targetCount}}</text>
+        <text class="task-name {{item.status === 'overdue' ? 'overdue' : ''}}">{{item.name}}</text>
+        <text class="task-description" wx:if="{{item.description && item.status !== 'overdue'}}">{{item.description}}</text>
+        <view class="task-meta">
+          <text class="task-instance">{{item.instanceLabel}}</text>
+          <text class="task-period" wx:if="{{item.periodLabel}}">· {{item.periodLabel}}</text>
+          <text class="task-progress" wx:if="{{item.periodTotal > 1}}">· 第 {{item.periodIndex}}/{{item.periodTotal}} 次</text>
         </view>
-        <view class="progress-track" wx:if="{{item.status !== 'completed' && !item.isOverdue}}">
-          <view class="progress-fill" style="width: {{(item.progress / item.targetCount) * 100}}%;"></view>
+        <text class="task-range">有效期 {{item.rangeLabel}}</text>
+        <view class="task-starts" wx:if="{{item.startsInLabel}}">
+          <text>{{item.startsInLabel}}</text>
         </view>
       </view>
       <!-- 积分标签 -->
       <view class="task-reward">
-        <text class="points" wx:if="{{!item.isOverdue}}">+{{item.basePoints}}</text>
-        <text class="points-label" wx:if="{{!item.isOverdue}}">积分</text>
-        <text class="expired-text" wx:if="{{item.isOverdue}}">已失效</text>
+        <text class="points" wx:if="{{item.status !== 'overdue'}}">+{{item.basePoints}}</text>
+        <text class="points-label" wx:if="{{item.status !== 'overdue'}}">积分</text>
+        <text class="done-text" wx:if="{{item.status === 'completed'}}">已完成</text>
+        <text class="expired-text" wx:if="{{item.status === 'overdue'}}">已失效</text>
       </view>
-      <text class="task-chevron" wx:if="{{item.status !== 'completed' && !item.isOverdue}}">›</text>
+      <text class="task-chevron" wx:if="{{item.status === 'active' || item.status === 'pending'}}">›</text>
     </view>
   </view>
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{!loading && displayTasks.length === 0}}">
-    <text class="empty-emoji" wx:if="{{currentStatus === 'in_progress'}}">🎉</text>
-    <text class="empty-emoji" wx:if="{{currentStatus === 'completed'}}">📝</text>
-    <text class="empty-emoji" wx:if="{{currentStatus === 'overdue'}}">✅</text>
-    <text class="empty-text" wx:if="{{currentStatus === 'in_progress'}}">太棒了！暂无进行中任务</text>
-    <text class="empty-text" wx:if="{{currentStatus === 'completed'}}">还没有完成的任务</text>
-    <text class="empty-text" wx:if="{{currentStatus === 'overdue'}}">没有逾期任务</text>
-    <text class="empty-hint" wx:if="{{currentStatus === 'in_progress'}}">所有任务都已完成或已逾期</text>
-    <text class="empty-hint" wx:if="{{currentStatus === 'completed'}}">完成任务获得积分奖励</text>
-    <text class="empty-hint" wx:if="{{currentStatus === 'overdue'}}">继续保持</text>
+    <text class="empty-emoji">{{emptyEmoji}}</text>
+    <text class="empty-text">{{emptyText}}</text>
+    <text class="empty-hint">{{emptyHint}}</text>
     <button class="empty-button" bindtap="onAddTask" wx:if="{{currentStatus !== 'overdue'}}">添加任务</button>
   </view>
 

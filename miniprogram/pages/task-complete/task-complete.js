@@ -11,6 +11,8 @@ const COMPLETION_LEVELS = [
 Page(keyboardAvoid({
   data: {
     taskId: '',
+    // 归属周期起点：提前完成待开始周期时，要把积分记到那个未来周期上
+    instanceStart: 0,
     taskName: '',
     basePoints: 0,
     icon: '',
@@ -47,9 +49,12 @@ Page(keyboardAvoid({
   onLoad(options) {
     const taskId = options.taskId || '';
     const childId = options.childId || app.globalData.currentChildId || '';
+    // 周期实例：任务页点的是"哪一个周期"，完成时必须落到同一个周期上
+    const instanceStart = Number(options.instanceStart) || 0;
 
     const initData = {
       taskId,
+      instanceStart,
       taskName: decodeURIComponent(options.taskName || ''),
       basePoints: parseInt(options.basePoints, 10) || 0,
       icon: decodeURIComponent(options.icon || ''),
@@ -228,7 +233,7 @@ Page(keyboardAvoid({
   stopPropagation() {},
 
   async onConfirmWithPin() {
-    const { taskId, selectedChild, selectedLevel, confirmationCode } = this.data;
+    const { taskId, instanceStart, selectedChild, selectedLevel, confirmationCode } = this.data;
     if (!/^\d{6}$/.test(confirmationCode)) {
       wx.showToast({ title: '请输入6位家长确认码', icon: 'none' });
       return;
@@ -239,6 +244,7 @@ Page(keyboardAvoid({
       const res = await app.callCloudFunction('task', {
         action: 'completeTask',
         taskId,
+        instanceStart: instanceStart || undefined,
         childId: selectedChild._id,
         completionLevel: selectedLevel,
         confirmationCode

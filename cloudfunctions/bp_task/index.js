@@ -219,20 +219,140 @@ async function recordPinFailure(usersCol, openid, user) {
   return lockedUntil > Date.now() ? '确认码错误次数过多，请10分钟后再试' : `确认码错误，还可尝试${5 - attempts}次`;
 }
 
-function getPeriodStart(task, now) {
+// 归一化并校验用户提交的时间范围：缺省按频次默认时长补齐（单次明天、每天 1 个月、
+// 每周 3 个月、每月 1 年、自定义按间隔），并保证 结束日期 >= 开始日期
+function resolveRange({ periodType, periodDays, startDate, endDate }, now) {
+  const type = periodType || 'once';
+  const days = Math.max(1, Number(periodDays) || 1);
+  const defDays = type === 'custom' ? days : (DEFAULT_RANGE_DAYS[type] || 1);
+  const start = normalizeDay(startDate) || (type === 'once' ? dayStart(now) + DAY_MS : dayStart(now));
+  let end = normalizeDay(endDate);
+  if (end === null) end = start + (defDays - 1) * DAY_MS;
+  if (end < start) end = start;
+  return { startDate: start, endDate: end };
+}
+
+// ==================== 时间范围 & 周期实例 ====================
+const DAY_MS = 86400000;
+
+// 各频次的默认时长（天）：单次明天、每天 1 个月、每周 3 个月、每月 1 年
+const DEFAULT_RANGE_DAYS = { once: 1, daily: 30, weekly: 90, monthly: 365 };
+
+// 频率（每天/每周…）→ 间隔天数，自定义周期用 periodDays
+const STEP_DAYS = { daily: 1, weekly: 7, monthly: 30 };
+
+const PERIOD_LABELS = { once: '单次', daily: '每天', weekly: '每周', monthly: '每月' };
+
+function dayStart(ts) {
+  const d = new Date(ts);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+// 时间戳 → 'YYYY-MM-DD'
+function fmtDate(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// 把传入的日期（毫秒时间戳 / 'YYYY-MM-DD' / Date）归一化到当天 00:00
+function normalizeDay(value) {
+  if (value === undefined || value === null || value === '') return null;
+  if (typeof value === 'number') return Number.isFinite(value) ? dayStart(value) : null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : dayStart(value.getTime());
+  const parsed = Date.parse(String(value).replace(/-/g, '/'));
+  return Number.isNaN(parsed) ? null : dayStart(parsed);
+}
+
+// 任务的时间范围；老任务没有 startDate/endDate 时按"创建时间 + 该频次默认时长"兜底，
+// 保证升级前创建的任务仍然可用
+function getTaskRange(task) {
   const type = task.periodType || 'once';
-  const date = new Date(now);
-  if (type === 'daily') date.setHours(0, 0, 0, 0);
-  else if (type === 'weekly') {
-    date.setHours(0, 0, 0, 0);
-    date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
-  } else if (type === 'monthly') date.setDate(1), date.setHours(0, 0, 0, 0);
-  else if (type === 'custom') {
-    const days = Math.max(1, Number(task.periodDays) || 1);
-    const anchor = Number(task.createdAt) || now;
-    return anchor + Math.floor((now - anchor) / (days * 86400000)) * days * 86400000;
+  const created = Number(task.createdAt) || Date.now();
+  const fallbackDays = type === 'custom'
+    ? Math.max(1, Number(task.periodDays) || 1)
+    : (DEFAULT_RANGE_DAYS[type] || 1);
+  const startDate = normalizeDay(task.startDate) || dayStart(created);
+  let endDate = normalizeDay(task.endDate);
+  if (endDate === null) endDate = startDate + (fallbackDays - 1) * DAY_MS;
+  if (endDate < startDate) endDate = startDate;
+  return { startDate, endDate, type };
+}
+
+// 周期长度（毫秒）：单次 = 整个时间段
+function getPeriodLength(task, range) {
+  if (range.type === 'once') return range.endDate + DAY_MS - range.startDate;
+  if (range.type === 'custom') return Math.max(1, Number(task.periodDays) || 1) * DAY_MS;
+  if (range.type === 'monthly') return 0; // 月次用日历月计算，不用固定天数
+  return (STEP_DAYS[range.type] || 1) * DAY_MS;
+}
+
+// 获取下一个月初的时间戳
+function getNextMonthStart(ts) {
+  const d = new Date(ts);
+  d.setMonth(d.getMonth() + 1);
+  d.setDate(1);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+// 获取某月的结束日期 23:59:59
+function getMonthEndTs(ts) {
+  const d = new Date(ts);
+  d.setMonth(d.getMonth() + 1);
+  d.setDate(0);
+  d.setHours(23, 59, 59, 999);
+  return d.getTime();
+}
+
+// 生成时间段内全部周期实例
+// 关键：周期是「天」粒度的闭区间。start 为该周期首日 00:00，end 为末日 00:00（含），
+// gate 为排他边界（= end + 1 天，仅供时间比较用），这样周期不会多长出一天。
+function generatePeriods(task, range) {
+  const rangeEndDay = range.endDate;              // 结束日期当天 00:00，含在范围内
+  const rangeEndGate = range.endDate + DAY_MS;    // 排他边界
+
+  if (range.type === 'once') {
+    return [{ index: 1, start: range.startDate, end: rangeEndDay, gate: rangeEndGate }];
   }
-  return type === 'once' ? 0 : date.getTime();
+
+  // 月次任务：按日历月计算
+  if (range.type === 'monthly') {
+    const periods = [];
+    let currentStart = range.startDate;
+    let index = 1;
+    while (currentStart <= rangeEndDay) {
+      const currentEnd = getMonthEndTs(currentStart);
+      periods.push({
+        index,
+        start: currentStart,
+        end: Math.min(currentEnd, rangeEndDay),
+        gate: Math.min(currentEnd + DAY_MS, rangeEndGate)
+      });
+      currentStart = getNextMonthStart(currentStart);
+      index++;
+    }
+    return periods;
+  }
+
+  const stepMs = getPeriodLength(task, range);
+  const total = Math.max(1, Math.ceil((rangeEndGate - range.startDate) / stepMs));
+  const periods = [];
+  for (let i = 0; i < total; i++) {
+    const start = range.startDate + i * stepMs;
+    // 最后一个周期的末日不能越过任务的结束日期
+    const end = Math.min(start + stepMs - DAY_MS, rangeEndDay);
+    periods.push({ index: i + 1, start, end, gate: Math.min(start + stepMs, rangeEndGate) });
+  }
+  return periods;
+}
+
+// 周期实例的四种进度：待开始 / 进行中 / 已完成 / 已逾期
+function computeInstanceStatus(period, completedDates, now) {
+  if (completedDates.has(period.start)) return 'completed';
+  if (now < period.start) return 'pending';
+  if (now >= period.gate) return 'overdue';   // 末日当天 23:59 前都还来得及
+  return 'active';
 }
 
 exports.main = async (event, context) => {
@@ -250,43 +370,83 @@ exports.main = async (event, context) => {
   try {
     switch (action) {
       case 'listTasks': {
-        const { category, childId } = data;
+        const { category, childId, status } = data;
         const where = { isActive: true, scope: 'parent', parentId: openid };
         if (category) where.category = category;
         const res = await tasksCol.where(where).orderBy('basePoints', 'desc').get();
-        const list = res.data || [];
-        let completionList = [];
-        if (childId && list.length) {
-          const completionRes = await completionsCol.where({ childId }).get();
-          completionList = completionRes.data || [];
-        }
+        const tasks = res.data || [];
         const now = Date.now();
-        const enriched = list.map(task => {
-          const periodStart = getPeriodStart(task, now);
-          const doneCount = completionList.filter(item => item.taskId === task._id && (task.periodType === 'once' || (item.createdAt || 0) >= periodStart)).length;
-          const targetCount = Math.max(1, Number(task.targetCount) || 1);
-          const progress = Math.min(doneCount, targetCount);
-          const status = progress >= targetCount ? 'completed' : (progress > 0 ? 'incomplete' : 'pending');
-          
-          // 获取分类元数据
+
+        // 一次性取该孩子的完成记录，按"周期起点"归组，供实例状态匹配
+        const completedDates = new Set();
+        const completionsByTask = {};
+        if (childId && tasks.length) {
+          const taskIdSet = new Set(tasks.map(t => t._id));
+          const completionRes = await completionsCol.where({ childId }).limit(1000).get();
+          (completionRes.data || []).forEach(item => {
+            if (!taskIdSet.has(item.taskId)) return;
+            const key = Number(item.instanceStart != null ? item.instanceStart : item.createdAt) || 0;
+            completedDates.add(`${item.taskId}@${key}`);
+            (completionsByTask[item.taskId] = completionsByTask[item.taskId] || new Set()).add(key);
+          });
+        }
+
+        // 范围内每个周期都展开成一条实例：时间段内有哪些周期，任务列表就有哪些行
+        const instances = [];
+        tasks.forEach(task => {
+          const range = getTaskRange(task);
+          const periods = generatePeriods(task, range);
+          const visiblePeriods = (range.type === 'daily')
+            ? periods.filter(p => p.gate > now - 30 * DAY_MS)
+            : periods;
+          const doneSet = completionsByTask[task._id] || new Set();
           const meta = CATEGORY_META[task.category] || CATEGORY_META.OTHER;
           const domainInfo = getCategoryDomain(task.category);
-          
-          return {
-            ...task,
-            progress,
-            targetCount,
-            status,
-            categoryName: meta.name,
-            categoryIcon: meta.icon,
-            categoryColor: meta.color,
-            domain: domainInfo.domain,
-            domainName: domainInfo.domainName,
-            periodLabel: task.periodType === 'custom' ? `每${task.periodDays}天` : 
-              ({ once: '单次', daily: '每天', weekly: '每周', monthly: '每月' }[task.periodType] || '单次')
-          };
+
+          visiblePeriods.slice(0, 400).forEach(p => {
+            instances.push({
+              _id: `${task._id}__${p.start}`,
+              taskId: task._id,
+              instanceStart: p.start,
+              instanceEnd: p.end,
+              periodIndex: p.index,
+              periodTotal: periods.length,
+              taskName: task.name,
+              name: task.name,
+              description: task.description,
+              icon: task.icon,
+              category: task.category,
+              categoryName: meta.name,
+              categoryIcon: meta.icon,
+              categoryColor: meta.color,
+              domain: domainInfo.domain,
+              domainName: domainInfo.domainName,
+              basePoints: task.basePoints,
+              targetCount: Math.max(1, Number(task.targetCount) || 1),
+              periodType: task.periodType,
+              periodDays: task.periodDays,
+              periodLabel: task.periodType === 'custom'
+                ? `每${task.periodDays}天`
+                : (PERIOD_LABELS[task.periodType] || '单次'),
+              rangeStart: range.startDate,
+              rangeEnd: range.endDate,
+              rangeLabel: `${fmtDate(range.startDate)} ~ ${fmtDate(range.endDate)}`,
+              status: computeInstanceStatus(p, doneSet, now)
+            });
+          });
         });
-        return { success: true, list: enriched };
+
+        // 待开始按最近优先，其余按时间倒序，让"今天的任务"排在最前
+        instances.sort((a, b) => {
+          if (status === 'pending') {
+            if (a.instanceStart !== b.instanceStart) return a.instanceStart - b.instanceStart;
+          } else if (a.instanceStart !== b.instanceStart) {
+            return b.instanceStart - a.instanceStart;
+          }
+          return (b.basePoints || 0) - (a.basePoints || 0);
+        });
+
+        return { success: true, list: instances };
       }
 
       case 'getCategories': {
@@ -311,10 +471,15 @@ exports.main = async (event, context) => {
       }
 
       case 'createTask': {
-        const { name, category, description, icon, periodType, periodDays, targetCount, maxDaily, requiresPhoto } = data;
+        const { name, category, description, icon, periodType, periodDays, targetCount, maxDaily, requiresPhoto, startDate, endDate } = data;
         if (!name || !category) return { success: false, error: '名称和分类必填' };
         const score = analyzeTaskPoints({ name, category, description });
-        
+
+        const type = ['once', 'daily', 'weekly', 'monthly', 'custom'].includes(periodType) ? periodType : 'once';
+        const days = Math.max(1, Number(periodDays) || 1);
+        // 时间范围：前端给默认值，这里做兜底与校正，保证 endDate 不早于 startDate
+        const range = resolveRange({ periodType: type, periodDays: days, startDate, endDate }, Date.now());
+
         const taskData = {
           name: name.trim(),
           category,
@@ -323,8 +488,10 @@ exports.main = async (event, context) => {
           description: (description || '').trim(),
           icon: icon || CATEGORY_META[category]?.icon || '📝',
           isActive: true,
-          periodType: ['once', 'daily', 'weekly', 'monthly', 'custom'].includes(periodType) ? periodType : 'once',
-          periodDays: Math.max(1, Number(periodDays) || 1),
+          periodType: type,
+          periodDays: days,
+          startDate: range.startDate,
+          endDate: range.endDate,
           targetCount: Math.max(1, Number(targetCount) || 1),
           maxDaily: Math.max(0, Number(maxDaily) || 0),
           requiresPhoto: !!requiresPhoto,
@@ -333,13 +500,14 @@ exports.main = async (event, context) => {
           createdAt: Date.now(),
           updatedAt: Date.now()
         };
-        
+
         await tasksCol.add({ data: taskData });
-        return { success: true, basePoints: score.points, scoreReason: score.reason };
+        const total = generatePeriods(taskData, getTaskRange(taskData)).length;
+        return { success: true, basePoints: score.points, scoreReason: score.reason, totalPeriods: total };
       }
 
       case 'updateTask': {
-        const { taskId, name, category, description, icon, maxDaily, requiresPhoto, isActive, periodType, periodDays, targetCount } = data;
+        const { taskId, name, category, description, icon, maxDaily, requiresPhoto, isActive, periodType, periodDays, targetCount, startDate, endDate } = data;
         if (!taskId) return { success: false, error: 'taskId 必填' };
         const existing = await tasksCol.doc(taskId).get();
         if (!existing.data || existing.data.parentId !== openid) {
@@ -356,6 +524,17 @@ exports.main = async (event, context) => {
         if (periodType !== undefined) updateData.periodType = ['once', 'daily', 'weekly', 'monthly', 'custom'].includes(periodType) ? periodType : 'once';
         if (periodDays !== undefined) updateData.periodDays = Math.max(1, Number(periodDays) || 1);
         if (targetCount !== undefined) updateData.targetCount = Math.max(1, Number(targetCount) || 1);
+        // 改周期或改时间范围时，用「新值覆盖旧值」的结果重新校正起止日期
+        if (periodType !== undefined || periodDays !== undefined || startDate !== undefined || endDate !== undefined) {
+          const range = resolveRange({
+            periodType: updateData.periodType || existing.data.periodType,
+            periodDays: updateData.periodDays || existing.data.periodDays,
+            startDate: startDate !== undefined ? startDate : existing.data.startDate,
+            endDate: endDate !== undefined ? endDate : (startDate !== undefined ? null : existing.data.endDate)
+          }, Date.now());
+          updateData.startDate = range.startDate;
+          updateData.endDate = range.endDate;
+        }
         if (name !== undefined || category !== undefined || description !== undefined) {
           const score = analyzeTaskPoints({ ...existing.data, ...updateData });
           updateData.basePoints = score.points;
@@ -402,10 +581,28 @@ exports.main = async (event, context) => {
         if (!task.data || task.data.parentId !== openid) return { success: false, error: '任务不存在' };
 
         const now = Date.now();
-        const periodStart = getPeriodStart(task.data, now);
+        const range = getTaskRange(task.data);
+        const periods = generatePeriods(task.data, range);
+
+        // 定位要完成的那个周期：优先列表点进来的那个实例；否则取当前周期，
+        // 当前无周期时（还没开始）允许完成最近一个待开始周期
+        let instanceStart = normalizeDay(data.instanceStart);
+        let period = instanceStart === null ? null : periods.find(p => p.start === instanceStart);
+        if (!period) {
+          const current = periods.find(p => now >= p.start && now < p.gate);
+          period = current || periods.find(p => p.start > now) || null;
+        }
+        if (!period) return { success: false, error: '该任务的时间段已结束' };
+        if (now >= period.gate) return { success: false, error: '该周期已逾期，无法完成' };
+
+        // 同一周期内已有完成记录时不重复计分（targetCount 允许一个周期多次）
+        const doneRes = await completionsCol.where({ childId, taskId }).limit(1000).get();
+        const doneInPeriod = (doneRes.data || []).filter(item => {
+          const key = Number(item.instanceStart != null ? item.instanceStart : item.createdAt) || 0;
+          return key >= period.start && key < period.gate;
+        }).length;
         const targetCount = Math.max(1, Number(task.data.targetCount) || 1);
-        const completedCount = await completionsCol.where({ childId, taskId, createdAt: _.gte(periodStart) }).count();
-        if (completedCount.total >= targetCount) return { success: false, error: '本周期任务已完成' };
+        if (doneInPeriod >= targetCount) return { success: false, error: '本周期任务已完成' };
 
         const ratio = COMPLETION_LEVELS[completionLevel].ratio;
         const actualPoints = Math.floor(task.data.basePoints * ratio);
@@ -427,6 +624,9 @@ exports.main = async (event, context) => {
               actualPoints,
               domain: domainInfo.domain,
               domainName: domainInfo.domainName,
+              // 归属周期起点：任务页按周期匹配完成情况靠这个字段
+              instanceStart: period.start,
+              periodIndex: period.index,
               completedAt: now,
               createdAt: now
             }
@@ -436,7 +636,7 @@ exports.main = async (event, context) => {
           })
         ]);
 
-        return { success: true, actualPoints, completionLevel, domain: domainInfo };
+        return { success: true, actualPoints, completionLevel, domain: domainInfo, instanceStart: period.start };
       }
 
       default:

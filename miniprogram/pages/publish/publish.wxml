@@ -54,6 +54,40 @@
       </view>
     </view>
 
+    <!-- 任务时间段：起止日期决定任务页里会展开出哪些周期 -->
+    <view class="form-row">
+      <view class="form-item" style="width: 100%;">
+        <text class="label">任务时间段 <text class="optional">{{rangeHint}}</text></text>
+        <view class="range-row">
+          <picker mode="date" value="{{startDateStr}}" start="{{rangeStart}}" bindchange="onStartDateChange">
+            <view class="range-field">
+              <text class="range-field-label">开始</text>
+              <text class="range-field-value">{{startDateStr}}</text>
+            </view>
+          </picker>
+          <text class="range-arrow">→</text>
+          <picker mode="date" value="{{endDateStr}}" start="{{startDateStr || rangeStart}}" bindchange="onEndDateChange">
+            <view class="range-field">
+              <text class="range-field-label">结束</text>
+              <text class="range-field-value">{{endDateStr}}</text>
+            </view>
+          </picker>
+        </view>
+        <view class="range-summary" wx:if="{{rangeSummary}}">
+          <text class="range-summary-text">{{rangeSummary}}</text>
+        </view>
+        <!-- 周期次数选择器（非自定义周期显示） -->
+        <view class="period-count-row" wx:if="{{formData.periodType !== 'custom'}}">
+          <text class="period-count-label">任务数量</text>
+          <view class="period-count-stepper">
+            <view class="stepper-btn" bindtap="onCountStep" data-delta="-1">－</view>
+            <text class="stepper-value">{{periodCount}} 次</text>
+            <view class="stepper-btn" bindtap="onCountStep" data-delta="1">＋</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- 完成要求 -->
     <view class="form-item">
       <text class="label">完成要求 <text class="optional">选填，帮助评估积分</text></text>

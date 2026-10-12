@@ -1,7 +1,17 @@
 // pages/task/task.js
-// 版本: v2.3 - 修复逾期判断bug
+// 版本: v3.0 - 任务时间段 + 周期实例（待开始/进行中/已完成/已逾期）
 const app = getApp();
-const { CATEGORY_META, getDomains } = require('../../utils/task-score');
+const { formatInstanceLabel, formatDayLabel } = require('../../utils/date-range');
+
+// 四个进度标签：待开始排在"进行中"前面，符合时间顺序
+const STATUS_TABS = [
+  { key: 'pending', name: '待开始', emptyEmoji: '⏳', emptyText: '还没有待开始的任务', emptyHint: '发布任务后，未来周期的任务会出现在这里' },
+  { key: 'active', name: '进行中', emptyEmoji: '🎉', emptyText: '太棒了！暂无进行中任务', emptyHint: '所有任务都已完成或已逾期' },
+  { key: 'completed', name: '已完成', emptyEmoji: '📝', emptyText: '还没有完成的任务', emptyHint: '完成任务获得积分奖励' },
+  { key: 'overdue', name: '已逾期', emptyEmoji: '✅', emptyText: '没有逾期任务', emptyHint: '继续保持' }
+];
+
+const STATUS_LABELS = { pending: '待开始', active: '进行中', completed: '已完成', overdue: '已逾期' };
 
 Page({
   data: {
@@ -10,10 +20,17 @@ Page({
     // 默认不筛选：五育领域与任务分类都默认选中「全部」（即其全部标签）
     currentCategory: '',
     currentDomain: '',
-    currentStatus: 'in_progress',
-    statusCounts: { in_progress: 0, completed: 0, overdue: 0 },
+    currentStatus: 'active',
+    // 计数直接挂在 tab 上，避免在 wxml 里写 statusCounts[item.key] 这种动态取值
+    statusTabs: STATUS_TABS.map(t => ({ ...t, count: 0 })),
+    statusCounts: { pending: 0, active: 0, completed: 0, overdue: 0 },
+    currentStatusLabel: '进行中',
+    emptyEmoji: '🎉',
+    emptyText: '太棒了！暂无进行中任务',
+    emptyHint: '所有任务都已完成或已逾期',
     filteredCategories: [],
     tasks: [],
+    displayTasks: [],
     loading: false,
     categories: [
       { key: 'STUDY', name: '学习', icon: '📚', bgColor: '#E3F2FD', domain: 'intelligence', domainName: '智育' },
@@ -67,27 +84,34 @@ Page({
     }
   },
 
+  // 一次取回该孩子在当前筛选下的全部周期实例，四个 Tab 的计数也用同一份数据算
   async loadTasks() {
     this.setData({ loading: true });
     try {
-      const res = await app.callCloudFunction('task', { 
+      const res = await app.callCloudFunction('task', {
         action: 'listTasks',
         category: this.data.currentCategory || undefined,
+        status: this.data.currentStatus,
         childId: this.data.selectedChildId
       });
       if (res.success) {
+        // 统一用同一个"现在"渲染整屏，避免跨零点时同一列表里出现两种当天口径
         const now = Date.now();
-        const tasks = res.list.map(task => {
-          const cat = this.data.categories.find(c => c.key === task.category) || this.data.categories[this.data.categories.length - 1];
-          const isOverdue = this.checkOverdue(task, now);
+        const tasks = (res.list || []).map(instance => {
+          const cat = this.data.categories.find(c => c.key === instance.category)
+            || this.data.categories[this.data.categories.length - 1];
           return {
-            ...task,
-            categoryIcon: task.categoryIcon || cat.icon,
-            categoryName: task.categoryName || cat.name,
-            bgColor: task.categoryColor || cat.bgColor,
-            domain: task.domain || cat.domain,
-            domainName: task.domainName || cat.domainName,
-            isOverdue: isOverdue
+            ...instance,
+            categoryIcon: instance.categoryIcon || cat.icon,
+            categoryName: instance.categoryName || cat.name,
+            bgColor: instance.categoryColor || cat.bgColor,
+            domain: instance.domain || cat.domain,
+            domainName: instance.domainName || cat.domainName,
+            statusLabel: STATUS_LABELS[instance.status] || '',
+            // 「今天 周一」这种一眼能对上日历的说法
+            instanceLabel: formatInstanceLabel(instance, now),
+            // 待开始的行额外标一下还有多久，避免"看得见却做不了"的困惑
+            startsInLabel: this.buildStartsInLabel(instance, now)
           };
         });
 
@@ -98,11 +122,13 @@ Page({
           ? this.data.categories.filter(c => c.domain === this.data.currentDomain)
           : this.data.categories;
 
+        const counts = this.computeCountsSync(allInDomain);
         this.setData({
           tasks,
           filteredCategories,
           displayTasks: this.filterTasks(allInDomain),
-          statusCounts: this.computeCountsSync(allInDomain)
+          statusTabs: this.withCounts(STATUS_TABS, counts),
+          statusCounts: counts
         });
       }
     } catch (e) {
@@ -112,66 +138,25 @@ Page({
     }
   },
 
-  // 检查任务是否逾期
-  checkOverdue(task, now) {
-    // 单次任务永远不会逾期
-    if (task.periodType === 'once') return false;
-    
-    // 转换为 Date 对象
-    const nowDate = new Date(now);
-    
-    if (task.periodType === 'daily') {
-      // 每天任务：当天23:59截止
-      const todayEnd = new Date(nowDate);
-      todayEnd.setHours(23, 59, 59, 999);
-      return now > todayEnd.getTime() && task.progress < task.targetCount;
-    } else if (task.periodType === 'weekly') {
-      // 每周任务：周日23:59截止
-      const weekEnd = new Date(nowDate);
-      weekEnd.setHours(23, 59, 59, 999);
-      const dayOfWeek = weekEnd.getDay();
-      const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-      weekEnd.setDate(weekEnd.getDate() + daysUntilSunday);
-      return now > weekEnd.getTime() && task.progress < task.targetCount;
-    } else if (task.periodType === 'monthly') {
-      // 每月任务：月末23:59截止
-      const monthEnd = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0, 23, 59, 59, 999);
-      return now > monthEnd.getTime() && task.progress < task.targetCount;
-    } else if (task.periodType === 'custom') {
-      // 自定义周期：按设定的间隔天数计算
-      const days = Math.max(1, Number(task.periodDays) || 1);
-      const periodStart = this.getPeriodStart(task, now);
-      const periodEnd = periodStart + days * 86400000;
-      return now > periodEnd && task.progress < task.targetCount;
-    }
-    
-    return false;
+  // 把计数写进每个 tab 对象，而不是在 wxml 里做 statusCounts[item.key] 这种动态取值
+  withCounts(tabs, counts) {
+    return (tabs || []).map(tab => ({ ...tab, count: counts[tab.key] || 0 }));
   },
 
-  getPeriodStart(task, now) {
-    const type = task.periodType || 'once';
-    const nowDate = new Date(now);
-    if (type === 'daily') nowDate.setHours(0, 0, 0, 0);
-    else if (type === 'weekly') {
-      nowDate.setHours(0, 0, 0, 0);
-      nowDate.setDate(nowDate.getDate() - ((nowDate.getDay() + 6) % 7));
-    } else if (type === 'monthly') {
-      nowDate.setDate(1);
-      nowDate.setHours(0, 0, 0, 0);
-    } else if (type === 'custom') {
-      const days = Math.max(1, Number(task.periodDays) || 1);
-      const anchor = Number(task.createdAt) || now;
-      return anchor + Math.floor((now - anchor) / (days * 86400000)) * days * 86400000;
-    }
-    return type === 'once' ? 0 : nowDate.getTime();
+  // 待开始的周期：显示"明天开始 / 3 天后开始"，让家长知道任务不会漏
+  buildStartsInLabel(instance, now = Date.now()) {
+    if (instance.status !== 'pending') return '';
+    const start = Number(instance.instanceStart) || 0;
+    if (!start) return '';
+    const label = formatDayLabel(start, now);
+    return label === '今天' ? '即将开始' : `${label}开始`;
   },
 
   computeCountsSync(taskList) {
-    const counts = { in_progress: 0, completed: 0, overdue: 0 };
+    const counts = { pending: 0, active: 0, completed: 0, overdue: 0 };
     (taskList || []).forEach(task => {
-      if (task.status === 'completed') counts.completed += 1;
-      else if (task.isOverdue) counts.overdue += 1;
-      else counts.in_progress += 1;
+      if (counts[task.status] === undefined) return;
+      counts[task.status] += 1;
     });
     return counts;
   },
@@ -197,57 +182,54 @@ Page({
 
   onStatusChange(e) {
     const currentStatus = e.currentTarget.dataset.status;
-    this.setData({ currentStatus, displayTasks: this.filterTasks(this.data.tasks, currentStatus) });
+    if (currentStatus === this.data.currentStatus) return;
+    const tab = STATUS_TABS.find(t => t.key === currentStatus) || STATUS_TABS[1];
+    this.setData({
+      currentStatus,
+      currentStatusLabel: tab.name,
+      emptyEmoji: tab.emptyEmoji,
+      emptyText: tab.emptyText,
+      emptyHint: tab.emptyHint,
+      displayTasks: this.filterTasks(this.data.tasks, currentStatus)
+    });
   },
 
+  // 实例自带状态，这里只负责按 Tab 过滤
   filterTasks(tasks, status) {
     const selected = status || this.data.currentStatus;
-    return (tasks || []).filter(task => {
-      if (selected === 'overdue') {
-        return task.isOverdue;
-      } else if (selected === 'completed') {
-        return task.status === 'completed';
-      }
-      // 进行中：未完成且未逾期
-      return task.status !== 'completed' && !task.isOverdue;
-    });
-  },
-
-  computeStatusCounts(allFiltered) {
-    const counts = { in_progress: 0, completed: 0, overdue: 0 };
-    (allFiltered || []).forEach(task => {
-      if (task.status === 'completed') counts.completed += 1;
-      else if (task.isOverdue) counts.overdue += 1;
-      else counts.in_progress += 1;
-    });
-    this.setData({ statusCounts: counts });
+    return (tasks || []).filter(task => task.status === selected);
   },
 
   onTaskTap(e) {
     const task = e.currentTarget.dataset.task;
-    
-    if (task.status === 'completed') return;
-    
-    if (task.isOverdue) {
+    if (!task) return;
+
+    if (task.status === 'completed') {
+      wx.showToast({ title: '这个周期已经完成了', icon: 'none' });
+      return;
+    }
+
+    if (task.status === 'overdue') {
       wx.showToast({
-        title: '任务已逾期，无法完成',
+        title: '该周期已逾期，无法补做',
         icon: 'none',
         duration: 2000
       });
       return;
     }
-    
+
     const childId = this.data.selectedChildId;
-    // 确认页的奖状要显示与列表行一致的身份信息（emoji / 领域 / 周期 / 进度）
+    // 确认页的奖状要显示与列表行一致的身份信息（emoji / 领域 / 周期 / 日期）
     const params = [
-      'taskId=' + encodeURIComponent(task._id),
+      'taskId=' + encodeURIComponent(task.taskId || task._id),
+      'instanceStart=' + encodeURIComponent(task.instanceStart || ''),
       'childId=' + encodeURIComponent(childId),
       'taskName=' + encodeURIComponent(task.name || ''),
       'basePoints=' + encodeURIComponent(task.basePoints || 0),
       'icon=' + encodeURIComponent(task.categoryIcon || task.icon || '📝'),
       'domainName=' + encodeURIComponent(task.domainName || ''),
-      'periodLabel=' + encodeURIComponent(task.periodLabel || ''),
-      'progress=' + encodeURIComponent(task.progress || 0),
+      'periodLabel=' + encodeURIComponent(task.instanceLabel || task.periodLabel || ''),
+      'progress=' + encodeURIComponent(task.status === 'completed' ? 1 : 0),
       'targetCount=' + encodeURIComponent(task.targetCount || 1)
     ].join('&');
     wx.navigateTo({ url: '/pages/task-complete/task-complete?' + params });

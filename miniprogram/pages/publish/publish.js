@@ -3,6 +3,10 @@
 const app = getApp();
 const { analyzeTaskPoints, CATEGORY_META } = require('../../utils/task-score');
 const { keyboardAvoid } = require('../../utils/keyboard');
+const {
+  dayStart, toDateStr, parseDateStr, getDefaultRange, countPeriods, formatRangeSummary,
+  getDefaultStart, calcEnd, calcCount, getPeriodCountRange, DEFAULT_PERIOD_COUNTS
+} = require('../../utils/date-range');
 
 // ==================== 全面预设任务模板 ====================
 const PRESET_TASKS = [
@@ -127,6 +131,20 @@ const PRESET_TASKS = [
 
 const PERIOD_LABELS = { once: '单次', daily: '每天', weekly: '每周', monthly: '每月' };
 
+// 各频次的时间段默认值与说明：单次默认明天，每天默认 1 个月，每周默认 3 个月，每月默认 1 年
+const RANGE_HINTS = {
+  once: '单次任务默认安排在明天，可在下方修改',
+  daily: '每天任务默认持续 1 个月，可在下方修改',
+  weekly: '每周任务默认持续 3 个月，可在下方修改',
+  monthly: '每月任务默认持续 1 年，可在下方修改',
+  custom: '按自定义间隔持续，请选择开始与结束日期'
+};
+
+// 日期选择器起点：今天
+function buildPickerRangeStart() {
+  return toDateStr(dayStart(Date.now()));
+}
+
 Page(keyboardAvoid({
   data: {
     categories: [
@@ -151,7 +169,23 @@ Page(keyboardAvoid({
       { key: 'OTHER', name: '其他', icon: '✨' }
     ],
     selectedCategoryName: '',
-    formData: { name: '', category: '', basePoints: 10, description: '', icon: '📝', periodType: 'once', periodDays: 1, targetCount: 1 },
+    formData: {
+      name: '', category: '', basePoints: 10, description: '', icon: '📝',
+      periodType: 'once', periodDays: 1, targetCount: 1,
+      // 时间范围：单次默认明天一天，其余频次按默认时长铺开
+      startDate: 0, endDate: 0
+    },
+    // 日期选择器的值（'YYYY-MM-DD'）与可选下限
+    startDateStr: '',
+    endDateStr: '',
+    rangeStart: buildPickerRangeStart(),
+    rangeHint: RANGE_HINTS.once,
+    rangeSummary: '',
+    // 用户是否手动改过结束日期：改过之后切换频次不再覆盖他的选择
+    endDateTouched: false,
+    // 周期次数
+    periodCount: 1,
+    countRange: { min: 1, max: 1 },
     periods: [
       { key: 'once', name: '单次任务' },
       { key: 'daily', name: '每天任务' },
@@ -212,6 +246,100 @@ Page(keyboardAvoid({
         periodLabel: task.periodType === 'custom' ? `每${task.periodDays}天` : PERIOD_LABELS[task.periodType]
       }))
     });
+    // 初始化时间范围：单次默认明天
+    const range = getDefaultRange('once');
+    this.applyRange(range.startDate, range.endDate, false);
+    this.setData({ rangeStart: buildPickerRangeStart() });
+  },
+
+  // 次数步进器
+  onCountStep(e) {
+    const delta = Number(e.currentTarget.dataset.delta) || 0;
+    const periodType = this.data.formData.periodType;
+    if (periodType === 'custom') return; // 自定义周期不支持次数调整
+
+    const countRange = this.data.countRange;
+    let newCount = this.data.periodCount + delta;
+    newCount = Math.max(countRange.min, Math.min(countRange.max, newCount));
+    if (newCount === this.data.periodCount) return;
+
+    // 重新计算结束日期，保持开始时间不变
+    const start = this.data.formData.startDate;
+    const newEnd = calcEnd(periodType, start, newCount);
+    this.applyRange(start, newEnd, true);
+  },
+
+  // 把起止日期写回 data：同时维护 picker 用的字符串与列表用的展示文案
+  applyRange(startDate, endDate, endDateTouched) {
+    const start = dayStart(startDate);
+    const end = Math.max(start, dayStart(endDate));
+    const periodType = this.data.formData.periodType;
+    const total = calcCount(periodType, start, end);
+    const countRange = getPeriodCountRange(periodType);
+    this.setData({
+      formData: { ...this.data.formData, startDate: start, endDate: end },
+      startDateStr: toDateStr(start),
+      endDateStr: toDateStr(end),
+      rangeSummary: formatRangeSummary(start, end, total),
+      endDateTouched: endDateTouched === undefined ? this.data.endDateTouched : endDateTouched,
+      periodCount: total,
+      countRange
+    });
+  },
+
+  // 切换频次时按该频次的默认时间段重新铺开（用户手动改过结束日期则只校正起点）
+  onPeriodTap(e) {
+    const period = this.data.periods.find(item => item.key === e.currentTarget.dataset.type);
+    if (!period) return;
+    const periodType = period.key;
+    const periodDays = this.data.formData.periodDays;
+
+    this.setData({
+      selectedPeriodName: period.name,
+      'formData.periodType': periodType,
+      rangeHint: RANGE_HINTS[periodType] || RANGE_HINTS.once
+    });
+
+    if (periodType === 'custom') {
+      // 自定义周期保持原有逻辑
+      if (this.data.endDateTouched) {
+        const start = this.data.formData.startDate;
+        this.applyRange(start, Math.max(start, this.data.formData.endDate), true);
+      } else {
+        const range = getDefaultRange(periodType, periodDays);
+        this.applyRange(range.startDate, range.endDate, false);
+      }
+      return;
+    }
+
+    // 新周期逻辑：根据周期类型计算默认开始日期和次数
+    const now = Date.now();
+    const defaultStart = getDefaultStart(periodType, now);
+    const defaultCount = DEFAULT_PERIOD_COUNTS[periodType] || 1;
+    const defaultEnd = calcEnd(periodType, defaultStart, defaultCount);
+    const countRange = getPeriodCountRange(periodType);
+
+    this.setData({
+      periodCount: defaultCount,
+      countRange
+    });
+    this.applyRange(defaultStart, defaultEnd, false);
+  },
+
+  onStartDateChange(e) {
+    const start = parseDateStr(e.detail.value);
+    if (start === null) return;
+    // 开始日期变了：保持结束日期不变，重新计算次数
+    const end = this.data.formData.endDate;
+    this.applyRange(start, end, this.data.endDateTouched);
+  },
+
+  onEndDateChange(e) {
+    const end = parseDateStr(e.detail.value);
+    if (end === null) return;
+    // 结束日期变了：保持开始日期不变，重新计算次数
+    const start = this.data.formData.startDate;
+    this.applyRange(start, Math.max(start, end), true);
   },
 
   onNameInput(e) {
@@ -240,13 +368,15 @@ Page(keyboardAvoid({
     this.setData({ formData, scorePreview: preview.points, scoreReason: preview.reason });
   },
 
-  onPeriodTap(e) {
-    const period = this.data.periods.find(item => item.key === e.currentTarget.dataset.type);
-    this.setData({ selectedPeriodName: period.name, 'formData.periodType': period.key });
-  },
-
   onNumberInput(e) {
-    this.setData({ ['formData.' + e.currentTarget.dataset.field]: e.detail.value });
+    const field = e.currentTarget.dataset.field;
+    const value = e.detail.value;
+    this.setData({ ['formData.' + field]: value });
+    // 自定义间隔天数变了：时间段跨度按新间隔重新铺开（用户改过结束日期则保留）
+    if (field === 'periodDays' && this.data.formData.periodType === 'custom' && !this.data.endDateTouched) {
+      const range = getDefaultRange('custom', value);
+      this.applyRange(range.startDate, range.endDate, false);
+    }
   },
 
   updatePresetFilters(values) {
@@ -311,27 +441,33 @@ Page(keyboardAvoid({
       wx.showToast({ title: '请填写完整信息', icon: 'none' });
       return;
     }
+    // 时间段必填：起止日期决定任务在任务页里会展开成哪些周期
+    const startDate = Number(task.startDate) || 0;
+    const endDate = Number(task.endDate) || 0;
+    if (!startDate || !endDate) {
+      wx.showToast({ title: '请选择任务时间段', icon: 'none' });
+      return;
+    }
+    if (endDate < startDate) {
+      wx.showToast({ title: '结束日期不能早于开始日期', icon: 'none' });
+      return;
+    }
 
     this.setData({ loading: true });
     try {
       const res = await app.callCloudFunction('task', {
         action: 'createTask',
         ...task,
+        startDate,
+        endDate,
         periodDays: Math.max(1, parseInt(task.periodDays, 10) || 1),
         targetCount: 1
       });
 
       if (res.success) {
-        wx.showToast({ title: '创建成功', icon: 'success' });
-        if (clearForm) {
-          this.setData({
-            formData: { name: '', category: '', basePoints: 10, description: '', icon: '📝', periodType: 'once', periodDays: 1, targetCount: 1 },
-            selectedCategoryName: '',
-            selectedPeriodName: '单次任务',
-            scorePreview: 4,
-            scoreReason: '按任务分类与完成要求评估'
-          });
-        }
+        const total = res.totalPeriods || countPeriods({ ...task, startDate, endDate });
+        wx.showToast({ title: `已生成 ${total} 个周期`, icon: 'success' });
+        if (clearForm) this.resetCustomForm();
         setTimeout(() => wx.switchTab({ url: '/pages/task/task' }), 1500);
       } else {
         wx.showToast({ title: res.error || '创建失败', icon: 'none' });
@@ -344,6 +480,24 @@ Page(keyboardAvoid({
     }
   },
 
+  // 创建成功后清空表单，并让时间范围回到「单次 = 明天」的默认状态
+  resetCustomForm() {
+    this.setData({
+      formData: {
+        name: '', category: '', basePoints: 10, description: '', icon: '📝',
+        periodType: 'once', periodDays: 1, targetCount: 1, startDate: 0, endDate: 0
+      },
+      selectedCategoryName: '',
+      selectedPeriodName: '单次任务',
+      scorePreview: 4,
+      scoreReason: '按任务分类与完成要求评估',
+      rangeHint: RANGE_HINTS.once,
+      endDateTouched: false
+    });
+    const range = getDefaultRange('once');
+    this.applyRange(range.startDate, range.endDate, false);
+  },
+
   async onPresetTap(e) {
     const task = e.currentTarget.dataset.task;
     // 正在创建时忽略重复点击，避免弹出第二个确认框
@@ -351,12 +505,21 @@ Page(keyboardAvoid({
 
     const periodLabel = task.periodLabel || (task.periodType === 'custom' ? `每${task.periodDays || 1}天` : PERIOD_LABELS[task.periodType] || '单次');
     const points = analyzeTaskPoints(task).points;
+    // 模板按该频次的默认时间段创建，弹窗里写清楚会生成多少个周期
+    const range = getDefaultRange(task.periodType, task.periodDays || 1);
+    const total = countPeriods({
+      periodType: task.periodType,
+      periodDays: task.periodDays || 1,
+      startDate: range.startDate,
+      endDate: range.endDate
+    });
+    const rangeText = formatRangeSummary(range.startDate, range.endDate, total);
 
     // 添加确认弹窗，避免误点直接创建任务
     const confirmed = await new Promise((resolve) => {
       wx.showModal({
         title: '添加任务',
-        content: `「${task.name}」\n${periodLabel} · ${points} 积分\n确定要添加这个任务吗？`,
+        content: `「${task.name}」\n${periodLabel} · ${points} 积分\n${rangeText}\n确定要添加这个任务吗？`,
         confirmText: '确认添加',
         cancelText: '取消',
         success: (result) => resolve(!!result.confirm),
@@ -373,7 +536,9 @@ Page(keyboardAvoid({
       description: task.description,
       icon: task.icon,
       periodType: task.periodType,
-      periodDays: task.periodDays || 1
+      periodDays: task.periodDays || 1,
+      startDate: range.startDate,
+      endDate: range.endDate
     }, false);
   },
 

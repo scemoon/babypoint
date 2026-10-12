@@ -97,6 +97,72 @@
 }
 .custom-num-input::placeholder { color: var(--on-dark-faint); }
 
+/* 任务时间段：开始 — 结束 两个日期选择器 */
+.range-row { display: flex; align-items: center; gap: 12rpx; }
+.range-row > picker { flex: 1; min-width: 0; }
+.range-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8rpx;
+  min-height: 82rpx;
+  padding: 18rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  box-sizing: border-box;
+}
+.range-field-label { color: var(--hint); font-size: 21rpx; }
+.range-field-value { color: var(--ink); font-size: 23rpx; font-weight: 700; }
+.range-arrow { color: var(--hint); font-size: 22rpx; }
+.range-summary { margin-top: 10rpx; }
+.range-summary-text { color: var(--water-lo); font-size: 20rpx; font-weight: 600; }
+
+/* 周期次数选择器 */
+.period-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14rpx;
+  padding: 12rpx 16rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--soft-water);
+}
+.period-count-label {
+  color: var(--ink);
+  font-size: 22rpx;
+  font-weight: 650;
+}
+.period-count-stepper {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.stepper-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--water-lo);
+  font-size: 32rpx;
+  font-weight: 400;
+}
+.stepper-btn:active {
+  background: var(--water-lo);
+  color: #FFF;
+}
+.stepper-value {
+  min-width: 100rpx;
+  text-align: center;
+  color: var(--ink);
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
 /* 积分分析：浅青底卡片（原为深色渐变面板；浅底上必须配深字，
    否则积分数字上一版是「蜜黄字 + 浅黄绿底」、单位是「近白字 + 浅黄绿底」，都看不清）*/
 .score-analysis {

@@ -37,15 +37,17 @@
 }
 .tiny-avatar image { width: 100%; height: 100%; }
 
-/* ========== 状态分段控件 ========== */
+/* ========== 状态分段控件：四个进度 ========== */
+/* 四个标签在窄屏上会被压扁，所以外层可横向滚动，单个标签有最小宽度兜底 */
+.status-scroll { width: 100%; margin: 18rpx 0 24rpx; }
 .status-segment {
   display: flex;
   gap: 6rpx;
-  margin: 18rpx 0 24rpx;
   padding: 6rpx;
   border-radius: var(--radius-md);
   background: var(--paper);
   border: 1rpx solid var(--line);
+  box-sizing: border-box;
 }
 .status-segment-item {
   flex: 1;
@@ -54,11 +56,13 @@
   justify-content: center;
   gap: 6rpx;
   min-height: 64rpx;
-  padding: 6rpx 4rpx;
+  min-width: 152rpx;
+  padding: 6rpx 8rpx;
   border-radius: 14rpx;
   color: var(--muted);
   font-size: 24rpx;
   font-weight: 550;
+  white-space: nowrap;
   transition: all .2s ease;
 }
 .status-segment-item.active {
@@ -307,6 +311,18 @@
   font-size: 18rpx;
   font-weight: 600;
 }
+/* 周期进度标签：四个状态各一色，颜色只做辅助，文字本身已写明状态 */
+.tag-status {
+  display: inline-flex;
+  padding: 2rpx 8rpx;
+  border-radius: 6rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+}
+.tag-status-active { background: var(--soft-water); color: var(--water-lo); }
+.tag-status-pending { background: var(--line); color: var(--label); }
+.tag-status-completed { background: var(--soft-lime); color: var(--gold-text); }
+.tag-status-overdue { background: var(--soft-coral); color: var(--coral-text); }
 .task-name {
   overflow: hidden;
   color: var(--ink);
@@ -341,6 +357,23 @@
 }
 .task-period { color: var(--hint); font-size: 19rpx; }
 .task-progress { color: var(--water-lo); font-size: 19rpx; font-weight: 600; }
+/* 周期日期：这一行是这个周期的，不是任务的 */
+.task-instance { color: var(--ink); font-size: 20rpx; font-weight: 650; }
+/* 任务整体的有效期：时间段决定任务会展开成哪些周期 */
+.task-range { display: block; margin-top: 2rpx; color: var(--hint); font-size: 18rpx; }
+.task-starts {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  background: var(--soft-water);
+  color: var(--water-lo);
+  font-size: 18rpx;
+  font-weight: 600;
+}
+/* 待开始的周期不抢眼，但仍要能看清任务内容 */
+.task-row.pending .task-name { color: var(--muted); }
 
 /* 进度条 */
 .progress-track {
@@ -385,6 +418,12 @@
   color: var(--hint);
   font-size: 20rpx;
   font-weight: 600;
+}
+/* 已完成的周期：右侧改成"已完成"，不再显示可获得的积分 */
+.task-reward .done-text {
+  color: var(--gold-text);
+  font-size: 20rpx;
+  font-weight: 700;
 }
 .task-chevron { color: var(--hint); font-size: 40rpx; font-weight: 300; }
 
