@@ -53,6 +53,10 @@ function getStepMs(periodType, periodDays) {
 // 某频次下的默认起止日期（单次 = 明天一天，其余从今天开始）
 function getDefaultRange(periodType, periodDays, now = Date.now()) {
   const today = dayStart(now);
+  const currentHour = new Date(now).getHours();
+  // 晚上6点后创建，默认第二天开始，给当天留出充足时间
+  const startDay = currentHour >= 18 ? addDays(today, 1) : today;
+  
   if (periodType === 'once') {
     const tomorrow = addDays(today, 1);
     return { startDate: tomorrow, endDate: tomorrow };
@@ -60,7 +64,7 @@ function getDefaultRange(periodType, periodDays, now = Date.now()) {
   const days = periodType === 'custom'
     ? Math.max(1, Number(periodDays) || 1)
     : (DEFAULT_RANGE_DAYS[periodType] || 1);
-  return { startDate: today, endDate: addDays(today, days - 1) };
+  return { startDate: startDay, endDate: addDays(startDay, days - 1) };
 }
 
 // 时间段内共有多少个周期（与云端 generatePeriods 同一套算法）

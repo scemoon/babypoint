@@ -27,3 +27,32 @@
 .continue-button .button-chevron { margin-left: 8rpx; font-size: 34rpx; vertical-align: -2rpx; }
 .pin-setup-step { padding-bottom: 24rpx; }
 .skip-pin { margin-top: 22rpx; padding: 16rpx; color: var(--muted); text-align: center; font-size: 22rpx; }
+
+/* 退出登录后的登录页样式 */
+.login-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0 40rpx;
+}
+.login-success-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 40rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2EB8A6, #12807A);
+  color: #fff;
+  font-size: 60rpx;
+  line-height: 120rpx;
+  text-align: center;
+}
+.login-step .form-heading {
+  text-align: center;
+  align-items: center;
+}
+.login-tip {
+  margin: 24rpx 0 40rpx;
+  color: var(--muted);
+  font-size: 24rpx;
+  text-align: center;
+}

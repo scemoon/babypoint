@@ -9,6 +9,7 @@ App({
     parentInfo: null,
     loginChecked: false,
     isNewUser: false,
+    appVersion: '1.0.9',  // 版本号手动维护，与上传版本一致
     // 孩子列表缓存：任务页已取过一次，任务确认页可直接同步渲染，
     // 避免进入确认页时先闪出底部「确认完成」按钮、内容随后才补齐
     childrenCache: null

@@ -1,52 +1,73 @@
 // task-score.js - 任务积分分析
-// 版本: v2.0 - 五育体系
+// 版本: v3.0 - 五育分类体系优化
 // 与 cloudfunctions/bp_task/index.js 保持一致
 
-// ==================== 新版五育分类体系 ====================
+// ==================== 五育分类体系 ====================
 const CATEGORY_BASE = {
   // 智育
-  STUDY: 5,
+  STUDY: 5,        // 学业学习
+  READING: 4,      // 阅读积累
+  SCIENCE: 4,      // 科学探索
+
   // 体育
-  SPORTS: 5,
+  SPORTS: 5,       // 体育运动
+  HEALTH: 3,      // 健康习惯
+
   // 美育
-  ART: 5,
-  // 劳育 (原 HOUSEWORK)
-  HOUSEWORK: 4,
-  // 阅读
-  READING: 4,
-  // 习惯
-  HABIT: 3,
+  ART: 5,          // 艺术创作
+  MUSIC: 4,        // 音乐素养
+  AESTHETIC: 4,    // 审美体验
+
+  // 德育
+  MORAL_FAMILY: 4,  // 家庭美德
+  MORAL_SOCIAL: 4,  // 社会公德
+  MORAL_CULTURE: 4, // 文化传承
+  HABIT: 3,        // 习惯养成
+
+  // 劳育
+  SELF_CARE: 3,     // 自理能力
+  HOUSEWORK: 4,     // 家务劳动
+  FINANCE: 3,       // 财商教育
+  SOCIAL: 3,        // 社交技能
+  SAFETY: 3,       // 安全意识
+
   // 其他
-  OTHER: 4,
-  
-  // ===== 新增德育分类 =====
-  MORAL_FAMILY: 4,
-  MORAL_SOCIAL: 4,
-  MORAL_SELF: 3,
-  MORAL_CULTURE: 4,
-  
-  // ===== 劳育细分 =====
-  LIFE_SELF: 3,
-  LIFE_MONEY: 3,
-  LIFE_SOCIAL: 3,
+  OTHER: 4,         // 其他任务
+  GROWTH_PLAN: 3,   // 成长计划
 };
 
 // 分类元数据 - 用于前端展示
 const CATEGORY_META = {
-  STUDY: { name: '学习', icon: '📚', color: '#E3F2FD', domain: 'intelligence', domainName: '智育' },
-  SPORTS: { name: '运动', icon: '⚽', color: '#E8F5E9', domain: 'physical', domainName: '体育' },
-  ART: { name: '艺术', icon: '🎨', color: '#FCE4EC', domain: 'aesthetic', domainName: '美育' },
-  HOUSEWORK: { name: '家务', icon: '🏠', color: '#FFF3E0', domain: 'lifeSkill', domainName: '劳育' },
-  LIFE_SELF: { name: '自理', icon: '🧹', color: '#E0F7FA', domain: 'lifeSkill', domainName: '劳育' },
-  LIFE_MONEY: { name: '理财', icon: '💰', color: '#FFF8E1', domain: 'lifeSkill', domainName: '劳育' },
-  LIFE_SOCIAL: { name: '社交', icon: '🤝', color: '#E1F5FE', domain: 'lifeSkill', domainName: '劳育' },
-  READING: { name: '阅读', icon: '📖', color: '#FFF8E1', domain: 'intelligence', domainName: '智育' },
-  HABIT: { name: '习惯', icon: '🌱', color: '#E0F2F1', domain: 'moral', domainName: '德育' },
-  MORAL_FAMILY: { name: '家庭美德', icon: '💝', color: '#FCE4EC', domain: 'moral', domainName: '德育' },
-  MORAL_SOCIAL: { name: '社会公德', icon: '🌟', color: '#FFF9C4', domain: 'moral', domainName: '德育' },
-  MORAL_SELF: { name: '自我管理', icon: '⏰', color: '#E8EAF6', domain: 'moral', domainName: '德育' },
-  MORAL_CULTURE: { name: '文化传承', icon: '🎭', color: '#FFECB3', domain: 'moral', domainName: '德育' },
-  OTHER: { name: '其他', icon: '✨', color: '#F5F5F5', domain: 'other', domainName: '其他' }
+  // 智育
+  STUDY: { name: '学习', icon: '📚', color: '#E3F2FD', textColor: '#1565C0', domain: 'intelligence', domainName: '智育' },
+  READING: { name: '阅读', icon: '📖', color: '#FFF8E1', textColor: '#F57F17', domain: 'intelligence', domainName: '智育' },
+  SCIENCE: { name: '科学', icon: '🔬', color: '#E8EAF6', textColor: '#3949AB', domain: 'intelligence', domainName: '智育' },
+
+  // 体育
+  SPORTS: { name: '运动', icon: '⚽', color: '#E8F5E9', textColor: '#2E7D32', domain: 'physical', domainName: '体育' },
+  HEALTH: { name: '健康', icon: '🌟', color: '#E0F7FA', textColor: '#00838F', domain: 'physical', domainName: '体育' },
+
+  // 美育
+  ART: { name: '艺术', icon: '🎨', color: '#FCE4EC', textColor: '#AD1457', domain: 'aesthetic', domainName: '美育' },
+  MUSIC: { name: '音乐', icon: '🎵', color: '#F3E5F5', textColor: '#7B1FA2', domain: 'aesthetic', domainName: '美育' },
+  AESTHETIC: { name: '审美', icon: '📷', color: '#FFF3E0', textColor: '#E65100', domain: 'aesthetic', domainName: '美育' },
+
+  // 德育
+  MORAL_FAMILY: { name: '家庭', icon: '💝', color: '#FCE4EC', textColor: '#C2185B', domain: 'moral', domainName: '德育' },
+  MORAL_SOCIAL: { name: '公德', icon: '🌟', color: '#FFF9C4', textColor: '#F9A825', domain: 'moral', domainName: '德育' },
+  MORAL_CULTURE: { name: '文化', icon: '🎭', color: '#FFECB3', textColor: '#FF6F00', domain: 'moral', domainName: '德育' },
+  HABIT: { name: '习惯', icon: '🌱', color: '#E0F2F1', textColor: '#00695C', domain: 'moral', domainName: '德育' },
+
+  // 劳育
+  SELF_CARE: { name: '自理', icon: '🧹', color: '#E0F7FA', textColor: '#00838F', domain: 'lifeSkill', domainName: '劳育' },
+  HOUSEWORK: { name: '家务', icon: '🏠', color: '#FFF3E0', textColor: '#E65100', domain: 'lifeSkill', domainName: '劳育' },
+  FINANCE: { name: '财商', icon: '💰', color: '#FFF8E1', textColor: '#FF8F00', domain: 'lifeSkill', domainName: '劳育' },
+  SOCIAL: { name: '社交', icon: '🤝', color: '#E1F5FE', textColor: '#0277BD', domain: 'lifeSkill', domainName: '劳育' },
+  SAFETY: { name: '安全', icon: '🚦', color: '#FFEBEE', textColor: '#C62828', domain: 'lifeSkill', domainName: '劳育' },
+
+  // 其他
+  OTHER: { name: '其他', icon: '✨', color: '#F5F5F5', textColor: '#757575', domain: 'other', domainName: '其他' },
+  GROWTH_PLAN: { name: '成长', icon: '📋', color: '#E8F5E9', textColor: '#388E3C', domain: 'other', domainName: '其他' },
 };
 
 // 获取育域信息

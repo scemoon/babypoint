@@ -45,14 +45,14 @@
   "compileType": "miniprogram",
   "libVersion": "3.4.0",
   "appid": "wxb5235acb737939be",
-  "projectname": "baby-points",
+  "projectname": "new-task-card",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2
   },
   "cloudbaseRoot": "",
-  "description": "宝贝积分 - 儿童积分管理小程序",
+  "description": "攒星卡 - 儿童成长激励小程序",
   "simulatorPluginLibVersion": {},
   "packOptions": {
     "ignore": [],

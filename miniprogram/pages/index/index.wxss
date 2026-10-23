@@ -1,29 +1,6 @@
 /* index.wxss - 首页 */
 .home-page { padding-top: 24rpx; padding-bottom: 160rpx; }
 
-/* ========== 欢迎行 ========== */
-.welcome-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 4rpx 0 24rpx;
-}
-.welcome-copy { display: flex; flex-direction: column; gap: 6rpx; }
-.eyebrow { color: var(--muted); font-size: 22rpx; font-weight: 500; }
-.welcome-title, .page-title { color: var(--ink); font-size: 38rpx; font-weight: 750; letter-spacing: -0.5rpx; }
-
-.child-switch {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-  padding: 8rpx 12rpx;
-  border: 1rpx solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--paper);
-  transition: all .12s ease;
-}
-.child-switch:active { transform: scale(.97); }
-
 .no-child-state {
   display: flex;
   flex-direction: column;
@@ -114,7 +91,16 @@
   50% { opacity: 1; }
 }
 .score-topline { justify-content: space-between; }
+.score-caption-row { display: flex; align-items: center; gap: 14rpx; }
 .score-caption { color: var(--on-dark-faint); font-size: 24rpx; }
+.score-grade {
+  padding: 2rpx 12rpx;
+  border-radius: 20rpx;
+  background: rgba(255,255,255,.22);
+  color: #FFF;
+  font-size: 20rpx;
+  font-weight: 600;
+}
 .score-number-row { align-items: baseline; gap: 12rpx; margin: 4rpx 0 18rpx; }
 .score-number {
   color: var(--sun);
@@ -133,6 +119,78 @@
 .score-tools { display: flex; align-items: center; justify-content: space-between; gap: 12rpx; }
 .score-shortcut { display: flex; align-items: center; gap: 7rpx; color: var(--on-dark-faint); font-size: 21rpx; }
 .score-shortcut:active { opacity: .72; }
+
+/* 所有孩子积分平铺展示 */
+.all-children-row {
+  display: flex;
+  gap: 12rpx;
+  padding: 16rpx 0;
+  justify-content: center;
+}
+.all-children-row.single {
+  justify-content: center;
+}
+.child-score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: 16rpx 8rpx;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,.18);
+}
+.all-children-row .child-score-card {
+  flex: 1;
+  max-width: 320rpx;
+}
+.all-children-row.single .child-score-card {
+  flex: none;
+  width: 50%;
+  max-width: 360rpx;
+}
+.child-score-avatar {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,.3);
+  color: #FFF;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.child-score-avatar image { width: 100%; height: 100%; }
+.child-score-name {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #FFF;
+}
+.child-score-grade {
+  font-size: 18rpx;
+  color: rgba(255,255,255,.7);
+}
+.child-score-points {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8rpx;
+}
+.child-score-num {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #FFF;
+}
+.child-score-label {
+  font-size: 16rpx;
+  color: rgba(255,255,255,.7);
+}
+.child-score-total {
+  font-size: 16rpx;
+  color: rgba(255,255,255,.6);
+  margin-top: 4rpx;
+}
 
 /* ========== 首页快捷操作 ========== */
 .home-actions { display: flex; align-items: stretch; gap: 14rpx; margin: 20rpx 0 32rpx; }
@@ -183,13 +241,11 @@
   align-items: center;
   gap: 14rpx;
   min-height: 96rpx;
-  padding: 6rpx 0;
+  padding: 6rpx 24rpx;
   border-bottom: 1rpx solid var(--line);
 }
 .rank-current {
-  padding: 6rpx 12rpx;
   background: var(--soft-water);
-  margin: 0 -12rpx;
   border-radius: var(--radius-sm);
   border-bottom-color: transparent;
 }
@@ -257,6 +313,16 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.redemption-meta {
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+}
+.redemption-child {
+  color: var(--water);
+  font-size: 20rpx;
+  font-weight: 600;
 }
 .redemption-date { color: var(--muted); font-size: 20rpx; }
 .redemption-cost {

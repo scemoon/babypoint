@@ -53,3 +53,64 @@
 .textarea { width: 100%; min-height: 150rpx; padding: 18rpx; font-size: 24rpx; }
 .form-hint { margin-top: 10rpx; font-size: 20rpx; }
 .save-button { position: fixed; right: 24rpx; bottom: calc(20rpx + env(safe-area-inset-bottom)); left: 24rpx; z-index: 5; width: auto; height: 96rpx; border-radius: 20rpx; }
+
+.add-category-btn {
+  margin-top: 12rpx;
+  color: var(--water-lo);
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 8rpx 0;
+}
+
+.new-category-form {
+  margin-top: 12rpx;
+  padding: 16rpx;
+  border: 1rpx solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--mist);
+}
+
+.new-category-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.icon-option {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  border: 2rpx solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  transition: all .12s ease;
+}
+
+.icon-option.active {
+  border-color: var(--water-lo);
+  background: var(--soft-water);
+}
+
+.new-category-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24rpx;
+  margin-top: 16rpx;
+}
+
+.cancel-btn {
+  color: var(--muted);
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+}
+
+.confirm-btn {
+  color: var(--water-lo);
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 8rpx 16rpx;
+}

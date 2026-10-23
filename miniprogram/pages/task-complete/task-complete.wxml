@@ -1,5 +1,5 @@
 <view class="container complete-page">
-  <!-- 小红花奖状：居中证书式排版
+  <!-- 成长奖状：居中证书式排版
        印章 → 任务名 → 领域/周期 → 本次可得（唯一的大数字）→ 撕口 → 盖章选完成度 -->
   <view class="diploma">
     <view class="diploma-seal"><text>{{icon || '📝'}}</text></view>

@@ -2,10 +2,35 @@
   <!-- 页面标题：扁平页头，不用渐变面板 -->
   
   <view class="parent-card"><view class="parent-avatar"><image wx:if="{{parentInfo.avatar}}" src="{{parentInfo.avatar}}" mode="aspectFill"/><text wx:else>{{parentInfo.nickname ? parentInfo.nickname[0] : '家'}}</text></view><view class="parent-copy"><text class="parent-name">{{parentInfo.nickname || '家长'}}</text><text class="parent-caption">微信登录 · 家庭管理员</text></view></view>
-  <view class="profile-hero" wx:if="{{currentChild}}">
-    <view class="profile-person"><view class="profile-avatar"><text wx:if="{{!currentChild.avatar}}">{{currentChild.name[0]}}</text><image wx:else src="{{currentChild.avatar}}" mode="aspectFill"/></view><view><text class="profile-name">{{currentChild.name}}</text><text class="profile-grade">{{currentChild.gradeLevel || currentChild.grade}}年级</text></view></view>
-    <view class="profile-total"><text class="total-number">{{currentChild.totalPoints || 0}}</text><text>累计获得积分</text></view>
-    <view class="profile-balance"><text>当前可用</text><text>{{(currentChild.totalPoints || 0) - (currentChild.redeemedPoints || 0)}} 分</text></view>
+
+  <!-- 孩子积分卡片列表 -->
+  <view class="children-cards" wx:if="{{children.length > 0}}">
+    <view class="children-cards-title">🌟 家庭成员积分</view>
+    <view class="children-cards-row {{children.length === 1 ? 'single' : ''}}">
+      <view wx:for="{{children}}" wx:key="_id" class="child-card {{item._id === currentChildId ? 'active' : ''}}" bindtap="onSelectChildInProfile" data-id="{{item._id}}">
+        <view class="child-card-avatar">
+          <text wx:if="{{!item.avatar}}">{{item.name[0]}}</text>
+          <image wx:else src="{{item.avatar}}" mode="aspectFill"/>
+        </view>
+        <view class="child-card-info">
+          <text class="child-card-name">{{item.name}}</text>
+          <text class="child-card-grade">{{item.schoolStageName || item.grade}}</text>
+        </view>
+        <view class="child-card-points">
+          <text class="child-card-points-num">{{(item.totalPoints || 0) - (item.redeemedPoints || 0)}}</text>
+          <text class="child-card-points-label">可用积分</text>
+        </view>
+        <view class="child-card-total">
+          <text class="child-card-total-num">{{item.totalPoints || 0}}</text>
+          <text class="child-card-total-label">累计</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 无孩子时显示提示 -->
+  <view class="no-child-hint" wx:if="{{children.length === 0 && profileReady}}">
+    <text>点击下方「管理孩子」添加家庭成员</text>
   </view>
   <view class="settings-label">家庭与记录</view>
   <view class="settings-list">
@@ -14,8 +39,85 @@
     <view class="settings-row" bindtap="onRewardHistory"><view class="settings-icon coral"><icon name="gift" size="34" color="#14343D"/></view><view class="settings-copy"><text>兑换记录</text><text>回看积分都换成了什么</text></view><text class="settings-arrow">›</text></view>
     <view class="settings-row" bindtap="onCompletionPin"><view class="settings-icon lime"><icon name="check" size="34" color="#14343D"/></view><view class="settings-copy"><text>任务确认码</text><text>记入积分前需要家长确认</text></view><text class="settings-arrow">›</text></view>
     <view class="settings-row" bindtap="onCustomerService"><view class="settings-icon cyan"><icon name="info" size="34" color="#14343D"/></view><view class="settings-copy"><text>联系客服</text><text>邮箱或微信联系</text></view><text class="settings-arrow">›</text></view>
+    <view class="settings-row" bindtap="onAbout"><view class="settings-icon gold"><icon name="info" size="34" color="#14343D"/></view><view class="settings-copy"><text>关于</text><text>系统功能介绍与版本信息</text></view><text class="settings-arrow">›</text></view>
+    <view class="settings-row" bindtap="onLogout"><view class="settings-icon red"><text class="logout-icon">🚪</text></view><view class="settings-copy"><text>退出登录</text><text>切换账号或重新登录</text></view><text class="settings-arrow">›</text></view>
   </view>
-  <view class="profile-foot"><text>宝贝积分</text><text>一起把小目标变成好习惯</text></view>
+  <view class="profile-foot"><text>攒星卡 v{{appVersion}}</text><text>一起把小目标变成好习惯</text></view>
+
+  <!-- 关于弹窗 -->
+  <view class="about-mask {{showAbout ? 'active' : ''}}" bindtap="onCloseAbout" catch:touchmove="stopPropagation">
+    <view class="about-dialog" catchtap="stopPropagation" catch:touchmove="stopPropagation">
+      <view class="about-header">
+        <text class="about-title">🌸 关于攒星卡</text>
+        <text class="about-close" bindtap="onCloseAbout">✕</text>
+      </view>
+      <scroll-view scroll-y class="about-content" enhanced show-scrollbar="{{false}}">
+        <view class="about-version">版本 {{appVersion}}</view>
+        <view class="about-section">
+          <text class="about-section-title">💡 产品介绍</text>
+          <text class="about-text">攒星卡是一款专注儿童习惯养成的家庭激励应用。通过丰富的体验奖励和发展机会，帮助孩子德智体美劳各方面均衡发展，将小目标变成好习惯。</text>
+        </view>
+        <view class="about-section">
+          <text class="about-section-title">🎯 核心功能</text>
+          <view class="about-feature">
+            <text class="about-feature-icon">📋</text>
+            <view class="about-feature-text">
+              <text class="about-feature-name">任务管理</text>
+              <text class="about-feature-desc">发布成长任务，追踪完成情况，自动记录积分</text>
+            </view>
+          </view>
+          <view class="about-feature">
+            <text class="about-feature-icon">🎁</text>
+            <view class="about-feature-text">
+              <text class="about-feature-name">奖励兑换</text>
+              <text class="about-feature-desc">设置丰富奖励，孩子通过努力积分来兑换</text>
+            </view>
+          </view>
+          <view class="about-feature">
+            <text class="about-feature-icon">👨‍👩‍👧</text>
+            <view class="about-feature-text">
+              <text class="about-feature-name">多孩子支持</text>
+              <text class="about-feature-desc">一个账号管理多个孩子的积分和任务</text>
+            </view>
+          </view>
+          <view class="about-feature">
+            <text class="about-feature-icon">📊</text>
+            <view class="about-feature-text">
+              <text class="about-feature-name">成长报告</text>
+              <text class="about-feature-desc">查看任务历史和积分变化，了解孩子成长</text>
+            </view>
+          </view>
+        </view>
+        <view class="about-section">
+          <text class="about-section-title">🏆 五育体系</text>
+          <view class="about-domain-grid">
+            <view class="about-domain-item">
+              <text>🧠</text><text>智育</text>
+            </view>
+            <view class="about-domain-item">
+              <text>💪</text><text>体育</text>
+            </view>
+            <view class="about-domain-item">
+              <text>🎨</text><text>美育</text>
+            </view>
+            <view class="about-domain-item">
+              <text>💝</text><text>德育</text>
+            </view>
+            <view class="about-domain-item">
+              <text>🏠</text><text>劳育</text>
+            </view>
+          </view>
+        </view>
+        <view class="about-section">
+          <text class="about-section-title">📝 使用说明</text>
+          <text class="about-text">1. 在"发布"页创建任务或选择预设模板\n2. 孩子完成后点击"确认"，家长输入确认码积分\n3. 在"奖励"页设置奖励，孩子可用积分兑换\n4. 持续跟踪孩子的成长轨迹</text>
+        </view>
+      </scroll-view>
+      <view class="about-footer">
+        <text>一起把小目标变成好习惯 🌱</text>
+      </view>
+    </view>
+  </view>
   <view class="contact-mask" wx:if="{{showCustomerContact}}" bindtap="onCloseCustomerContact">
     <view class="contact-dialog" catchtap="stopPropagation">
       <text class="contact-title">联系客服</text>

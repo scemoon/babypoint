@@ -18,7 +18,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#12807A",
-    "navigationBarTitleText": "宝贝积分",
+    "navigationBarTitleText": "攒星卡",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
@@ -35,5 +35,6 @@
     ]
   },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "version": "1.0.8"
 }

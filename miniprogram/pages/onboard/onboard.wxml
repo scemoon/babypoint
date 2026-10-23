@@ -1,23 +1,33 @@
 <view class="container onboard-page">
-  <view class="onboard-brand"><view class="brand-mark"><icon name="home" size="54" color="#14343D"/></view><text class="brand-title">宝贝积分</text><text class="brand-subtitle">让小目标，变成看得见的进步。</text></view>
+  <view class="onboard-brand"><view class="brand-mark"><icon name="home" size="54" color="#14343D"/></view><text class="brand-title">攒星卡</text><text class="brand-subtitle">让小目标，变成看得见的进步。</text></view>
   <!-- 确认是首次登录之前不渲染引导内容：老用户进入本页会立刻被送回首页，不该看到引导表单 -->
   <block wx:if="{{ready}}">
-  <view class="step-indicator"><view class="step-dot {{step === 1 ? 'active' : 'done'}}"></view><text class="{{step === 1 ? 'active-step' : ''}}">创建家庭</text><view class="step-line"></view><view class="step-dot {{step === 2 ? 'active' : ''}}"></view><text class="{{step === 2 ? 'active-step' : ''}}">确认码</text></view>
-  <view wx:if="{{step === 1}}">
-    <view class="form-heading"><text>添加孩子档案</text><text class="form-subtitle">微信身份已用于登录，先为孩子创建档案</text></view>
-    <view class="form-item"><text class="label">孩子怎么称呼</text><input class="input" placeholder="输入孩子姓名或昵称" bindinput="onChildNameInput" value="{{childName}}" cursor-spacing="24"/></view>
-    <view class="form-item"><text class="label">所在年级</text><picker mode="selector" range="{{grades}}" range-key="name" bindchange="onGradeChange"><view class="picker-view">{{selectedGradeName || '选择年级'}}<text>⌄</text></view></picker></view>
-    <view class="form-item"><text class="label">性别</text><view class="gender-group"><view class="gender-option {{gender === 'male' ? 'active' : ''}}" bindtap="onGenderChange" data-gender="male"><icon name="user" size="34" color="#14343D"/><text>男孩</text></view><view class="gender-option {{gender === 'female' ? 'active' : ''}}" bindtap="onGenderChange" data-gender="female"><icon name="user" size="34" color="#14343D"/><text>女孩</text></view><view class="gender-option {{gender === 'other' ? 'active' : ''}}" bindtap="onGenderChange" data-gender="other"><icon name="user" size="34" color="#14343D"/><text>其他</text></view></view></view>
-    <view class="notice"><icon name="info" size="30" color="#2A808A"/><text>年级会在每年 9 月自动升级，也可以之后修改。</text></view>
-    <button class="continue-button" bindtap="onNext" loading="{{loading}}">创建家庭任务板</button>
+  <!-- 退出登录后显示的登录页 (step 0) -->
+  <view wx:if="{{step === 0}}" class="login-step">
+    <view class="login-success-icon">✓</view>
+    <view class="form-heading"><text>已退出登录</text><text class="form-subtitle">您已安全退出账号</text></view>
+    <view class="login-tip">点击下方按钮重新登录</view>
+    <button class="continue-button" bindtap="onReLogin" loading="{{loading}}">重新登录</button>
   </view>
-  <view wx:else class="pin-setup-step">
-    <view class="form-heading"><text>设置家长确认码</text><text class="form-subtitle">每次给任务记分前，需要家长确认。也可以稍后在“我的”中设置。</text></view>
-    <view class="form-item"><text class="label">6位数字确认码</text><input class="input" type="number" password maxlength="6" placeholder="设置确认码" value="{{newPin}}" data-field="newPin" bindinput="onPinInput" cursor-spacing="24"/></view>
-    <view class="form-item"><text class="label">再次输入</text><input class="input" type="number" password maxlength="6" placeholder="再次输入确认码" value="{{confirmPin}}" data-field="confirmPin" bindinput="onPinInput" cursor-spacing="24"/></view>
-    <view class="notice"><icon name="info" size="30" color="#2A808A"/><text>确认码只保存在云端加密信息中。连续输错5次会暂时锁定10分钟。</text></view>
-    <button class="continue-button" bindtap="onSetCompletionPin" loading="{{loading}}">设置确认码并开始</button>
-    <view class="skip-pin" bindtap="onSkipCompletionPin">稍后设置，先进入首页</view>
+  <!-- 欢迎引导流程 (step 1, 2) -->
+  <view wx:else>
+    <view class="step-indicator"><view class="step-dot {{step === 1 ? 'active' : 'done'}}"></view><text class="{{step === 1 ? 'active-step' : ''}}">创建家庭</text><view class="step-line"></view><view class="step-dot {{step === 2 ? 'active' : ''}}"></view><text class="{{step === 2 ? 'active-step' : ''}}">确认码</text></view>
+    <view wx:if="{{step === 1}}">
+      <view class="form-heading"><text>添加孩子档案</text><text class="form-subtitle">微信身份已用于登录，先为孩子创建档案</text></view>
+      <view class="form-item"><text class="label">孩子怎么称呼</text><input class="input" placeholder="输入孩子姓名或昵称" bindinput="onChildNameInput" value="{{childName}}" cursor-spacing="24"/></view>
+      <view class="form-item"><text class="label">所在年级</text><picker mode="selector" range="{{grades}}" range-key="name" bindchange="onGradeChange"><view class="picker-view">{{selectedGradeName || '选择年级'}}<text>⌄</text></view></picker></view>
+      <view class="form-item"><text class="label">性别</text><view class="gender-group"><view class="gender-option {{gender === 'male' ? 'active' : ''}}" bindtap="onGenderChange" data-gender="male"><icon name="user" size="34" color="#14343D"/><text>男孩</text></view><view class="gender-option {{gender === 'female' ? 'active' : ''}}" bindtap="onGenderChange" data-gender="female"><icon name="user" size="34" color="#14343D"/><text>女孩</text></view><view class="gender-option {{gender === 'other' ? 'active' : ''}}" bindtap="onGenderChange" data-gender="other"><icon name="user" size="34" color="#14343D"/><text>其他</text></view></view></view>
+      <view class="notice"><icon name="info" size="30" color="#2A808A"/><text>年级会在每年 9 月自动升级，也可以之后修改。</text></view>
+      <button class="continue-button" bindtap="onNext" loading="{{loading}}">创建家庭任务板</button>
+    </view>
+    <view wx:else class="pin-setup-step">
+      <view class="form-heading"><text>设置家长确认码</text><text class="form-subtitle">每次给任务记分前，需要家长确认。也可以稍后在"我的"中设置。</text></view>
+      <view class="form-item"><text class="label">6位数字确认码</text><input class="input" type="number" password maxlength="6" placeholder="设置确认码" value="{{newPin}}" data-field="newPin" bindinput="onPinInput" cursor-spacing="24"/></view>
+      <view class="form-item"><text class="label">再次输入</text><input class="input" type="number" password maxlength="6" placeholder="再次输入确认码" value="{{confirmPin}}" data-field="confirmPin" bindinput="onPinInput" cursor-spacing="24"/></view>
+      <view class="notice"><icon name="info" size="30" color="#2A808A"/><text>确认码只保存在云端加密信息中。连续输错5次会暂时锁定10分钟。</text></view>
+      <button class="continue-button" bindtap="onSetCompletionPin" loading="{{loading}}">设置确认码并开始</button>
+      <view class="skip-pin" bindtap="onSkipCompletionPin">稍后设置，先进入首页</view>
+    </view>
   </view>
   </block>
   <!-- 键盘占位：撑出可滚动余量，把输入框推到键盘之上（收起时高度为 0） -->

@@ -2,20 +2,39 @@
 const app = getApp();
 const { keyboardAvoid } = require('../../utils/keyboard');
 
-// 内置奖励分类（统一主题色，不使用多彩）
+// 内置奖励分类 - 教育专家设计的激励体系
 const BUILTIN_CATEGORIES = [
-  { key: 'FOOD', name: '美食', icon: '🍔' },
-  { key: 'PLAY', name: '娱乐', icon: '🎮' },
-  { key: 'TOY', name: '玩具', icon: '🎁' },
-  { key: 'OUTING', name: '出行', icon: '🚗' },
-  { key: 'PRIVILEGE', name: '特权', icon: '👑' },
-  { key: 'DIGITAL', name: '数码', icon: '📱' }
+  // 体验类 - 核心激励，注重亲子时光
+  { key: 'FAMILY_TIME', name: '亲子时光', icon: '🎬', domain: 'experience' },
+  { key: 'OUTDOOR', name: '户外探索', icon: '⛺', domain: 'experience' },
+  { key: 'CULTURE', name: '文化体验', icon: '🏛️', domain: 'experience' },
+  { key: 'RESPONSIBILITY', name: '小大人体验', icon: '🦸', domain: 'experience' },
+  // 发展类 - 成长导向
+  { key: 'STUDY_PRIVILEGE', name: '学习特权', icon: '📚', domain: 'growth' },
+  { key: 'HOBBY', name: '兴趣拓展', icon: '🎯', domain: 'growth' },
+  { key: 'TECH', name: '科技探索', icon: '🔬', domain: 'growth' },
+  // 荣誉类 - 社交货币
+  { key: 'AUTONOMY', name: '自主权', icon: '👑', domain: 'honor' },
+  { key: 'SOCIAL', name: '社交特权', icon: '🤝', domain: 'honor' },
+  { key: 'BADGE', name: '荣誉徽章', icon: '🏆', domain: 'honor' },
+  // 物质类 - 适度使用
+  { key: 'STATIONERY', name: '文具图书', icon: '✏️', domain: 'material' },
+  { key: 'SPORTS', name: '运动装备', icon: '⚽', domain: 'material' },
+  { key: 'SAVINGS', name: '小小储蓄', icon: '🐷', domain: 'material' }
 ];
+
+// 加载自定义分类
+function loadCustomCategoriesSync() {
+  try {
+    return wx.getStorageSync('customRewardCategories') || [];
+  } catch (e) {
+    return [];
+  }
+}
 
 Page(keyboardAvoid({
   data: {
     builtinCategories: BUILTIN_CATEGORIES,
-    customCategories: [],
     categories: BUILTIN_CATEGORIES,
     currentCategory: '',
     keyword: '',
@@ -23,34 +42,22 @@ Page(keyboardAvoid({
     filteredRewards: [],
     selectedChild: null,
     children: [],
-    loading: false,
-    showAddCategory: false,
-    newCategory: { name: '', icon: '🎁' }
+    loading: false
   },
 
   onLoad() {
-    this.loadCustomCategories();
+    const customCategories = loadCustomCategoriesSync();
+    const merged = [...BUILTIN_CATEGORIES, ...customCategories];
+    this.setData({
+      categories: merged
+    });
     this.loadChildren();
   },
 
   onShow() {
     if (app.globalData.currentChildId) {
-      this.loadRewards();
+      this.loadChildren();
     }
-  },
-
-  loadCustomCategories() {
-    try {
-      const list = wx.getStorageSync('customRewardCategories') || [];
-      this.setData({ customCategories: list }, () => this.rebuildCategories());
-    } catch (e) {
-      console.error(e);
-    }
-  },
-
-  rebuildCategories() {
-    const merged = [...this.data.builtinCategories, ...this.data.customCategories];
-    this.setData({ categories: merged });
   },
 
   async loadChildren() {
@@ -115,16 +122,11 @@ Page(keyboardAvoid({
   },
 
   onCategoryChange(e) {
-    const index = e.currentTarget.dataset.index;
-    if (index === -1 || index === undefined) {
+    const key = e.currentTarget.dataset.key;
+    if (key === '' || key === undefined) {
       this.setData({ currentCategory: '' }, () => this.loadRewards());
     } else {
-      const target = this.data.categories[index];
-      if (target) {
-        this.setData({ currentCategory: target.key }, () => this.loadRewards());
-      } else {
-        this.setData({ currentCategory: '' }, () => this.loadRewards());
-      }
+      this.setData({ currentCategory: key }, () => this.loadRewards());
     }
   },
 
@@ -156,86 +158,5 @@ Page(keyboardAvoid({
 
   onAddReward() {
     wx.navigateTo({ url: '/pages/reward-add/reward-add' });
-  },
-
-  // ---------- 自定义分类 ----------
-  onShowAddCategory() {
-    this.setData({
-      showAddCategory: true,
-      newCategory: { name: '', icon: '🎁' }
-    });
-  },
-
-  onCloseAddCategory() {
-    this.setData({ showAddCategory: false });
-  },
-
-  onNewCategoryNameInput(e) {
-    this.setData({ 'newCategory.name': e.detail.value });
-  },
-
-  onNewCategoryIconTap(e) {
-    this.setData({ 'newCategory.icon': e.currentTarget.dataset.icon });
-  },
-
-  onSaveCustomCategory() {
-    const { name, icon } = this.data.newCategory;
-    if (!name || !name.trim()) {
-      wx.showToast({ title: '请输入分类名称', icon: 'none' });
-      return;
-    }
-    const trimmed = name.trim();
-    if (trimmed.length > 8) {
-      wx.showToast({ title: '名称不超过8个字', icon: 'none' });
-      return;
-    }
-    const key = 'CUSTOM_' + Date.now().toString(36);
-    const next = [...this.data.customCategories, { key, name: trimmed, icon, custom: true }];
-    try {
-      wx.setStorageSync('customRewardCategories', next);
-    } catch (e) {
-      console.error(e);
-    }
-    this.setData({
-      customCategories: next,
-      showAddCategory: false,
-      currentCategory: key
-    }, () => {
-      this.rebuildCategories();
-      this.loadRewards();
-    });
-    wx.showToast({ title: '已添加', icon: 'success' });
-  },
-
-  onLongPressCategory(e) {
-    const index = e.currentTarget.dataset.index;
-    const cat = this.data.categories[index];
-    if (!cat || !cat.custom) return;
-    wx.showActionSheet({
-      itemList: ['删除该分类'],
-      success: (res) => {
-        if (res.tapIndex === 0) {
-          wx.showModal({
-            title: '删除分类',
-            content: '确认删除「' + cat.name + '」？该分类下的奖励不会被删除。',
-            success: (r) => {
-              if (r.confirm) {
-                const next = this.data.customCategories.filter(c => c.key !== cat.key);
-                wx.setStorageSync('customRewardCategories', next);
-                const updates = { customCategories: next };
-                if (this.data.currentCategory === cat.key) {
-                  updates.currentCategory = '';
-                }
-                this.setData(updates, () => {
-                  this.rebuildCategories();
-                  if (this.data.currentCategory === '') this.loadRewards();
-                });
-                wx.showToast({ title: '已删除', icon: 'success' });
-              }
-            }
-          });
-        }
-      }
-    });
   }
 }));

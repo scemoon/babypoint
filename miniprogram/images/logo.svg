@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <!-- 主色调渐变 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2EB8A6"/>
+      <stop offset="100%" style="stop-color:#12807A"/>
+    </linearGradient>
+    <!-- 嫩芽渐变 -->
+    <linearGradient id="sproutGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#4CAF50"/>
+      <stop offset="100%" style="stop-color:#8BC34A"/>
+    </linearGradient>
+    <!-- 脚印渐变 -->
+    <linearGradient id="footGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#E0F7FA"/>
+    </linearGradient>
+    <!-- 阴影 -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- 背景圆形 -->
+  <circle cx="200" cy="200" r="180" fill="url(#bgGrad)" filter="url(#shadow)"/>
+  
+  <!-- 背景装饰 - 小圆点 -->
+  <circle cx="80" cy="100" r="6" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="320" cy="120" r="8" fill="rgba(255,255,255,0.15)"/>
+  <circle cx="100" cy="300" r="5" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="310" cy="280" r="7" fill="rgba(255,255,255,0.15)"/>
+  <circle cx="60" cy="200" r="4" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="340" cy="200" r="5" fill="rgba(255,255,255,0.15)"/>
+
+  <!-- 脚印图标 - 主视觉 -->
+  <g transform="translate(200, 180)">
+    <!-- 脚印轮廓 -->
+    <path d="M-30,-60 
+             C-30,-75 -15,-85 0,-85 
+             C15,-85 30,-75 30,-60
+             C30,-45 20,-35 10,-30
+             C5,-28 5,-20 8,-15
+             C12,-8 18,-5 22,0
+             C26,5 28,12 25,18
+             C22,24 15,28 8,30
+             C0,32 -15,32 -25,28
+             C-35,24 -42,15 -42,5
+             C-42,-10 -38,-35 -30,-60Z" 
+          fill="url(#footGrad)" opacity="0.95"/>
+    
+    <!-- 脚趾 -->
+    <ellipse cx="-15" cy="-75" rx="10" ry="12" fill="url(#footGrad)" opacity="0.9"/>
+    <ellipse cx="5" cy="-80" rx="8" ry="10" fill="url(#footGrad)" opacity="0.9"/>
+    <ellipse cx="22" cy="-78" rx="7" ry="9" fill="url(#footGrad)" opacity="0.9"/>
+  </g>
+
+  <!-- 嫩芽 - 从脚印中生长出来 -->
+  <g transform="translate(200, 100)">
+    <!-- 茎 -->
+    <path d="M0,0 Q-5,20 0,45" stroke="url(#sproutGrad)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    
+    <!-- 左叶子 -->
+    <path d="M-2,15 Q-25,5 -30,20 Q-25,25 -5,22 Q-2,18 -2,15Z" fill="url(#sproutGrad)"/>
+    
+    <!-- 右叶子 -->
+    <path d="M0,25 Q20,10 25,25 Q20,32 3,30 Q0,28 0,25Z" fill="url(#sproutGrad)"/>
+    
+    <!-- 顶芽 -->
+    <ellipse cx="-2" cy="-8" rx="8" ry="12" fill="#8BC34A"/>
+    <ellipse cx="-2" cy="-10" rx="5" ry="8" fill="#AED581"/>
+  </g>
+
+  <!-- 文字：小步成长 -->
+  <text x="200" y="320" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-weight="bold" font-size="42" fill="#FFFFFF">小步成长</text>
+  
+  <!-- 英文副标题 -->
+  <text x="200" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="rgba(255,255,255,0.8)" letter-spacing="2">GROWTH STEPS</text>
+</svg>

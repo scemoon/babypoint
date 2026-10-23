@@ -37,5 +37,5 @@ jobs:
             --appid ${{ secrets.WECHAT_APPID }} \
             --private-key ./private_key.pem \
             --version "${{ github.event.inputs.version || '2.0.1' }}" \
-            --desc "${{ github.event.inputs.desc || 'Bug fix' }}" \
+            --desc "${{ github.event.inputs.desc || 'fix: 创建任务带 childId + 修复 addDays 未定义' }}" \
             --project ./miniprogram

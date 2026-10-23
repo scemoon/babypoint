@@ -221,11 +221,23 @@ async function recordPinFailure(usersCol, openid, user) {
 
 // 归一化并校验用户提交的时间范围：缺省按频次默认时长补齐（单次明天、每天 1 个月、
 // 每周 3 个月、每月 1 年、自定义按间隔），并保证 结束日期 >= 开始日期
+// 修复：晚上6点后创建默认第二天开始，周期性任务的开始日期不早于今天
 function resolveRange({ periodType, periodDays, startDate, endDate }, now) {
   const type = periodType || 'once';
   const days = Math.max(1, Number(periodDays) || 1);
   const defDays = type === 'custom' ? days : (DEFAULT_RANGE_DAYS[type] || 1);
-  const start = normalizeDay(startDate) || (type === 'once' ? dayStart(now) + DAY_MS : dayStart(now));
+  const parsedStart = normalizeDay(startDate);
+  const today = dayStart(now);
+  const currentHour = new Date(now).getHours();
+  // 晚上6点后创建，默认第二天开始
+  const effectiveToday = currentHour >= 18 ? addDays(today, 1) : today;
+  
+  let start;
+  if (type === 'once') {
+    start = parsedStart || (dayStart(now) + DAY_MS);
+  } else {
+    start = parsedStart ? Math.max(parsedStart, effectiveToday) : effectiveToday;
+  }
   let end = normalizeDay(endDate);
   if (end === null) end = start + (defDays - 1) * DAY_MS;
   if (end < start) end = start;
@@ -249,6 +261,16 @@ function dayStart(ts) {
   return d.getTime();
 }
 
+// 时间戳按天偏移（保持 00:00 对齐），用于「今天 + N 天」
+// 修复：resolveRange 里用到了 addDays 但本文件没有定义，导致创建任务直接抛
+// "addDays is not defined"
+function addDays(ts, days) {
+  const d = new Date(ts);
+  d.setDate(d.getDate() + Number(days || 0));
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
 // 时间戳 → 'YYYY-MM-DD'
 function fmtDate(ts) {
   const d = new Date(ts);
@@ -256,11 +278,22 @@ function fmtDate(ts) {
 }
 
 // 把传入的日期（毫秒时间戳 / 'YYYY-MM-DD' / Date）归一化到当天 00:00
+// 修复：手动解析 YYYY-MM-DD 格式，避免 Date.parse 的时区问题
 function normalizeDay(value) {
   if (value === undefined || value === null || value === '') return null;
   if (typeof value === 'number') return Number.isFinite(value) ? dayStart(value) : null;
   if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : dayStart(value.getTime());
-  const parsed = Date.parse(String(value).replace(/-/g, '/'));
+  // 手动解析 YYYY-MM-DD 格式，构造本地时区的日期
+  const str = String(value).trim();
+  const parts = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (parts) {
+    const year = parseInt(parts[1], 10);
+    const month = parseInt(parts[2], 10) - 1;
+    const day = parseInt(parts[3], 10);
+    const d = new Date(year, month, day, 0, 0, 0, 0);
+    return d.getTime();
+  }
+  const parsed = Date.parse(str);
   return Number.isNaN(parsed) ? null : dayStart(parsed);
 }
 
@@ -313,7 +346,8 @@ function generatePeriods(task, range) {
   const rangeEndGate = range.endDate + DAY_MS;    // 排他边界
 
   if (range.type === 'once') {
-    return [{ index: 1, start: range.startDate, end: rangeEndDay, gate: rangeEndGate }];
+    // once 任务：当天 00:00 开始，当天 23:59:59 结束（gate = end + 1天）
+    return [{ index: 1, start: range.startDate, end: range.startDate + DAY_MS - 1, gate: rangeEndGate }];
   }
 
   // 月次任务：按日历月计算
@@ -371,7 +405,13 @@ exports.main = async (event, context) => {
     switch (action) {
       case 'listTasks': {
         const { category, childId, status } = data;
-        const where = { isActive: true, scope: 'parent', parentId: openid };
+        if (!childId) return { success: false, error: '缺少 childId 参数' };
+        // 验证孩子归属
+        const childRes = await childrenCol.doc(childId).get();
+        if (!childRes.data) return { success: false, error: '孩子不存在' };
+        if (childRes.data._openid !== openid) return { success: false, error: '无权查看此孩子的任务' };
+        
+        const where = { isActive: true, scope: 'child', childId: childId };
         if (category) where.category = category;
         const res = await tasksCol.where(where).orderBy('basePoints', 'desc').get();
         const tasks = res.data || [];
@@ -471,8 +511,15 @@ exports.main = async (event, context) => {
       }
 
       case 'createTask': {
-        const { name, category, description, icon, periodType, periodDays, targetCount, maxDaily, requiresPhoto, startDate, endDate } = data;
+        const { name, category, description, icon, periodType, periodDays, targetCount, maxDaily, requiresPhoto, startDate, endDate, childId } = data;
         if (!name || !category) return { success: false, error: '名称和分类必填' };
+        if (!childId) return { success: false, error: '请先选择孩子' };
+        
+        // 验证孩子归属：该孩子的 _openid 必须是当前用户
+        const childRes = await childrenCol.doc(childId).get();
+        if (!childRes.data) return { success: false, error: '孩子不存在' };
+        if (childRes.data._openid !== openid) return { success: false, error: '无权为此孩子创建任务' };
+        
         const score = analyzeTaskPoints({ name, category, description });
 
         const type = ['once', 'daily', 'weekly', 'monthly', 'custom'].includes(periodType) ? periodType : 'once';
@@ -495,7 +542,8 @@ exports.main = async (event, context) => {
           targetCount: Math.max(1, Number(targetCount) || 1),
           maxDaily: Math.max(0, Number(maxDaily) || 0),
           requiresPhoto: !!requiresPhoto,
-          scope: 'parent',
+          scope: 'child',           // 改为绑定到孩子
+          childId: childId,        // 绑定到指定孩子
           parentId: openid,
           createdAt: Date.now(),
           updatedAt: Date.now()
@@ -510,7 +558,8 @@ exports.main = async (event, context) => {
         const { taskId, name, category, description, icon, maxDaily, requiresPhoto, isActive, periodType, periodDays, targetCount, startDate, endDate } = data;
         if (!taskId) return { success: false, error: 'taskId 必填' };
         const existing = await tasksCol.doc(taskId).get();
-        if (!existing.data || existing.data.parentId !== openid) {
+        if (!existing.data) return { success: false, error: '任务不存在' };
+        if (existing.data.parentId !== openid) {
           return { success: false, error: '只能修改自己创建的任务' };
         }
         const updateData = { updatedAt: Date.now() };
@@ -547,7 +596,8 @@ exports.main = async (event, context) => {
       case 'deleteTask': {
         const { taskId } = data;
         const existing = await tasksCol.doc(taskId).get();
-        if (!existing.data || existing.data.parentId !== openid) {
+        if (!existing.data) return { success: false, error: '任务不存在' };
+        if (existing.data.parentId !== openid) {
           return { success: false, error: '只能删除自己创建的任务' };
         }
         await tasksCol.doc(taskId).update({ data: { isActive: false, updatedAt: Date.now() } });
@@ -636,7 +686,10 @@ exports.main = async (event, context) => {
           })
         ]);
 
-        return { success: true, actualPoints, completionLevel, domain: domainInfo, instanceStart: period.start };
+        // 更新积分后查回最新 totalPoints，以便前端刷新全局数据
+        const updatedChild = await childrenCol.doc(childId).get();
+
+        return { success: true, actualPoints, completionLevel, domain: domainInfo, instanceStart: period.start, totalPoints: updatedChild.data.totalPoints };
       }
 
       default:

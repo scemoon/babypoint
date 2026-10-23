@@ -1,6 +1,40 @@
 <view class="container edit-page">
-  <view class="edit-intro"><view class="edit-badge reward-badge"><icon name="gift" size="38" color="#14343D"/></view><text class="eyebrow">和孩子一起定目标</text><text class="page-title">添加奖励</text><text class="intro-hint">选一个孩子期待的小奖励，再决定它需要多少积分。</text></view>
-  <view class="form-section"><view class="form-item"><text class="label">奖励名称</text><input class="input" placeholder="例如：周末选一部电影" bindinput="onNameInput" value="{{formData.name}}" cursor-spacing="24"/></view><view class="form-item"><text class="label">奖励分类</text><picker mode="selector" range="{{categories}}" range-key="name" bindchange="onCategoryChange"><view class="picker-value">{{selectedCategoryName || '选择最合适的分类'}}<text>⌄</text></view></picker></view><view class="form-item"><text class="label">兑换所需积分</text><view class="points-input"><input class="input" type="number" placeholder="50" bindinput="onPointsInput" value="{{formData.points}}" cursor-spacing="24"/><text>积分</text></view></view><view class="form-item"><text class="label">补充说明 <text class="optional">选填</text></text><textarea class="textarea" placeholder="说明奖励内容或使用规则" bindinput="onDescInput" value="{{formData.description}}" cursor-spacing="24"/></view></view>
+  <view class="form-section">
+    <view class="form-item">
+      <text class="label">奖励名称</text>
+      <input class="input" placeholder="例如：周末选一部电影" bindinput="onNameInput" value="{{formData.name}}" cursor-spacing="24"/>
+    </view>
+    <view class="form-item">
+      <text class="label">奖励分类</text>
+      <view wx:if="{{!showNewCategory}}">
+        <picker mode="selector" range="{{categories}}" range-key="name" bindchange="onCategoryChange">
+          <view class="picker-value">{{selectedCategoryName || '选择最合适的分类'}}<text>⌄</text></view>
+        </picker>
+        <view class="add-category-btn" bindtap="onShowAddCategory">＋ 新建分类</view>
+      </view>
+      <view wx:else class="new-category-form">
+        <input class="input" placeholder="输入分类名称" maxlength="8" value="{{newCategoryName}}" bindinput="onNewCategoryNameInput" cursor-spacing="24"/>
+        <view class="new-category-icons">
+          <text wx:for="{{iconOptions}}" wx:key="*this" class="icon-option {{newCategoryIcon === item ? 'active' : ''}}" data-icon="{{item}}" bindtap="onSelectCategoryIcon">{{item}}</text>
+        </view>
+        <view class="new-category-actions">
+          <text class="cancel-btn" bindtap="onCancelNewCategory">取消</text>
+          <text class="confirm-btn" bindtap="onConfirmNewCategory">确认</text>
+        </view>
+      </view>
+    </view>
+    <view class="form-item">
+      <text class="label">兑换所需积分</text>
+      <view class="points-input">
+        <input class="input" type="number" placeholder="50" bindinput="onPointsInput" value="{{formData.points}}" cursor-spacing="24"/>
+        <text>积分</text>
+      </view>
+    </view>
+    <view class="form-item">
+      <text class="label">补充说明 <text class="optional">选填</text></text>
+      <textarea class="textarea" placeholder="说明奖励内容或使用规则" bindinput="onDescInput" value="{{formData.description}}" cursor-spacing="24"/>
+    </view>
+  </view>
   <view class="form-hint"><icon name="info" size="28" color="#2A808A"/><text>兑换时会从孩子的可用积分中扣除对应积分。</text></view>
   <button class="save-button" bindtap="onSubmit" loading="{{loading}}">创建奖励</button>
   <!-- 键盘占位：撑出可滚动余量，把输入框推到键盘之上（收起时高度为 0） -->

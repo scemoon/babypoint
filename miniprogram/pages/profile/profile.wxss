@@ -29,6 +29,117 @@
 .parent-caption { color: var(--muted); font-size: 20rpx; }
 .eyebrow { color: var(--muted); font-size: 22rpx; font-weight: 500; }
 
+/* ========== 孩子积分卡片列表 ========== */
+.children-cards {
+  margin-bottom: 18rpx;
+}
+.children-cards-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 12rpx;
+  padding: 0 4rpx;
+}
+.children-scroll {
+  width: 100%;
+}
+.children-cards-row {
+  display: flex;
+  gap: 16rpx;
+  padding: 4rpx;
+  justify-content: center;
+}
+.children-cards-row.single {
+  justify-content: center;
+}
+.child-card {
+  padding: 20rpx;
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  border: 2rpx solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+.children-cards-row .child-card {
+  flex: 1;
+  max-width: 400rpx;
+}
+.children-cards-row.single .child-card {
+  flex: none;
+  width: 90%;
+  max-width: 600rpx;
+}
+.child-card.active {
+  border-color: var(--water-lo);
+  background: var(--soft-water);
+}
+.child-card-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: var(--water);
+  color: #FFF;
+  font-size: 26rpx;
+  font-weight: 700;
+  overflow: hidden;
+}
+.child-card-avatar image { width: 100%; height: 100%; }
+.child-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+.child-card-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+.child-card-grade {
+  font-size: 20rpx;
+  color: var(--muted);
+}
+.child-card-points {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12rpx 0;
+  background: var(--soft-water);
+  border-radius: var(--radius-sm);
+}
+.child-card-points-num {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--water);
+}
+.child-card-points-label {
+  font-size: 18rpx;
+  color: var(--muted);
+}
+.child-card-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.child-card-total-num {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+.child-card-total-label {
+  font-size: 18rpx;
+  color: var(--muted);
+}
+.no-child-hint {
+  text-align: center;
+  padding: 40rpx;
+  color: var(--muted);
+  font-size: 24rpx;
+}
+
 /* ========== 个人资料卡片 ==========
    与首页 .score-panel 保持一致：同一套渐变、同样的装饰（柔光圆 + 底部嫩黄绿高光线）、
    同一套文字令牌（大数字 --sun / 标签 --on-dark-faint），字号与字体栈也对齐，
@@ -124,6 +235,9 @@
 .settings-icon.cyan { background: var(--soft-water); }
 .settings-icon.lime { background: var(--soft-lime); }
 .settings-icon.coral { background: var(--soft-coral); }
+.settings-icon.gold { background: var(--soft-gold); }
+.settings-icon.red { background: #FFEBEB; }
+.logout-icon { font-size: 32rpx; line-height: 1; }
 .settings-copy {
   display: flex;
   flex: 1;
@@ -205,4 +319,170 @@
   text-align: center;
   font-size: 23rpx;
   font-weight: 650;
+}
+
+/* ========== 关于弹窗 ========== */
+.about-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, .5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  z-index: 100;
+}
+.about-mask.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.about-dialog {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90vh;
+  transform: translateY(100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--paper);
+  opacity: 0;
+  pointer-events: none;
+  transition: all .3s ease;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+}
+.about-mask.active .about-dialog {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.about-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 28rpx 20rpx;
+  border-bottom: 1rpx solid var(--line);
+  position: relative;
+  flex-shrink: 0;
+}
+/* 底部弹窗拖动指示条 */
+.about-header::before {
+  content: '';
+  position: absolute;
+  top: 12rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: var(--line);
+  z-index: 1;
+}
+.about-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--ink);
+}
+.about-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--mist);
+  color: var(--muted);
+  font-size: 28rpx;
+}
+.about-content {
+  flex: 1;
+  min-height: 0;
+  height: 0;
+  padding: 24rpx 28rpx;
+  box-sizing: border-box;
+}
+.about-version {
+  text-align: center;
+  color: var(--muted);
+  font-size: 22rpx;
+  margin-bottom: 24rpx;
+}
+.about-section {
+  margin-bottom: 28rpx;
+}
+.about-section-title {
+  display: block;
+  color: var(--ink);
+  font-size: 26rpx;
+  font-weight: 700;
+  margin-bottom: 12rpx;
+}
+.about-text {
+  display: block;
+  color: var(--muted);
+  font-size: 22rpx;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  width: 100%;
+}
+.about-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 14rpx;
+  margin-bottom: 16rpx;
+}
+.about-feature-icon {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+.about-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+.about-feature-name {
+  color: var(--ink);
+  font-size: 24rpx;
+  font-weight: 600;
+}
+.about-feature-desc {
+  color: var(--muted);
+  font-size: 20rpx;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.about-domain-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10rpx;
+}
+.about-domain-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  padding: 16rpx 8rpx;
+  border-radius: var(--radius-sm);
+  background: var(--mist);
+}
+.about-domain-item text:first-child {
+  font-size: 32rpx;
+}
+.about-domain-item text:last-child {
+  color: var(--ink);
+  font-size: 20rpx;
+  font-weight: 600;
+}
+.about-footer {
+  padding: 20rpx 28rpx;
+  border-top: 1rpx solid var(--line);
+  text-align: center;
+  color: var(--muted);
+  font-size: 20rpx;
+  flex-shrink: 0;
 }

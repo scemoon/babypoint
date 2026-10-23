@@ -5,8 +5,8 @@ const { formatInstanceLabel, formatDayLabel } = require('../../utils/date-range'
 
 // 四个进度标签：待开始排在"进行中"前面，符合时间顺序
 const STATUS_TABS = [
-  { key: 'pending', name: '待开始', emptyEmoji: '⏳', emptyText: '还没有待开始的任务', emptyHint: '发布任务后，未来周期的任务会出现在这里' },
   { key: 'active', name: '进行中', emptyEmoji: '🎉', emptyText: '太棒了！暂无进行中任务', emptyHint: '所有任务都已完成或已逾期' },
+  { key: 'pending', name: '待开始', emptyEmoji: '⏳', emptyText: '还没有待开始的任务', emptyHint: '发布任务后，未来周期的任务会出现在这里' },
   { key: 'completed', name: '已完成', emptyEmoji: '📝', emptyText: '还没有完成的任务', emptyHint: '完成任务获得积分奖励' },
   { key: 'overdue', name: '已逾期', emptyEmoji: '✅', emptyText: '没有逾期任务', emptyHint: '继续保持' }
 ];
@@ -235,11 +235,73 @@ Page({
     wx.navigateTo({ url: '/pages/task-complete/task-complete?' + params });
   },
 
+  // 长按任务显示删除选项（仅进行中/待开始）
+  onTaskLongPress(e) {
+    const task = e.currentTarget.dataset.task;
+    if (!task) return;
+
+    // 只允许删除进行中和待开始的任务
+    if (task.status !== 'active' && task.status !== 'pending') {
+      return;
+    }
+
+    wx.showActionSheet({
+      itemList: ['删除任务'],
+      itemColor: '#FF3B30',
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.confirmDeleteTask(task);
+        }
+      }
+    });
+  },
+
+  // 确认删除任务
+  confirmDeleteTask(task) {
+    const taskName = task.name || '该任务';
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除「${taskName}」吗？${task.status === 'pending' ? '该任务还未开始，删除后将不会出现在任务列表中。' : '该任务正在进行中，删除后将不再有效。'}`,
+      confirmText: '删除',
+      confirmColor: '#FF3B30',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          this.deleteTask(task);
+        }
+      }
+    });
+  },
+
+  // 执行删除任务
+  async deleteTask(task) {
+    try {
+      wx.showLoading({ title: '删除中...' });
+      const res = await app.callCloudFunction('task', {
+        action: 'deleteTask',
+        taskId: task.taskId || task._id,
+        childId: this.data.selectedChildId
+      });
+
+      if (res.success) {
+        wx.showToast({ title: '已删除', icon: 'success' });
+        // 刷新列表
+        this.loadTasks();
+      } else {
+        wx.showToast({ title: res.error || '删除失败', icon: 'none' });
+      }
+    } catch (e) {
+      wx.showToast({ title: e.message || '删除失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
+    }
+  },
+
   onAddTask() {
     wx.switchTab({ url: '/pages/publish/publish' });
   },
 
   onShow() {
-    if (this.data.selectedChildId) this.loadTasks();
+    this.loadChildren();
   }
 });

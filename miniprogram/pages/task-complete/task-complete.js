@@ -252,6 +252,21 @@ Page(keyboardAvoid({
 
       if (res.success) {
         this.setData({ showPinModal: false });
+
+        // 同步全局孩子积分：更新缓存中当前孩子的 totalPoints
+        const newTotal = res.totalPoints;
+        if (newTotal !== undefined && app.globalData.childrenCache) {
+          app.globalData.childrenCache = app.globalData.childrenCache.map(c =>
+            c._id === this.data.selectedChild._id ? { ...c, totalPoints: newTotal } : c
+          );
+        }
+        // 同时更新页内 selectedChild，保持切换页后数据一致
+        if (newTotal !== undefined) {
+          this.setData({
+            selectedChild: { ...this.data.selectedChild, totalPoints: newTotal }
+          });
+        }
+
         wx.showModal({
           title: '完成任务',
           content: '获得 ' + res.actualPoints + ' 积分！',

@@ -31,6 +31,26 @@ Page(keyboardAvoid({
   },
 
   async onLoad() {
+    // 检测是否为主动退出 - 优先处理，不调用云函数
+    const logoutFlag = wx.getStorageSync('logoutFlag');
+    if (logoutFlag) {
+      // 清除主动退出标记，重置全局状态，显示登录页（step 0）
+      wx.removeStorageSync('logoutFlag');
+      app.globalData.loginChecked = false;
+      app.globalData.isNewUser = true;
+      app.globalData.parentInfo = null;
+      app.globalData.currentChildId = '';
+      this.setData({
+        ready: true,
+        step: 0,  // step 0 表示登录页，不是欢迎引导页
+        childName: '',
+        selectedGrade: '',
+        selectedGradeName: '',
+        gender: 'male'
+      });
+      return;
+    }
+
     // 引导页只服务于首次登录。
     // 已知登录态时：是新用户才留在本页，否则直接回首页。
     if (app.globalData.loginChecked) {
@@ -58,6 +78,36 @@ Page(keyboardAvoid({
       console.error('onboard checkLogin error', e);
       // 读不到登录态时不展示引导页，回首页由首页给出重试入口
       wx.switchTab({ url: '/pages/index/index' });
+    }
+  },
+
+  // 重新登录（退出登录后点击重新登录按钮）
+  async onReLogin() {
+    this.setData({ loading: true });
+    try {
+      // 调用登录云函数，重新获取登录态
+      const loginRes = await app.callCloudFunction('login', {});
+      if (loginRes && loginRes.success) {
+        if (loginRes.isNew) {
+          // 新用户 -> 显示欢迎引导页
+          app.globalData.loginChecked = true;
+          app.globalData.isNewUser = true;
+          this.setData({ step: 1 });
+        } else {
+          // 老用户 -> 跳转到首页
+          app.globalData.loginChecked = true;
+          app.globalData.isNewUser = false;
+          app.globalData.parentInfo = loginRes.userInfo || {};
+          wx.switchTab({ url: '/pages/index/index' });
+        }
+      } else {
+        wx.showToast({ title: '登录失败，请重试', icon: 'none' });
+      }
+    } catch (e) {
+      console.error('relogin error', e);
+      wx.showToast({ title: '登录失败，请重试', icon: 'none' });
+    } finally {
+      this.setData({ loading: false });
     }
   },
 

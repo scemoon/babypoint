@@ -1,7 +1,7 @@
 <view class="container task-page">
   <!-- 页面标题：扁平页头，不用渐变面板 -->
   <view class="page-intro page-intro-flat">
-    <text class="eyebrow">🌸 小红花 · 五育成长</text>
+    <text class="eyebrow">🌸 攒星卡 · 成长激励</text>
 
   </view>
 
@@ -70,7 +70,7 @@
 
   <!-- 任务列表：每个周期一行 -->
   <view class="task-list" wx:if="{{!loading && displayTasks.length}}">
-    <view class="task-row {{item.status === 'completed' ? 'completed' : ''}} {{item.status === 'overdue' ? 'overdue' : ''}} {{item.status === 'pending' ? 'pending' : ''}}" wx:for="{{displayTasks}}" wx:key="_id" bindtap="onTaskTap" data-task="{{item}}">
+    <view class="task-row {{item.status === 'completed' ? 'completed' : ''}} {{item.status === 'overdue' ? 'overdue' : ''}} {{item.status === 'pending' ? 'pending' : ''}}" wx:for="{{displayTasks}}" wx:key="_id" bindtap="onTaskTap" bindlongpress="onTaskLongPress" data-task="{{item}}">
       <!-- 左侧 emoji 图标：与发布页任务模板一致 -->
       <view class="task-icon"><text>{{item.categoryIcon || '📝'}}</text></view>
       <!-- 任务主体 -->

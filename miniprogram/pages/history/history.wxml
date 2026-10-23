@@ -14,7 +14,7 @@ module.exports = {
 </wxs>
 
 <view class="container history-page">
-  <view class="page-intro"><text class="eyebrow">回看每一天的积累</text><text class="page-title">积分记录</text></view>
+  
 
   <scroll-view scroll-x class="child-strip" wx:if="{{children.length > 1}}">
     <view class="child-strip-inner">

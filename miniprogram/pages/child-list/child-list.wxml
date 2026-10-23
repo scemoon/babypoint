@@ -1,5 +1,5 @@
 <view class="container child-page">
-  <view class="page-intro"><text class="eyebrow">家庭成员</text><text class="page-title">管理孩子</text><text class="intro-hint">选择当前查看的孩子，也可以更新档案。</text></view>
+ 
   <view class="child-list" wx:if="{{children.length}}">
     <view class="child-entry {{item._id === currentChildId ? 'current' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
       <view class="child-avatar"><text>{{item.name[0]}}</text></view><view class="child-info"><text class="child-name">{{item.name}}</text><text class="child-grade">{{item.schoolStage === 'kindergarten' ? '幼儿园' : item.schoolStage === 'primary' ? '小学' : '初中'}}{{(item.gradeLevel % 3) || 3}}年级</text></view><view class="child-points"><text>{{item.totalPoints || 0}}</text><text>总积分</text></view>

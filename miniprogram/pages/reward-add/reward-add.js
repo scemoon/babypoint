@@ -2,19 +2,40 @@
 const app = getApp();
 const { keyboardAvoid } = require('../../utils/keyboard');
 
+const BUILTIN_CATEGORIES = [
+  { key: 'FOOD', name: '美食', icon: '🍔' },
+  { key: 'PLAY', name: '娱乐', icon: '🎮' },
+  { key: 'TOY', name: '玩具', icon: '🎁' },
+  { key: 'OUTING', name: '出行', icon: '🚗' },
+  { key: 'PRIVILEGE', name: '特权', icon: '👑' },
+  { key: 'DIGITAL', name: '数码', icon: '📱' }
+];
+
+function loadCustomCategories() {
+  try {
+    return wx.getStorageSync('customRewardCategories') || [];
+  } catch (e) {
+    return [];
+  }
+}
+
 Page(keyboardAvoid({
   data: {
-    categories: [
-      { key: 'FOOD', name: '美食', icon: '🍔' },
-      { key: 'PLAY', name: '娱乐', icon: '🎮' },
-      { key: 'TOY', name: '玩具', icon: '🎁' },
-      { key: 'OUTING', name: '出行', icon: '🚗' },
-      { key: 'PRIVILEGE', name: '特权', icon: '👑' },
-      { key: 'DIGITAL', name: '数码', icon: '📱' }
-    ],
+    categories: BUILTIN_CATEGORIES,
     selectedCategoryName: '',
     formData: { name: '', category: '', points: 50, description: '', icon: '🎁' },
-    loading: false
+    loading: false,
+    showNewCategory: false,
+    newCategoryName: '',
+    newCategoryIcon: '🎁',
+    iconOptions: ['🎁', '🎉', '⭐', '🌈', '🎨', '🎵', '🏆', '✨', '🎯', '🚀', '🌟', '💎']
+  },
+
+  onLoad() {
+    // 合并内置分类和自定义分类
+    const customCategories = loadCustomCategories();
+    const merged = [...BUILTIN_CATEGORIES, ...customCategories];
+    this.setData({ categories: merged });
   },
 
   onNameInput(e) {
@@ -42,6 +63,64 @@ Page(keyboardAvoid({
     const formData = this.data.formData;
     formData.description = e.detail.value;
     this.setData({ formData });
+  },
+
+  // ---------- 新建分类 ----------
+  onShowAddCategory() {
+    this.setData({
+      showNewCategory: true,
+      newCategoryName: '',
+      newCategoryIcon: '🎁'
+    });
+  },
+
+  onCancelNewCategory() {
+    this.setData({ showNewCategory: false });
+  },
+
+  onNewCategoryNameInput(e) {
+    this.setData({ newCategoryName: e.detail.value });
+  },
+
+  onSelectCategoryIcon(e) {
+    this.setData({ newCategoryIcon: e.currentTarget.dataset.icon });
+  },
+
+  onConfirmNewCategory() {
+    const { newCategoryName, newCategoryIcon } = this.data;
+    if (!newCategoryName || !newCategoryName.trim()) {
+      wx.showToast({ title: '请输入分类名称', icon: 'none' });
+      return;
+    }
+    const trimmed = newCategoryName.trim();
+    if (trimmed.length > 8) {
+      wx.showToast({ title: '名称不超过8个字', icon: 'none' });
+      return;
+    }
+
+    // 保存到存储
+    const key = 'CUSTOM_' + Date.now().toString(36);
+    const newCat = { key, name: trimmed, icon: newCategoryIcon, custom: true };
+    const customCategories = loadCustomCategories();
+    const updated = [...customCategories, newCat];
+    try {
+      wx.setStorageSync('customRewardCategories', updated);
+    } catch (e) {
+      console.error(e);
+    }
+
+    // 更新分类列表并选中
+    const merged = [...BUILTIN_CATEGORIES, ...updated];
+    const formData = this.data.formData;
+    formData.category = key;
+    formData.icon = newCategoryIcon;
+    this.setData({
+      categories: merged,
+      formData,
+      selectedCategoryName: trimmed,
+      showNewCategory: false
+    });
+    wx.showToast({ title: '已添加', icon: 'success' });
   },
 
   async onSubmit() {

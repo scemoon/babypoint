@@ -10,7 +10,7 @@ Page({
     profileReady: false,
     loadFailed: false,
     ranking: [],
-    rankingLimit: 10,
+    rankingLimit: 5,
     rankingHasMore: false,
     rankingLoadingMore: false,
     latestRedemptions: [],
@@ -24,6 +24,18 @@ Page({
   onShow() {
     if (app.globalData.currentChildId) {
       this.loadData();
+      this.refreshChildren();
+    }
+  },
+
+  async refreshChildren() {
+    try {
+      const res = await app.callCloudFunction('child', { action: 'listChildren' });
+      if (res.success && res.list && res.list.length > 0) {
+        this.setData({ children: res.list });
+      }
+    } catch (e) {
+      console.error('刷新孩子列表失败', e);
     }
   },
 
@@ -94,24 +106,27 @@ Page({
         this.setData({ loadFailed: true });
       }
 
-      const rankingRes = await app.callCloudFunction('ranking', { action: 'getRanking', currentChildId, limit: 10 });
+      const rankingRes = await app.callCloudFunction('ranking', { action: 'getRanking', currentChildId, limit: 5 });
       if (rankingRes.success) {
         const ranking = rankingRes.list;
         const familyRanking = this.data.children
           .map(item => item._id === currentChildId ? (this.data.currentChild || item) : item)
           .sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
         const rankIndex = familyRanking.findIndex(child => child._id === currentChildId);
-        this.setData({ ranking, currentChildRank: rankIndex < 0 ? 0 : rankIndex + 1, rankingLimit: 10, rankingHasMore: rankingRes.hasMore, rankingLoadingMore: false });
+        this.setData({ ranking, currentChildRank: rankIndex < 0 ? 0 : rankIndex + 1, rankingLimit: 5, rankingHasMore: rankingRes.hasMore, rankingLoadingMore: false });
       }
 
       const redeemRes = await app.callCloudFunction('reward', { action: 'getLatestRedemptions', limit: 5 });
       if (redeemRes.success) {
         // 兑换记录里积分历史上用过两个字段名：现在写 pointsRequired，更早的记录只有
         // pointsSpent。这里优先取新字段再兜底旧字段，避免右侧只显示「− 积分」。
+        const childrenMap = {};
+        (this.data.children || []).forEach(c => { childrenMap[c._id] = c.name; });
         const latestRedemptions = (redeemRes.list || []).map(item => {
           const cost = item.pointsRequired != null ? item.pointsRequired
             : (item.pointsSpent != null ? item.pointsSpent : 0);
-          return { ...item, points: Number(cost) || 0 };
+          const childName = childrenMap[item.childId] || '未知';
+          return { ...item, points: Number(cost) || 0, childName };
         });
         this.setData({ latestRedemptions });
       }
@@ -134,7 +149,9 @@ Page({
   onSelectChild(e) {
     const childId = e.currentTarget.dataset.id;
     app.saveCurrentChildId(childId);
-    this.setData({ showChildPicker: false });
+    const child = this.data.children.find(c => c._id === childId);
+    const currentChild = child ? this.buildChildViewModel(child) : null;
+    this.setData({ showChildPicker: false, currentChild });
     this.loadData();
   },
 

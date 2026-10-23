@@ -162,37 +162,40 @@
 .filter-card-title { font-size: 26rpx; font-weight: 700; color: var(--ink); }
 .filter-card-action { font-size: 22rpx; font-weight: 650; color: var(--water-lo); }
 
-/* ========== 分类滚动 ========== */
-.category-scroll { width: calc(100% + 44rpx); margin-left: -22rpx; white-space: nowrap; }
-.category-pills {
-  display: flex;
-  gap: 10rpx;
-  padding: 4rpx 22rpx;
-  align-items: center;
-  white-space: nowrap;
+/* ========== 分类网格（全展示） ========== */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
+  padding: 4rpx 0;
 }
-.category-pill {
-  display: inline-flex;
+.category-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6rpx;
-  padding: 10rpx 18rpx;
-  border: 1rpx solid var(--line);
-  border-radius: var(--radius-pill);
+  justify-content: center;
+  padding: 20rpx 12rpx;
+  min-height: 100rpx;
+  border: 2rpx solid var(--line);
+  border-radius: var(--radius-md);
   background: var(--paper);
-  color: var(--muted);
-  font-size: 22rpx;
-  white-space: nowrap;
   transition: all .12s ease;
 }
-.category-pill:active { transform: scale(.96); }
-.category-pill.active {
+.category-item:active { transform: scale(.96); }
+.category-item.active {
   background: var(--soft-water);
   border-color: var(--water-lo);
-  color: var(--ink);
-  font-weight: 700;
 }
-.category-pill-icon { font-size: 22rpx; }
-.category-pill-mark { margin-left: 2rpx; font-size: 18rpx; opacity: .85; }
+.category-icon {
+  font-size: 32rpx;
+  margin-bottom: 6rpx;
+}
+.category-name {
+  font-size: 20rpx;
+  color: var(--ink);
+  font-weight: 600;
+  text-align: center;
+}
 
 /* ========== 列表标题 ========== */
 .list-heading {

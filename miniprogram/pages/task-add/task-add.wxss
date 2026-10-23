@@ -41,6 +41,48 @@
 .period-options { display: flex; flex-wrap: wrap; gap: 10rpx; }
 .period-chip { padding: 13rpx 18rpx; border: 1rpx solid var(--line); border-radius: var(--radius-pill); background: var(--paper); color: var(--muted); font-size: 21rpx; }
 .period-chip.active { background: var(--soft-water); border-color: var(--water-lo); color: var(--ink); font-weight: 700; }
+/* 任务归属孩子选择 */
+.child-options { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.child-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 16rpx 8rpx 8rpx;
+  border-radius: 999rpx;
+  background: var(--paper);
+  border: 1rpx solid var(--line);
+  color: var(--muted);
+  font-size: 22rpx;
+  transition: all .15s ease;
+}
+.child-chip.active { background: var(--ink); border-color: var(--ink); color: #FFF; font-weight: 700; }
+.tiny-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 999rpx;
+  overflow: hidden;
+  background: var(--soft-water);
+  color: var(--ink);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+.tiny-avatar image { width: 100%; height: 100%; }
+.child-chip.active .tiny-avatar { background: rgba(255, 255, 255, .2); color: #FFF; }
+.child-empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+  padding: 20rpx;
+  border: 1rpx dashed var(--line);
+  border-radius: 16rpx;
+  background: var(--paper);
+}
+.child-empty-text { color: var(--muted); font-size: 22rpx; }
+.child-empty-link { color: var(--water); font-size: 22rpx; font-weight: 700; flex-shrink: 0; }
 .points-input { display: flex; align-items: center; gap: 12rpx; }
 .points-input input { flex: 1; }
 .points-input > text { color: var(--muted); font-size: 23rpx; }

@@ -4,8 +4,7 @@ const app = getApp();
 const { analyzeTaskPoints, CATEGORY_META } = require('../../utils/task-score');
 const { keyboardAvoid } = require('../../utils/keyboard');
 const {
-  dayStart, toDateStr, parseDateStr, getDefaultRange, countPeriods, formatRangeSummary,
-  getDefaultStart, calcEnd, calcCount, getPeriodCountRange, DEFAULT_PERIOD_COUNTS
+  dayStart, toDateStr, parseDateStr, getDefaultRange, countPeriods, formatRangeSummary, DEFAULT_RANGE_DAYS
 } = require('../../utils/date-range');
 
 // ==================== 全面预设任务模板 ====================
@@ -121,12 +120,56 @@ const PRESET_TASKS = [
   { name: '合作完成一件事', category: 'LIFE_SOCIAL', icon: '🤝', description: '和小伙伴一起合作完成任务', periodType: 'weekly' },
   { name: '分享自己的物品', category: 'LIFE_SOCIAL', icon: '🎁', description: '愿意和他人分享', periodType: 'weekly' },
   { name: '解决与同伴的冲突', category: 'LIFE_SOCIAL', icon: '🤝', description: '用沟通解决矛盾', periodType: 'monthly' },
-  
-  // ========== 其他 - 趣味任务 ==========
-  { name: '学做一道新菜', category: 'OTHER', icon: '🍳', description: '在大人指导下学做简单菜肴', periodType: 'monthly' },
-  { name: '科学小实验', category: 'OTHER', icon: '🔬', description: '完成一个简单的科学实验', periodType: 'monthly' },
+
+  // ========== 文化传承 MORAL_CULTURE (6) ==========
+  { name: '古诗词背诵', category: 'MORAL_CULTURE', icon: '🗣️', description: '背诵一首古诗词', periodType: 'weekly' },
+  { name: '传统节日习俗', category: 'MORAL_CULTURE', icon: '🏮', description: '了解一个传统节日的习俗', periodType: 'monthly' },
+  { name: '二十四节气学习', category: 'MORAL_CULTURE', icon: '🌤️', description: '了解二十四节气相关知识', periodType: 'monthly' },
+  { name: '传统故事聆听', category: 'MORAL_CULTURE', icon: '📖', description: '聆听并复述传统故事', periodType: 'weekly' },
+  { name: '非遗文化了解', category: 'MORAL_CULTURE', icon: '🎭', description: '了解一项非物质文化遗产', periodType: 'monthly' },
+  { name: '文化传承行动', category: 'MORAL_CULTURE', icon: '🌟', description: '参与一项文化传承活动', periodType: 'monthly' },
+
+  // ========== 安全教育 OTHER (8) ==========
+  // 幼儿园
+  { name: '认识红绿灯', category: 'OTHER', icon: '🚦', description: '学习认识红绿灯和过马路', periodType: 'weekly' },
+  { name: '不跟陌生人走', category: 'OTHER', icon: '🚫', description: '知道不能跟陌生人走', periodType: 'daily' },
+  // 小学低年级
+  { name: '用电安全知识', category: 'OTHER', icon: '⚡', description: '学习安全用电常识', periodType: 'monthly' },
+  { name: '防火安全演练', category: 'OTHER', icon: '🔥', description: '了解火灾逃生基本常识', periodType: 'monthly' },
+  // 小学高年级
+  { name: '网络安全意识', category: 'OTHER', icon: '💻', description: '学习网络安全和防诈骗知识', periodType: 'monthly' },
+  { name: '防溺水安全', category: 'OTHER', icon: '🏊', description: '学习防溺水安全知识', periodType: 'monthly' },
+  // 初中
+  { name: '急救知识学习', category: 'OTHER', icon: '🩹', description: '学习基本的急救知识', periodType: 'monthly' },
+  { name: '应急逃生技能', category: 'OTHER', icon: '🚨', description: '掌握基本的应急逃生技能', periodType: 'monthly' },
+
+  // ========== 科学探索 OTHER (6) ==========
+  // 幼儿园
+  { name: '玩沙玩水游戏', category: 'OTHER', icon: '💧', description: '在安全环境下玩沙玩水探索', periodType: 'weekly' },
+  { name: '动植物观察', category: 'OTHER', icon: '🌱', description: '观察身边的植物或小动物', periodType: 'weekly' },
+  // 小学低年级
+  { name: '天气记录', category: 'OTHER', icon: '☁️', description: '记录一周的天气变化', periodType: 'weekly' },
+  { name: '简单小实验', category: 'OTHER', icon: '🔬', description: '完成一个简单的科学实验', periodType: 'monthly' },
+  // 小学高年级
+  { name: '编程启蒙学习', category: 'OTHER', icon: '💻', description: '学习基础的编程思维', periodType: 'weekly' },
+  // 初中
+  { name: '探究学习项目', category: 'OTHER', icon: '🔍', description: '完成一个探究学习项目', periodType: 'monthly' },
+
+  // ========== 亲子互动 OTHER (6) ==========
+  { name: '亲子游戏时光', category: 'OTHER', icon: '🎮', description: '和家长一起玩游戏', periodType: 'weekly' },
+  { name: '亲子厨房', category: 'OTHER', icon: '👨‍🍳', description: '和家长一起做简单的食物', periodType: 'monthly' },
+  { name: '户外踏青', category: 'OTHER', icon: '🌳', description: '和家长一起到户外踏青', periodType: 'monthly' },
+  { name: '亲子阅读时光', category: 'OTHER', icon: '📚', description: '和家长一起阅读', periodType: 'weekly' },
+  { name: '亲子运动', category: 'OTHER', icon: '⚽', description: '和家长一起运动锻炼', periodType: 'weekly' },
+  { name: '家庭会议', category: 'OTHER', icon: '👨‍👩‍👧', description: '参与家庭会议讨论', periodType: 'monthly' },
+
+  // ========== 其他 OTHER (6) ==========
   { name: '照顾小动物', category: 'OTHER', icon: '🐶', description: '喂养和照顾家里的宠物', periodType: 'daily' },
-  { name: '参观博物馆', category: 'OTHER', icon: '🏛️', description: '去博物馆或科技馆学习', periodType: 'monthly' },
+  { name: '参观展览', category: 'OTHER', icon: '🏛️', description: '去博物馆、科技馆等参观', periodType: 'monthly' },
+  { name: '益智游戏', category: 'OTHER', icon: '🧩', description: '完成数独、棋类等益智游戏', periodType: 'weekly' },
+  { name: '户外写生', category: 'OTHER', icon: '🎨', description: '到户外进行绘画写生', periodType: 'monthly' },
+  { name: '环保行动', category: 'OTHER', icon: '♻️', description: '参与一次环保行动', periodType: 'monthly' },
+  { name: '照顾植物', category: 'OTHER', icon: '🌻', description: '种植并照顾一种植物', periodType: 'monthly' },
 ];
 
 const PERIOD_LABELS = { once: '单次', daily: '每天', weekly: '每周', monthly: '每月' };
@@ -147,6 +190,8 @@ function buildPickerRangeStart() {
 
 Page(keyboardAvoid({
   data: {
+    children: [],
+    selectedChildId: '',
     categories: [
       // 智育
       { key: 'STUDY', name: '学习', icon: '📚' },
@@ -183,18 +228,25 @@ Page(keyboardAvoid({
     rangeSummary: '',
     // 用户是否手动改过结束日期：改过之后切换频次不再覆盖他的选择
     endDateTouched: false,
-    // 周期次数
-    periodCount: 1,
-    countRange: { min: 1, max: 1 },
     periods: [
       { key: 'once', name: '单次任务' },
       { key: 'daily', name: '每天任务' },
       { key: 'weekly', name: '每周任务' },
-      { key: 'monthly', name: '每月任务' },
-      { key: 'custom', name: '自定义周期' }
+      { key: 'monthly', name: '每月任务' }
     ],
     selectedPeriodName: '单次任务',
     loading: false,
+    // 五育领域筛选
+    presetDomains: [
+      { key: '', name: '全部' },
+      { key: 'intelligence', name: '🧠智育' },
+      { key: 'physical', name: '💪体育' },
+      { key: 'aesthetic', name: '🎨美育' },
+      { key: 'moral', name: '💝德育' },
+      { key: 'lifeSkill', name: '🏠劳育' },
+      { key: 'other', name: '✨其他' }
+    ],
+    presetDomain: '',
     // 新版筛选分类 - 按育域分组
     presetCategories: [
       { key: '', name: '全部', domain: '' },
@@ -223,8 +275,7 @@ Page(keyboardAvoid({
       { key: 'daily', name: '每天' },
       { key: 'weekly', name: '每周' },
       { key: 'monthly', name: '每月' },
-      { key: 'once', name: '单次' },
-      { key: 'custom', name: '自定义' }
+      { key: 'once', name: '单次' }
     ],
     presetCategory: '',
     presetPeriod: '',
@@ -233,8 +284,15 @@ Page(keyboardAvoid({
     presetKeyword: '',
     presets: PRESET_TASKS.map(task => ({ ...task, basePoints: analyzeTaskPoints(task).points })),
     displayPresets: [],
+    displayCategories: [],
     scorePreview: 4,
-    scoreReason: '按任务分类与完成要求评估'
+    scoreReason: '按任务分类与完成要求评估',
+    // 智能成长计划弹窗
+    showGrowthPlan: false,
+    selectedGrade: '',
+    currentMonthName: '',
+    growthPlan: { phases: [], totalTasks: 0, coveredMonths: 0 },
+    selectedGrowthTasksCount: 0
   },
 
   onLoad() {
@@ -244,46 +302,61 @@ Page(keyboardAvoid({
         ...task,
         basePoints: analyzeTaskPoints(task).points,
         periodLabel: task.periodType === 'custom' ? `每${task.periodDays}天` : PERIOD_LABELS[task.periodType]
-      }))
+      })),
+      displayCategories: this.data.presetCategories
     });
     // 初始化时间范围：单次默认明天
     const range = getDefaultRange('once');
     this.applyRange(range.startDate, range.endDate, false);
     this.setData({ rangeStart: buildPickerRangeStart() });
+    // 加载孩子列表
+    this.loadChildren();
   },
 
-  // 次数步进器
-  onCountStep(e) {
-    const delta = Number(e.currentTarget.dataset.delta) || 0;
-    const periodType = this.data.formData.periodType;
-    if (periodType === 'custom') return; // 自定义周期不支持次数调整
-
-    const countRange = this.data.countRange;
-    let newCount = this.data.periodCount + delta;
-    newCount = Math.max(countRange.min, Math.min(countRange.max, newCount));
-    if (newCount === this.data.periodCount) return;
-
-    // 重新计算结束日期，保持开始时间不变
-    const start = this.data.formData.startDate;
-    const newEnd = calcEnd(periodType, start, newCount);
-    this.applyRange(start, newEnd, true);
+  onShow() {
+    // 每次显示时刷新孩子列表
+    this.loadChildren();
   },
 
-  // 把起止日期写回 data：同时维护 picker 用的字符串与列表用的展示文案
+  async loadChildren() {
+    try {
+      const res = await app.callCloudFunction('child', { action: 'listChildren' });
+      if (res.success && res.list && res.list.length > 0) {
+        const children = res.list;
+        const currentChildId = app.globalData.currentChildId;
+        const selectedChildId = children.find(c => c._id === currentChildId)?._id || children[0]._id;
+        this.setData({ children, selectedChildId });
+        // 当前孩子失效（被删除）时回退到第一个孩子，并同步全局状态
+        if (currentChildId !== selectedChildId) app.saveCurrentChildId(selectedChildId);
+      }
+    } catch (e) {
+      console.error('加载孩子列表失败', e);
+    }
+  },
+
+  onSelectChild(e) {
+    const childId = e.currentTarget.dataset.id;
+    app.saveCurrentChildId(childId);
+    this.setData({ selectedChildId: childId });
+  },
+
+  // 次数步进器已移除：任务数量改由开始/结束日期决定
   applyRange(startDate, endDate, endDateTouched) {
     const start = dayStart(startDate);
     const end = Math.max(start, dayStart(endDate));
     const periodType = this.data.formData.periodType;
-    const total = calcCount(periodType, start, end);
-    const countRange = getPeriodCountRange(periodType);
+    const total = countPeriods({
+      periodType,
+      periodDays: this.data.formData.periodDays,
+      startDate: start,
+      endDate: end
+    });
     this.setData({
       formData: { ...this.data.formData, startDate: start, endDate: end },
       startDateStr: toDateStr(start),
       endDateStr: toDateStr(end),
       rangeSummary: formatRangeSummary(start, end, total),
-      endDateTouched: endDateTouched === undefined ? this.data.endDateTouched : endDateTouched,
-      periodCount: total,
-      countRange
+      endDateTouched: endDateTouched === undefined ? this.data.endDateTouched : endDateTouched
     });
   },
 
@@ -300,30 +373,13 @@ Page(keyboardAvoid({
       rangeHint: RANGE_HINTS[periodType] || RANGE_HINTS.once
     });
 
-    if (periodType === 'custom') {
-      // 自定义周期保持原有逻辑
-      if (this.data.endDateTouched) {
-        const start = this.data.formData.startDate;
-        this.applyRange(start, Math.max(start, this.data.formData.endDate), true);
-      } else {
-        const range = getDefaultRange(periodType, periodDays);
-        this.applyRange(range.startDate, range.endDate, false);
-      }
-      return;
+    if (this.data.endDateTouched) {
+      const start = this.data.formData.startDate;
+      this.applyRange(start, Math.max(start, this.data.formData.endDate), true);
+    } else {
+      const range = getDefaultRange(periodType, periodDays);
+      this.applyRange(range.startDate, range.endDate, false);
     }
-
-    // 新周期逻辑：根据周期类型计算默认开始日期和次数
-    const now = Date.now();
-    const defaultStart = getDefaultStart(periodType, now);
-    const defaultCount = DEFAULT_PERIOD_COUNTS[periodType] || 1;
-    const defaultEnd = calcEnd(periodType, defaultStart, defaultCount);
-    const countRange = getPeriodCountRange(periodType);
-
-    this.setData({
-      periodCount: defaultCount,
-      countRange
-    });
-    this.applyRange(defaultStart, defaultEnd, false);
   },
 
   onStartDateChange(e) {
@@ -372,19 +428,24 @@ Page(keyboardAvoid({
     const field = e.currentTarget.dataset.field;
     const value = e.detail.value;
     this.setData({ ['formData.' + field]: value });
-    // 自定义间隔天数变了：时间段跨度按新间隔重新铺开（用户改过结束日期则保留）
-    if (field === 'periodDays' && this.data.formData.periodType === 'custom' && !this.data.endDateTouched) {
-      const range = getDefaultRange('custom', value);
-      this.applyRange(range.startDate, range.endDate, false);
-    }
   },
 
   updatePresetFilters(values) {
     const presetCategory = values.presetCategory !== undefined ? values.presetCategory : this.data.presetCategory;
     const presetPeriod = values.presetPeriod !== undefined ? values.presetPeriod : this.data.presetPeriod;
+    const presetDomain = values.presetDomain !== undefined ? values.presetDomain : this.data.presetDomain;
     const presetKeyword = (values.presetKeyword !== undefined ? values.presetKeyword : this.data.presetKeyword).trim().toLowerCase();
-    
+
+    // 先按领域过滤 presetCategories 的展示范围
+    const visibleCats = this.data.presetCategories
+      .filter(c => !presetDomain || c.domain === presetDomain);
+    const visibleKeys = new Set(visibleCats.map(c => c.key));
+
+    // 当选择了具体领域时，只显示该领域下的分类；否则显示全部分类
+    const displayCategories = presetDomain ? visibleCats : this.data.presetCategories;
+
     const displayPresets = this.data.presets
+      .filter(task => !presetDomain || visibleKeys.has(task.category))
       .filter(task => !presetCategory || task.category === presetCategory)
       .filter(task => !presetPeriod || task.periodType === presetPeriod)
       .filter(task => !presetKeyword || `${task.name} ${task.description}`.toLowerCase().includes(presetKeyword))
@@ -393,7 +454,7 @@ Page(keyboardAvoid({
         basePoints: analyzeTaskPoints(task).points,
         periodLabel: task.periodType === 'custom' ? `每${task.periodDays}天` : PERIOD_LABELS[task.periodType]
       }));
-    this.setData({ ...values, displayPresets });
+    this.setData({ ...values, displayPresets, displayCategories });
   },
 
   onPresetSearchInput(e) {
@@ -435,10 +496,27 @@ Page(keyboardAvoid({
     });
   },
 
-  async createTask(task, clearForm) {
+  onPresetDomainTap(e) {
+    const key = e.currentTarget.dataset.key;
+    const domain = this.data.presetDomains.find(d => d.key === key) || this.data.presetDomains[0];
+    // 选领域时同时清空已选分类，避免组合出空结果
+    this.updatePresetFilters({
+      presetDomain: domain.key,
+      presetCategory: '',
+      presetCategoryName: domain.key ? '全部' : '全部分类'
+    });
+  },
+
+  async createTask(task, clearForm, options = {}) {
     if (this.data.loading) return;
     if (!task.name || !task.category) {
       wx.showToast({ title: '请填写完整信息', icon: 'none' });
+      return;
+    }
+    // 任务必须绑定到具体孩子：云函数 createTask 缺 childId 会返回「请先选择孩子」
+    const childId = task.childId || this.data.selectedChildId || app.globalData.currentChildId;
+    if (!childId) {
+      wx.showToast({ title: '请先选择孩子', icon: 'none' });
       return;
     }
     // 时间段必填：起止日期决定任务在任务页里会展开成哪些周期
@@ -458,6 +536,7 @@ Page(keyboardAvoid({
       const res = await app.callCloudFunction('task', {
         action: 'createTask',
         ...task,
+        childId,
         startDate,
         endDate,
         periodDays: Math.max(1, parseInt(task.periodDays, 10) || 1),
@@ -466,9 +545,12 @@ Page(keyboardAvoid({
 
       if (res.success) {
         const total = res.totalPeriods || countPeriods({ ...task, startDate, endDate });
-        wx.showToast({ title: `已生成 ${total} 个周期`, icon: 'success' });
-        if (clearForm) this.resetCustomForm();
-        setTimeout(() => wx.switchTab({ url: '/pages/task/task' }), 1500);
+        // silent 模式不弹 toast，用于批量创建场景
+        if (!options.silent) {
+          wx.showToast({ title: `已生成 ${total} 个周期`, icon: 'success' });
+          if (clearForm) this.resetCustomForm();
+          setTimeout(() => wx.switchTab({ url: '/pages/task/task' }), 1500);
+        }
       } else {
         wx.showToast({ title: res.error || '创建失败', icon: 'none' });
       }
@@ -542,16 +624,477 @@ Page(keyboardAvoid({
     }, false);
   },
 
-  onCustomSubmit(e) {
-    const { name, category, description } = e.detail.value;
-    if (!name || !category) {
+  // 点击"创建自定义任务"：数据全在 this.data.formData 里（bindtap 不走 e.detail.value）
+  onCustomSubmit() {
+    const { formData } = this.data;
+    if (!formData.name || !formData.category) {
       wx.showToast({ title: '请填写名称和分类', icon: 'none' });
       return;
     }
-    this.createTask({
-      ...this.data.formData,
+    this.createTask({ ...formData }, true);
+  },
+
+  // ========== 智能年成长计划 ==========
+  // 年级列表 - 与 grade.js 的年级代码对应
+  grades: [
+    { key: 'K', name: '幼儿园', icon: '🏠', stage: 'kindergarten', codes: ['kindergarten_small', 'kindergarten_medium', 'kindergarten_big'] },
+    { key: 'G1', name: '小一', icon: '📒', stage: 'primary', codes: ['primary_1'] },
+    { key: 'G2', name: '小二', icon: '📓', stage: 'primary', codes: ['primary_2'] },
+    { key: 'G3', name: '小三', icon: '📔', stage: 'primary', codes: ['primary_3'] },
+    { key: 'G4', name: '小四', icon: '📕', stage: 'primary', codes: ['primary_4'] },
+    { key: 'G5', name: '小五', icon: '📗', stage: 'primary', codes: ['primary_5'] },
+    { key: 'G6', name: '小六', icon: '📘', stage: 'primary', codes: ['primary_6'] },
+    { key: 'J1', name: '初一', icon: '📙', stage: 'junior', codes: ['middle_1'] },
+    { key: 'J2', name: '初二', icon: '📚', stage: 'junior', codes: ['middle_2'] },
+    { key: 'J3', name: '初三', icon: '📛', stage: 'junior', codes: ['middle_3'] },
+  ],
+
+  // 打开成长计划弹窗 - 自动选中孩子年级
+  async onOpenGrowthPlan() {
+    // 先获取当前选中孩子的年级
+    let defaultGrade = '';
+    let hasChildren = false;
+
+    try {
+      const res = await app.callCloudFunction('child', { action: 'listChildren' });
+      if (res.success && res.list && res.list.length) {
+        hasChildren = true;
+        const currentChildId = app.globalData.currentChildId;
+        const child = res.list.find(c => c._id === currentChildId) || res.list[0];
+        if (child && child.grade) {
+          // 将孩子的年级代码映射到成长计划年级
+          const gradeItem = (this.grades || []).find(g => g.codes && g.codes.includes(child.grade));
+          if (gradeItem) {
+            defaultGrade = gradeItem.key;
+          }
+        }
+      }
+    } catch (e) {
+      console.error('获取孩子年级失败', e);
+    }
+
+    this.setData({
+      showGrowthPlan: true,
+      selectedGrade: defaultGrade,
+      hasChildrenInPlan: hasChildren,
+      growthPlan: { phases: [], totalTasks: 0, coveredMonths: 0 }
+    });
+
+    // 如果有默认年级，生成成长计划
+    if (defaultGrade) {
+      this.generateGrowthPlan(defaultGrade);
+    }
+  },
+
+  // 关闭成长计划弹窗
+  onCloseGrowthPlan() {
+    this.setData({ showGrowthPlan: false });
+  },
+
+  // 选择年级
+  onGradeSelect(e) {
+    const grade = e.currentTarget.dataset.grade;
+    this.setData({ selectedGrade: grade });
+    this.generateGrowthPlan(grade);
+  },
+
+  // 获取当前月份名称
+  getCurrentMonthName() {
+    const now = new Date();
+    const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+    return months[now.getMonth()];
+  },
+
+  // 生成成长计划
+  generateGrowthPlan(grade) {
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1; // 1-12
+    const currentYear = now.getFullYear();
+
+    // 根据年级确定年龄段和年级级别
+    const stage = this.getGradeStage(grade);
+    const gradeLevel = this.getGradeLevel(grade);
+
+    // 生成时间阶段（考虑暑假、寒假）
+    const phases = this.generatePhases(currentMonth, currentYear, stage, gradeLevel);
+
+    // 计算总任务数和覆盖月数
+    let totalTasks = 0;
+    let coveredMonths = 0;
+    let selectedCount = 0;
+    phases.forEach(phase => {
+      const taskCount = phase.tasks.length;
+      totalTasks += taskCount;
+      if (taskCount > 0) coveredMonths++;
+      phase.tasks.forEach(t => {
+        if (t.selected) selectedCount++;
+      });
+    });
+
+    // 获取月份名称
+    const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+    const currentMonthName = monthNames[currentMonth - 1];
+
+    this.setData({
+      currentMonthName,
+      growthPlan: { phases, totalTasks, coveredMonths },
+      selectedGrowthTasksCount: selectedCount
+    });
+  },
+
+  // 获取年级阶段
+  getGradeStage(grade) {
+    if (!grade) return 'primary';
+    if (grade.startsWith('kindergarten')) return 'kindergarten';
+    if (grade.startsWith('primary')) return 'primary';
+    if (grade.startsWith('middle')) return 'middle';
+    return 'primary';
+  },
+
+  // 获取年级级别（用于能力梯度递进）
+  // 返回该阶段内的年级数字：幼儿园1-3，小学1-6，初中1-3
+  getGradeLevel(grade) {
+    if (!grade) return 1;
+    if (grade.startsWith('kindergarten')) {
+      if (grade === 'kindergarten_big') return 3;
+      if (grade === 'kindergarten_medium') return 2;
+      return 1;
+    }
+    if (grade.startsWith('primary_')) {
+      return parseInt(grade.split('_')[1]) || 1;
+    }
+    if (grade.startsWith('middle_')) {
+      return parseInt(grade.split('_')[1]) || 1;
+    }
+    return 1;
+  },
+
+  // 生成时间阶段
+  generatePhases(currentMonth, currentYear, stage, gradeLevel) {
+    const phases = [];
+
+    // 根据当前月份确定各阶段
+    if (currentMonth <= 6) {
+      // 上半年：当前月 -> 6月底
+      if (currentMonth >= 7) {
+        // 暑假阶段
+        phases.push(this.createPhase('暑假时光', `${currentMonth}月-8月`, this.getVacationTasks(stage, 'summer', gradeLevel), currentMonth));
+      }
+      phases.push(this.createPhase('学期成长', `${currentMonth}月-6月`, this.getSemesterTasks(stage, gradeLevel), currentMonth));
+      phases.push(this.createPhase('期末冲刺', '6月', this.getExamTasks(stage, gradeLevel), 6));
+    }
+
+    if (currentMonth >= 7 || currentMonth <= 2) {
+      // 暑假/寒假阶段
+      const vacationType = currentMonth >= 6 && currentMonth <= 8 ? 'summer' : 'winter';
+      const startMonth = currentMonth >= 6 && currentMonth <= 8 ? Math.max(currentMonth, 7) : 1;
+      const endMonth = currentMonth >= 6 && currentMonth <= 8 ? 8 : 2;
+      phases.push(this.createPhase(
+        vacationType === 'summer' ? '暑假时光' : '寒假时光',
+        `${startMonth}月-${endMonth}月`,
+        this.getVacationTasks(stage, vacationType, gradeLevel),
+        startMonth
+      ));
+    }
+
+    if (currentMonth >= 9 || (currentMonth >= 1 && currentMonth <= 2)) {
+      // 下半年/春季学期
+      const startMonth = currentMonth <= 2 ? 2 : Math.max(currentMonth, 9);
+      phases.push(this.createPhase('新学期规划', `${startMonth}月-12月`, this.getSemesterTasks(stage, gradeLevel), startMonth));
+      phases.push(this.createPhase('年末总结', '12月', this.getYearEndTasks(stage, gradeLevel), 12));
+    }
+
+    // 按月份排序
+    phases.sort((a, b) => a.startMonth - b.startMonth);
+
+    return phases;
+  },
+
+  // 创建阶段
+  createPhase(name, dateRange, tasks, startMonth) {
+    const periodLabels = { once: '单次', daily: '每天', weekly: '每周', monthly: '每月' };
+    return {
       name,
-      description
-    }, true);
+      dateRange,
+      startMonth,
+      tasks: tasks.map(t => ({
+        ...t,
+        selected: true, // 默认全选
+        periodLabel: periodLabels[t.periodType] || t.periodType,
+        domainName: t.domainName || '其他',
+        domain: t.domain || 'other'
+      }))
+    };
+  },
+
+  // 学期任务 - 教育专家设计：五育并举，因龄施教
+  getSemesterTasks(stage, gradeLevel) {
+    if (stage === 'kindergarten') {
+      // 幼儿园：感官探索+习惯萌芽+亲子陪伴
+      return [
+        { name: '亲子绘本阅读', icon: '📚', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '每天亲子共读，培养阅读兴趣' },
+        { name: '涂鸦创作', icon: '🎨', category: 'ART', domain: 'aesthetic', domainName: '美育', periodType: 'daily', description: '自由绘画，表达想象力' },
+        { name: '户外运动', icon: '⚽', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日户外活动，增强体质' },
+        { name: '早睡早起', icon: '😴', category: 'HEALTH', domain: 'physical', domainName: '体育', periodType: 'daily', description: '规律作息，养成好习惯' },
+        { name: '礼貌问候', icon: '👋', category: 'MORAL_SOCIAL', domain: 'moral', domainName: '德育', periodType: 'daily', description: '主动问好，懂得礼貌' },
+        { name: '帮做家务', icon: '🏠', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '力所能及的家务' },
+      ];
+    } else if (stage === 'primary') {
+      if (gradeLevel <= 2) {
+        // 小学低年级：习惯养成+学习适应+同伴交往
+        return [
+          { name: '专注作业20分钟', icon: '✍️', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '专心写作业，坐姿端正' },
+          { name: '阅读20分钟', icon: '📖', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '每日阅读，积累词汇' },
+          { name: '跳绳练习', icon: '🪢', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '跳绳100个，锻炼体能' },
+          { name: '整理书包', icon: '🎒', category: 'SELF_CARE', domain: 'lifeSkill', domainName: '劳育', periodType: 'daily', description: '整理第二天物品' },
+          { name: '礼貌问候', icon: '👋', category: 'MORAL_SOCIAL', domain: 'moral', domainName: '德育', periodType: 'daily', description: '主动问好，友爱同学' },
+          { name: '家务分担', icon: '🏠', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '承担力所能及的家务' },
+        ];
+      } else if (gradeLevel <= 4) {
+        // 小学中年级：能力提升+兴趣培养
+        return [
+          { name: '专注作业30分钟', icon: '✍️', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '专心写作业，做好检查' },
+          { name: '阅读30分钟', icon: '📖', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '深度阅读，做好笔记' },
+          { name: '户外运动', icon: '⚽', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日运动30分钟' },
+          { name: '护眼习惯', icon: '👀', category: 'HEALTH', domain: 'physical', domainName: '体育', periodType: 'daily', description: '正确用眼，定时休息' },
+          { name: '时间规划', icon: '⏰', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '学习时间管理' },
+          { name: '家务分担', icon: '🏠', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '承担固定家务' },
+        ];
+      } else {
+        // 小学高年级：自主管理+价值观形成
+        return [
+          { name: '自主作业', icon: '✍️', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '独立完成，主动检查' },
+          { name: '深度阅读', icon: '📚', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '主题阅读，做好批注' },
+          { name: '体育锻炼', icon: '🏃', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日运动40分钟' },
+          { name: '错题整理', icon: '📒', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'weekly', description: '整理错题本，分析原因' },
+          { name: '时间管理', icon: '⏰', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '制定计划，执行复盘' },
+          { name: '家务承担', icon: '🏠', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '独立完成家务' },
+        ];
+      }
+    } else {
+      // 初中：自主学习+情绪成熟+社会责任
+      return [
+        { name: '自主学习', icon: '📚', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '制定计划，独立完成' },
+        { name: '阅读提升', icon: '📖', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '经典阅读，拓展视野' },
+        { name: '体育锻炼', icon: '🏃', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日运动50分钟' },
+        { name: '作息规律', icon: '⏰', category: 'HEALTH', domain: 'physical', domainName: '体育', periodType: 'daily', description: '早睡早起，自我管理' },
+        { name: '周计划复盘', icon: '📋', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '制定计划，总结复盘' },
+        { name: '家务承担', icon: '🏠', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '分担家庭责任' },
+      ];
+    }
+  },
+
+  // 假期任务 - 教育专家设计：暑假重体验探索，寒假重传统文化
+  getVacationTasks(stage, vacationType, gradeLevel) {
+    if (vacationType === 'summer') {
+      // 暑假：体验式学习 + 户外探索 + 亲子协作
+      if (stage === 'kindergarten') {
+        return [
+          { name: '暑期作息', icon: '😴', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'daily', description: '保持规律作息' },
+          { name: '涂鸦创作', icon: '🎨', category: 'ART', domain: 'aesthetic', domainName: '美育', periodType: 'daily', description: '每日自由绘画' },
+          { name: '户外探索', icon: '🌳', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'weekly', description: '大自然探索' },
+          { name: '亲子戏水', icon: '🏊', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'weekly', description: '安全玩水' },
+          { name: '照顾植物', icon: '🌱', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '照料植物' },
+          { name: '亲子游戏', icon: '🎮', category: 'SOCIAL', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '亲子互动时光' },
+        ];
+      } else if (stage === 'primary') {
+        if (gradeLevel <= 3) {
+          // 小学低中年级：趣味探索为主
+          return [
+            { name: '游泳学习', icon: '🏊', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'weekly', description: '学会游泳' },
+            { name: '阅读打卡', icon: '📖', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '每日阅读30分钟' },
+            { name: '科学实验', icon: '🔬', category: 'SCIENCE', domain: 'intelligence', domainName: '智育', periodType: 'weekly', description: '动手小实验' },
+            { name: '户外徒步', icon: '🥾', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'weekly', description: '徒步探索自然' },
+            { name: '才艺练习', icon: '🎨', category: 'ART', domain: 'aesthetic', domainName: '美育', periodType: 'weekly', description: '乐器/绘画练习' },
+            { name: '亲子游戏', icon: '🎮', category: 'SOCIAL', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '亲子互动时光' },
+          ];
+        } else {
+          // 小学高年级：兴趣深化 + 适度预习
+          return [
+            { name: '游泳训练', icon: '🏊', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'weekly', description: '游泳技能提升' },
+            { name: '深度阅读', icon: '📚', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '主题阅读' },
+            { name: '科学探究', icon: '🔬', category: 'SCIENCE', domain: 'intelligence', domainName: '智育', periodType: 'weekly', description: '科学小课题研究' },
+            { name: '户外探险', icon: '🥾', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'weekly', description: '户外探险活动' },
+            { name: '艺术创作', icon: '🎨', category: 'ART', domain: 'aesthetic', domainName: '美育', periodType: 'weekly', description: '艺术创作项目' },
+            { name: '亲子旅行', icon: '🌍', category: 'SOCIAL', domain: 'lifeSkill', domainName: '劳育', periodType: 'monthly', description: '家庭旅行计划' },
+          ];
+        }
+      } else {
+        // 初中：自主管理 + 职业探索 + 社会实践
+        return [
+          { name: '体能训练', icon: '💪', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日锻炼' },
+          { name: '名著阅读', icon: '📚', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '经典名著阅读' },
+          { name: '自主预习', icon: '🧠', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'weekly', description: '下学期知识预习' },
+          { name: '志愿服务', icon: '🙋', category: 'MORAL_SOCIAL', domain: 'moral', domainName: '德育', periodType: 'monthly', description: '社区志愿服务' },
+          { name: '职业探索', icon: '🔭', category: 'OTHER', domain: 'intelligence', domainName: '智育', periodType: 'monthly', description: '了解感兴趣的职业' },
+          { name: '家庭会议', icon: '👨‍👩‍👧', category: 'SOCIAL', domain: 'lifeSkill', domainName: '劳育', periodType: 'monthly', description: '家庭沟通交流' },
+        ];
+      }
+    } else {
+      // 寒假：传统文化 + 家庭团聚 + 亲子协作
+      if (stage === 'kindergarten') {
+        return [
+          { name: '新年习俗', icon: '🏮', category: 'MORAL_CULTURE', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '了解春节习俗' },
+          { name: '亲子手工', icon: '✂️', category: 'ART', domain: 'aesthetic', domainName: '美育', periodType: 'weekly', description: '新年手工制作' },
+          { name: '健康作息', icon: '😴', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'daily', description: '规律作息' },
+          { name: '家庭聚会礼仪', icon: '👨‍👩‍👧', category: 'MORAL_FAMILY', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '礼貌待客' },
+          { name: '亲子游戏', icon: '🎮', category: 'SOCIAL', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '亲子互动时光' },
+        ];
+      } else if (stage === 'primary') {
+        if (gradeLevel <= 3) {
+          // 小学低中年级
+          return [
+            { name: '年味参与', icon: '🏮', category: 'MORAL_CULTURE', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '春节习俗体验' },
+            { name: '阅读时光', icon: '📖', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '每日阅读' },
+            { name: '体育锻炼', icon: '🏃', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日运动' },
+            { name: '家务帮手', icon: '🏠', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '春节大扫除' },
+            { name: '新年祝福', icon: '🎁', category: 'MORAL_SOCIAL', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '学会送祝福' },
+          ];
+        } else {
+          // 小学高年级
+          return [
+            { name: '传统文化', icon: '🏮', category: 'MORAL_CULTURE', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '传统文化学习' },
+            { name: '深度阅读', icon: '📚', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '主题阅读' },
+            { name: '体育锻炼', icon: '🏃', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日运动' },
+            { name: '新年规划', icon: '🎯', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'once', description: '制定新年目标' },
+            { name: '家庭责任', icon: '💪', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '分担家务' },
+          ];
+        }
+      } else {
+        // 初中
+        return [
+          { name: '传统文化', icon: '🏮', category: 'MORAL_CULTURE', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '春节文化传承' },
+          { name: '名著阅读', icon: '📚', category: 'READING', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '经典名著阅读' },
+          { name: '体能锻炼', icon: '💪', category: 'SPORTS', domain: 'physical', domainName: '体育', periodType: 'daily', description: '每日锻炼' },
+          { name: '人际互动', icon: '🤝', category: 'SOCIAL', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '亲友社交互动' },
+          { name: '下学期预习', icon: '📚', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'weekly', description: '预习新知识' },
+          { name: '家庭责任', icon: '💪', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'weekly', description: '承担家庭责任' },
+        ];
+      }
+    }
+  },
+
+  // 考试阶段任务 - 精简版，专注复习
+  getExamTasks(stage, gradeLevel) {
+    if (stage === 'primary' || stage === 'junior') {
+      return [
+        { name: '错题回顾', icon: '📒', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'daily', description: '复习错题' },
+        { name: '作息调整', icon: '😴', category: 'HEALTH', domain: 'physical', domainName: '体育', periodType: 'daily', description: '早睡早起' },
+        { name: '心理调适', icon: '🌈', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'weekly', description: '放松心态' },
+        { name: '模拟测试', icon: '📝', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'weekly', description: '做模拟卷' },
+      ];
+    }
+    return [];
+  },
+
+  // 年末任务 - 反思与规划
+  getYearEndTasks(stage, gradeLevel) {
+    if (stage === 'kindergarten') {
+      return [
+        { name: '年度回顾', icon: '📅', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'once', description: '回顾这一年成长' },
+        { name: '新年愿望', icon: '🎆', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'once', description: '说出新年愿望' },
+        { name: '感恩家人', icon: '💝', category: 'MORAL_FAMILY', domain: 'moral', domainName: '德育', periodType: 'once', description: '感谢家人陪伴' },
+      ];
+    } else if (stage === 'primary') {
+      return [
+        { name: '年度总结', icon: '📊', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'once', description: '总结全年学习' },
+        { name: '新年计划', icon: '🎯', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'once', description: '制定新目标' },
+        { name: '感恩家人', icon: '💝', category: 'MORAL_FAMILY', domain: 'moral', domainName: '德育', periodType: 'once', description: '感谢家人支持' },
+      ];
+    } else {
+      return [
+        { name: '学期总结', icon: '📊', category: 'STUDY', domain: 'intelligence', domainName: '智育', periodType: 'once', description: '总结本学期' },
+        { name: '新年规划', icon: '🎯', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'once', description: '制定新目标' },
+        { name: '成长反思', icon: '🔄', category: 'HABIT', domain: 'moral', domainName: '德育', periodType: 'once', description: '自我复盘' },
+        { name: '家庭责任', icon: '💪', category: 'HOUSEWORK', domain: 'lifeSkill', domainName: '劳育', periodType: 'once', description: '承担家庭责任' },
+      ];
+    }
+  },
+
+  // 切换成长任务勾选
+  onToggleGrowthTask(e) {
+    const { phaseIdx, taskIdx } = e.currentTarget.dataset;
+    const { growthPlan } = this.data;
+    const phases = [...growthPlan.phases];
+    const phase = { ...phases[phaseIdx] };
+    phase.tasks = [...phase.tasks];
+    phase.tasks[taskIdx] = { ...phase.tasks[taskIdx], selected: !phase.tasks[taskIdx].selected };
+    phases[phaseIdx] = phase;
+
+    // 计算选中的任务数
+    let selectedCount = 0;
+    phases.forEach(p => {
+      p.tasks.forEach(t => {
+        if (t.selected) selectedCount++;
+      });
+    });
+
+    this.setData({
+      growthPlan: { ...growthPlan, phases },
+      selectedGrowthTasksCount: selectedCount
+    });
+  },
+
+  // 确认添加成长计划
+  async onConfirmGrowthPlan() {
+    const { growthPlan, selectedGrade } = this.data;
+
+    // 收集选中的任务
+    const selectedTasks = [];
+    growthPlan.phases.forEach(phase => {
+      phase.tasks.forEach(task => {
+        if (task.selected) {
+          selectedTasks.push(task);
+        }
+      });
+    });
+
+    if (selectedTasks.length === 0) {
+      wx.showToast({ title: '请至少选择一个任务', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '添加中...' });
+
+    try {
+      // 获取当前日期
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+
+      // 为每个选中的任务创建周期实例（silent模式不弹toast）
+      const gradeInfo = (this.grades || []).find(g => g.key === selectedGrade);
+      const childId = this.data.selectedChildId;
+
+      for (const task of selectedTasks) {
+        // 根据周期类型确定时间段，periodDays 使用该频次的默认时长
+        const periodDays = DEFAULT_RANGE_DAYS[task.periodType] || 30;
+        const range = getDefaultRange(task.periodType, periodDays);
+
+        await this.createTask({
+          name: task.name,
+          category: task.category,
+          description: task.description,
+          icon: task.icon,
+          periodType: task.periodType,
+          periodDays: periodDays,
+          startDate: range.startDate,
+          endDate: range.endDate,
+          childId: childId
+        }, false, { silent: true });
+      }
+
+      wx.hideLoading();
+      wx.showToast({ title: `已添加 ${selectedTasks.length} 个任务`, icon: 'success' });
+
+      // 关闭弹窗
+      this.setData({ showGrowthPlan: false });
+
+      // 跳转到任务页
+      setTimeout(() => wx.switchTab({ url: '/pages/task/task' }), 1500);
+    } catch (e) {
+      wx.hideLoading();
+      wx.showToast({ title: e.message || '添加失败', icon: 'none' });
+    }
   }
 }));

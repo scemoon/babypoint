@@ -1,8 +1,18 @@
 <view class="container publish-page">
   <!-- 页面标题：扁平页头，不用渐变面板 -->
   <view class="page-intro page-intro-flat">
-    <text class="eyebrow">🌸 小红花 · 五育成长</text>
+    <text class="eyebrow">🌸 攒星卡 · 成长激励</text>
   </view>
+
+  <!-- 孩子切换器 -->
+  <scroll-view scroll-x class="child-strip" wx:if="{{children.length > 1}}">
+    <view class="child-strip-inner">
+      <view class="child-pill {{item._id === selectedChildId ? 'active' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
+        <view class="tiny-avatar"><text wx:if="{{!item.avatar}}">{{item.name[0]}}</text><image wx:else src="{{item.avatar}}" mode="aspectFill"/></view>
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </scroll-view>
 
   <!-- ========== 自定义任务 ========== -->
   <view class="section-heading">
@@ -38,17 +48,8 @@
       <view class="form-item" style="width: 100%;">
         <text class="label">任务周期</text>
         <view class="period-options">
-          <view wx:for="{{periods}}" wx:key="key" wx:if="{{item.key !== 'custom'}}" class="period-chip {{formData.periodType === item.key ? 'active' : ''}}" data-type="{{item.key}}" bindtap="onPeriodTap">
+          <view wx:for="{{periods}}" wx:key="key" class="period-chip {{formData.periodType === item.key ? 'active' : ''}}" data-type="{{item.key}}" bindtap="onPeriodTap">
             {{item.name}}
-          </view>
-          <!-- 自定义周期：与"每月任务"同行内联输入天数 -->
-          <view class="period-custom">
-            <view class="period-chip {{formData.periodType === 'custom' ? 'active' : ''}}" data-type="custom" bindtap="onPeriodTap">自定义周期</view>
-            <view class="period-custom-input" wx:if="{{formData.periodType === 'custom'}}">
-              <text class="custom-prefix">每</text>
-              <input class="custom-num-input" type="number" placeholder="3" value="{{formData.periodDays}}" data-field="periodDays" bindinput="onNumberInput" cursor-spacing="24"/>
-              <text class="custom-suffix">天</text>
-            </view>
           </view>
         </view>
       </view>
@@ -76,45 +77,31 @@
         <view class="range-summary" wx:if="{{rangeSummary}}">
           <text class="range-summary-text">{{rangeSummary}}</text>
         </view>
-        <!-- 周期次数选择器（非自定义周期显示） -->
-        <view class="period-count-row" wx:if="{{formData.periodType !== 'custom'}}">
-          <text class="period-count-label">任务数量</text>
-          <view class="period-count-stepper">
-            <view class="stepper-btn" bindtap="onCountStep" data-delta="-1">－</view>
-            <text class="stepper-value">{{periodCount}} 次</text>
-            <view class="stepper-btn" bindtap="onCountStep" data-delta="1">＋</view>
-          </view>
-        </view>
       </view>
     </view>
 
     <!-- 完成要求 -->
     <view class="form-item">
-      <text class="label">完成要求 <text class="optional">选填，帮助评估积分</text></text>
+      <view class="label-row">
+        <text class="label">完成要求 <text class="optional">选填</text></text>
+        <view class="smart-score" wx:if="{{scorePreview}}">
+          <text class="smart-score-value">{{scorePreview}}</text>
+          <text class="smart-score-unit">积分/次</text>
+        </view>
+      </view>
       <textarea class="task-description" placeholder="例如：独立完成当天作业，预计30分钟" bindinput="onDescriptionInput" value="{{formData.description}}" maxlength="120" cursor-spacing="24"/>
     </view>
 
-    <!-- 积分分析 -->
-    <view class="score-analysis">
-      <view class="score-info">
-        <text class="score-analysis-label">📊 智能评估</text>
-        <text class="score-analysis-reason">{{scoreReason}}</text>
-      </view>
-      <view class="score-points">
-        <text class="points-value">{{scorePreview}}</text>
-        <text class="points-unit">积分/次</text>
-      </view>
+    <view class="action-row">
+      <button class="create-button" bindtap="onCustomSubmit" loading="{{loading}}">＋ 创建任务</button>
+      <button class="growth-plan-btn" bindtap="onOpenGrowthPlan">📅 年度成长</button>
     </view>
-
-    <view class="score-policy">系统根据任务分类、要求自动评估积分</view>
-
-    <button class="create-button" bindtap="onCustomSubmit" loading="{{loading}}">＋ 创建自定义任务</button>
   </view>
 
   <!-- ========== 任务模板库 ========== -->
   <view class="section-heading preset-heading">
     <view>
-      <text class="section-number">02</text>
+      <text class="section-number">03</text>
       <text class="section-title">任务模板库</text>
     </view>
     <text class="section-note">{{displayPresets.length}} 项</text>
@@ -130,15 +117,29 @@
     </view>
   </view>
 
+  <!-- 五育领域筛选 -->
+  <view class="filter-card">
+    <view class="filter-card-head">
+      <text class="filter-card-title">领域筛选</text>
+      <text class="filter-card-hint">按五育领域快速定位</text>
+    </view>
+    <scroll-view scroll-x class="preset-period-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="preset-period-pills">
+        <view wx:for="{{presetDomains}}" wx:key="key" class="preset-period-pill {{presetDomain === item.key ? 'active' : ''}}" bindtap="onPresetDomainTap" data-key="{{item.key}}">{{item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
   <!-- 分类筛选：图标卡片网格 -->
   <view class="filter-card">
     <view class="filter-card-head">
       <text class="filter-card-title">分类筛选</text>
-      <text class="filter-card-hint">点选查看对应模板</text>
+      <text class="filter-card-hint">{{presetDomain ? '已按领域筛选' : '点选查看对应模板'}}</text>
     </view>
     <view class="preset-cat-grid">
-      <view wx:for="{{presetCategories}}" wx:key="key" class="preset-cat-tile {{presetCategory === item.key ? 'active' : ''}}" bindtap="onPresetCategoryTap" data-key="{{item.key}}">
+      <view wx:for="{{displayCategories}}" wx:key="key" class="preset-cat-tile {{presetCategory === item.key ? 'active' : ''}}" bindtap="onPresetCategoryTap" data-key="{{item.key}}">
         <text class="preset-cat-tile-name">{{item.name}}</text>
+        <text class="preset-cat-domain-tag" wx:if="{{item.domainName}}">{{item.domainName}}</text>
       </view>
     </view>
   </view>
@@ -184,4 +185,87 @@
 
   <!-- 键盘占位：撑出可滚动余量，把输入框推到键盘之上（收起时高度为 0） -->
   <view class="keyboard-spacer" style="height: {{keyboardHeight}}px"></view>
+
+  <!-- ========== 智能年成长计划弹窗 ========== -->
+  <view class="growth-modal-mask {{showGrowthPlan ? 'active' : ''}}" bindtap="onCloseGrowthPlan"></view>
+  <view class="growth-modal {{showGrowthPlan ? 'active' : ''}}">
+    <!-- 弹窗头部 -->
+    <view class="growth-modal-header">
+      <view class="growth-modal-drag"></view>
+      <view class="growth-modal-title-row">
+        <text class="growth-modal-title">📅 智能年成长计划</text>
+        <text class="growth-modal-close" bindtap="onCloseGrowthPlan">✕</text>
+      </view>
+    </view>
+
+    <scroll-view scroll-y class="growth-modal-content">
+      <!-- 没有孩子时的提示 -->
+      <view class="growth-empty-tip" wx:if="{{!hasChildrenInPlan}}">
+        <text class="growth-empty-icon">👶</text>
+        <text class="growth-empty-text">请先在「我的」页面添加孩子</text>
+        <text class="growth-empty-sub">添加孩子后，才能生成专属的年度成长计划</text>
+        <view class="growth-empty-btn" bindtap="onCloseGrowthPlan">去添加孩子</view>
+      </view>
+
+      <!-- 有孩子时显示年级选择 -->
+      <block wx:if="{{hasChildrenInPlan}}">
+      <!-- 第一部分：年级选择 -->
+      <view class="growth-section">
+        <view class="grade-grid">
+          <view wx:for="{{grades}}" wx:key="key" 
+                class="grade-item {{selectedGrade === item.key ? 'active' : ''}}" 
+                bindtap="onGradeSelect" data-grade="{{item.key}}">
+            <text class="grade-icon">{{item.icon}}</text>
+            <text class="grade-name">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 第二部分：成长规划预览 -->
+      <view class="growth-section" wx:if="{{selectedGrade}}">
+        <view class="growth-section-title">📋 从现在到年底的成长规划</view>
+        <view class="growth-summary">
+          <text class="growth-summary-text">基于{{currentMonthName}}至12月，智能安排 {{growthPlan.totalTasks}} 个任务，覆盖 {{growthPlan.coveredMonths}} 个月</text>
+        </view>
+
+        <!-- 规划时间轴 -->
+        <view class="growth-timeline">
+          <view wx:for="{{growthPlan.phases}}" wx:key="name" class="growth-phase">
+            <view class="growth-phase-header">
+              <text class="growth-phase-name">{{item.name}}</text>
+              <text class="growth-phase-date">{{item.dateRange}}</text>
+            </view>
+            <view class="growth-phase-tasks">
+              <view wx:for="{{item.tasks}}" wx:key="name" wx:for-index="taskIdx" class="growth-task-item" bindtap="onToggleGrowthTask" data-task-idx="{{taskIdx}}" data-phase-idx="{{index}}">
+                <view class="growth-task-checkbox {{item.selected ? 'checked' : ''}}">
+                  <text wx:if="{{item.selected}}">✓</text>
+                </view>
+                <view class="growth-task-info">
+                  <view class="growth-task-header">
+                    <text class="growth-task-icon">{{item.icon}}</text>
+                    <text class="growth-task-name">{{item.name}}</text>
+                  </view>
+                  <view class="growth-task-tags">
+                    <text class="growth-task-domain {{item.domain}}">{{item.domainName}}</text>
+                    <text class="growth-task-period">{{item.periodLabel}}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      </block>
+    </scroll-view>
+
+    <!-- 底部确认栏 -->
+    <view class="growth-modal-footer" wx:if="{{selectedGrade}}">
+      <view class="growth-selected-info">
+        <text>已选 {{selectedGrowthTasksCount}} 个任务</text>
+      </view>
+      <button class="growth-confirm-btn" bindtap="onConfirmGrowthPlan" disabled="{{selectedGrowthTasksCount === 0}}">
+        一键添加 {{selectedGrowthTasksCount > 0 ? selectedGrowthTasksCount : ''}} 个任务
+      </button>
+    </view>
+  </view>
 </view>

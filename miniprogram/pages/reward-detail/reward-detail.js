@@ -83,6 +83,13 @@ Page({
       });
 
       if (res.success) {
+        // 同步全局孩子积分：更新缓存中当前孩子的已兑换积分
+        const newRedeemed = res.newRedeemedPoints;
+        if (newRedeemed !== undefined && app.globalData.childrenCache) {
+          app.globalData.childrenCache = app.globalData.childrenCache.map(c =>
+            c._id === childId ? { ...c, redeemedPoints: newRedeemed } : c
+          );
+        }
         wx.showModal({
           title: '兑换成功',
           content: '恭喜！已成功兑换 ' + this.data.reward.name,

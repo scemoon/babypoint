@@ -13,20 +13,6 @@ module.exports = {
 </wxs>
 
 <view class="container home-page">
-  <view class="welcome-row" wx:if="{{currentChild}}">
-    <view class="welcome-copy">
-      <text class="eyebrow">家庭任务板</text>
-      <text class="welcome-title">{{currentChild ? currentChild.name + '，准备出发？' : '今天一起出发'}}</text>
-    </view>
-    <view class="child-switch" bindtap="onShowChildPicker">
-      <view class="switch-avatar">
-        <text wx:if="{{!currentChild.avatar}}">{{currentChild.name[0]}}</text>
-        <image wx:else class="avatar-image" src="{{currentChild.avatar}}" mode="aspectFill"/>
-      </view>
-      <text class="switch-name">{{currentChild.name}}</text>
-      <text class="switch-mark">⌄</text>
-    </view>
-  </view>
 
   <!-- 加载占位：位置与积分卡片一致，刷新时既不闪「先添加孩子档案」，也不会有布局跳动 -->
   <view class="score-panel score-panel-skeleton" wx:if="{{!profileReady}}">
@@ -53,23 +39,29 @@ module.exports = {
   </view>
 
   <view wx:if="{{currentChild}}">
-  <!-- 积分面板：明亮青碧渐变 -->
+  <!-- 积分面板：明亮青碧渐变 - 平铺展示所有孩子 -->
   <view class="score-panel" wx:if="{{currentChild}}">
     <view class="score-topline">
-      <text class="score-caption">可用积分</text>
+      <text class="score-caption">家庭积分</text>
       <view class="score-shortcut" bindtap="onViewHistory">
         <icon name="history" size="29" color="#FFFFFF"/><text>积分记录</text>
       </view>
     </view>
-    <view class="score-number-row">
-      <text class="score-number">{{currentChild.availablePoints}}</text>
-      <text class="score-unit">积分</text>
-    </view>
     <view class="score-divider"></view>
-    <view class="score-foot">
-      <view class="score-stats">
-        <view class="score-stat"><text class="score-small">{{currentChild.totalPoints || 0}}</text><text class="score-small-label">累计获得</text></view>
-        <view class="score-stat"><text class="score-small">{{currentChild.redeemedPoints || 0}}</text><text class="score-small-label">已经兑换</text></view>
+    <!-- 所有孩子积分平铺展示 -->
+    <view class="all-children-row {{children.length === 1 ? 'single' : ''}}">
+      <view wx:for="{{children}}" wx:key="_id" class="child-score-card" bindtap="onSelectChild" data-id="{{item._id}}">
+        <view class="child-score-avatar">
+          <text wx:if="{{!item.avatar}}">{{item.name[0]}}</text>
+          <image wx:else src="{{item.avatar}}" mode="aspectFill"/>
+        </view>
+        <text class="child-score-name">{{item.name}}</text>
+        <text class="child-score-grade">{{item.schoolStageName || item.grade}}</text>
+        <view class="child-score-points">
+          <text class="child-score-num">{{(item.totalPoints || 0) - (item.redeemedPoints || 0)}}</text>
+          <text class="child-score-label">可用</text>
+        </view>
+        <text class="child-score-total">累计 {{item.totalPoints || 0}}</text>
       </view>
     </view>
   </view>
@@ -96,7 +88,10 @@ module.exports = {
       <view class="redemption-icon"><icon name="gift" size="34" color="#D9503A"/></view>
       <view class="redemption-info">
         <text class="redemption-name">{{item.rewardName}}</text>
-        <text class="redemption-date">{{utils.formatDate(item.redeemedAt)}}</text>
+        <view class="redemption-meta">
+          <text class="redemption-child">{{item.childName || '未知'}}</text>
+          <text class="redemption-date">{{utils.formatDate(item.redeemedAt)}}</text>
+        </view>
       </view>
       <view class="redemption-cost" wx:if="{{item.points > 0}}">
         <text class="cost-value">−{{item.points}}</text>
@@ -124,7 +119,7 @@ module.exports = {
       <view class="picker-head"><text>切换孩子</text><text class="picker-close" bindtap="onHideChildPicker">关闭</text></view>
       <view class="picker-option {{item._id === currentChild._id ? 'selected' : ''}}" wx:for="{{children}}" wx:key="_id" bindtap="onSelectChild" data-id="{{item._id}}">
         <view class="switch-avatar"><text wx:if="{{!item.avatar}}">{{item.name[0]}}</text><image wx:else class="avatar-image" src="{{item.avatar}}" mode="aspectFill"/></view>
-        <text>{{item.name}}</text><text class="option-grade">{{item.grade}}</text>
+        <text>{{item.name}}</text><text class="option-grade">{{item.schoolStageName || item.grade}}</text>
         <icon wx:if="{{item._id === currentChild._id}}" name="check" size="32" color="#12807A"/>
       </view>
     </view>

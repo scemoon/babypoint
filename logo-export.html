@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小步成长 Logo 导出工具</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    padding: 40px 20px;
+    color: white;
+  }
+  h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .canvas-container {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    margin-bottom: 30px;
+  }
+  canvas {
+    display: block;
+  }
+  .btn-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button {
+    padding: 16px 32px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  button:hover {
+    transform: translateY(-2px);
+  }
+  button:active {
+    transform: translateY(0);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #2EB8A6, #12807A);
+    color: white;
+    box-shadow: 0 8px 24px rgba(46,184,166,0.4);
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .info {
+    margin-top: 30px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .size-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .size-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(46,184,166,0.5);
+    background: rgba(46,184,166,0.1);
+    color: #2EB8A6;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .size-btn.active {
+    background: #2EB8A6;
+    color: white;
+    border-color: #2EB8A6;
+  }
+  .size-btn:hover {
+    border-color: #2EB8A6;
+  }
+</style>
+</head>
+<body>
+
+<h1>🌱 小步成长 Logo 导出工具</h1>
+
+<div class="canvas-container">
+  <canvas id="logoCanvas" width="400" height="400"></canvas>
+</div>
+
+<div class="size-options">
+  <button class="size-btn active" onclick="setSize(400)">400×400</button>
+  <button class="size-btn" onclick="setSize(800)">800×800</button>
+  <button class="size-btn" onclick="setSize(1024)">1024×1024（推荐）</button>
+</div>
+
+<div class="btn-group">
+  <button class="btn-primary" onclick="exportPNG()">📥 导出 PNG</button>
+  <button class="btn-secondary" onclick="exportSquarePNG()">📥 导出正方形（小程序图标）</button>
+</div>
+
+<div class="info">
+  <p>点击按钮导出 PNG 图片</p>
+  <p>1024×1024 适用于微信小程序图标提交审核</p>
+  <p>透明背景版本需在下方选择</p>
+</div>
+
+<script>
+let currentSize = 400;
+
+function setSize(size) {
+  currentSize = size;
+  document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  drawLogo();
+}
+
+function drawLogo() {
+  const canvas = document.getElementById('logoCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = currentSize;
+  canvas.width = size;
+  canvas.height = size;
+  
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size * 0.42;
+  
+  // 背景渐变
+  const bgGrad = ctx.createLinearGradient(0, 0, size, size);
+  bgGrad.addColorStop(0, '#2EB8A6');
+  bgGrad.addColorStop(1, '#12807A');
+  
+  // 绘制背景圆形
+  ctx.beginPath();
+  ctx.arc(cx, cy - size * 0.05, r, 0, Math.PI * 2);
+  ctx.fillStyle = bgGrad;
+  ctx.fill();
+  
+  // 背景装饰圆点
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  const dots = [
+    [cx - r * 0.7, cy - r * 0.6, size * 0.025],
+    [cx + r * 0.7, cy - r * 0.5, size * 0.03],
+    [cx - r * 0.6, cy + r * 0.5, size * 0.02],
+    [cx + r * 0.6, cy + r * 0.4, size * 0.025],
+  ];
+  dots.forEach(([x, y, rad]) => {
+    ctx.beginPath();
+    ctx.arc(cx + (x - cx), cy + (y - cy), rad * size / 400, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  
+  // 绘制脚印
+  const footScale = size / 400;
+  const footY = cy + size * 0.05;
+  
+  ctx.save();
+  ctx.translate(cx, footY);
+  ctx.scale(footScale, footScale);
+  
+  // 脚印主体
+  ctx.beginPath();
+  ctx.moveTo(-25, -50);
+  ctx.bezierCurveTo(-25, -65, -12, -72, 0, -72);
+  ctx.bezierCurveTo(12, -72, 25, -65, 25, -50);
+  ctx.bezierCurveTo(25, -38, 18, -28, 8, -24);
+  ctx.bezierCurveTo(4, -22, 4, -16, 6, -12);
+  ctx.bezierCurveTo(10, -6, 15, -3, 18, 0);
+  ctx.bezierCurveTo(22, 4, 24, 10, 21, 15);
+  ctx.bezierCurveTo(18, 20, 12, 24, 6, 26);
+  ctx.bezierCurveTo(-2, 28, -15, 28, -22, 24);
+  ctx.bezierCurveTo(-30, 20, -35, 12, -35, 4);
+  ctx.bezierCurveTo(-35, -10, -32, -30, -25, -50);
+  ctx.closePath();
+  
+  const footGrad = ctx.createLinearGradient(0, -72, 0, 30);
+  footGrad.addColorStop(0, '#ffffff');
+  footGrad.addColorStop(1, '#e0f7fa');
+  ctx.fillStyle = footGrad;
+  ctx.globalAlpha = 0.95;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  
+  // 脚趾
+  const toes = [
+    [-12, -63, 9, 11],
+    [4, -68, 7, 9],
+    [18, -66, 6, 8],
+  ];
+  toes.forEach(([x, y, rx, ry]) => {
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = footGrad;
+    ctx.globalAlpha = 0.9;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+  
+  ctx.restore();
+  
+  // 绘制嫩芽
+  const sproutY = footY - size * 0.35;
+  ctx.save();
+  ctx.translate(cx, sproutY);
+  ctx.scale(footScale, footScale);
+  
+  // 茎
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.quadraticCurveTo(-4, 18, 0, 40);
+  ctx.strokeStyle = '#4CAF50';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+  
+  // 左叶子
+  ctx.beginPath();
+  ctx.moveTo(-2, 12);
+  ctx.quadraticCurveTo(-22, 4, -26, 16);
+  ctx.quadraticCurveTo(-22, 22, -4, 18);
+  ctx.fillStyle = '#8BC34A';
+  ctx.fill();
+  
+  // 右叶子
+  ctx.beginPath();
+  ctx.moveTo(0, 22);
+  ctx.quadraticCurveTo(18, 8, 22, 20);
+  ctx.quadraticCurveTo(18, 28, 2, 26);
+  ctx.fillStyle = '#8BC34A';
+  ctx.fill();
+  
+  // 顶芽
+  ctx.beginPath();
+  ctx.ellipse(-1, -6, 7, 10, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#8BC34A';
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.ellipse(-1, -8, 4, 6, 0, 0, Math.PI * 2);
+  ctx.fillStyle = '#AED581';
+  ctx.fill();
+  
+  ctx.restore();
+  
+  // 绘制文字
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${size * 0.1}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.2)';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 3;
+  ctx.fillText('小步成长', cx, cy + size * 0.32);
+  
+  ctx.font = `${size * 0.035}px Arial, sans-serif`;
+  ctx.letterSpacing = '4px';
+  ctx.fillText('GROWTH STEPS', cx, cy + size * 0.38);
+  
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+}
+
+function exportPNG() {
+  const canvas = document.getElementById('logoCanvas');
+  const link = document.createElement('a');
+  link.download = `小步成长_Logo_${currentSize}x${currentSize}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function exportSquarePNG() {
+  // 创建正方形画布
+  const canvas = document.getElementById('logoCanvas');
+  const size = 1024;
+  const squareCanvas = document.createElement('canvas');
+  squareCanvas.width = size;
+  squareCanvas.height = size;
+  const ctx = squareCanvas.getContext('2d');
+  
+  // 绘制logo到正方形画布
+  ctx.drawImage(canvas, 0, 0, size, size);
+  
+  const link = document.createElement('a');
+  link.download = '小步成长_小程序图标_1024x1024.png';
+  link.href = squareCanvas.toDataURL('image/png');
+  link.click();
+}
+
+// 初始绘制
+drawLogo();
+</script>
+
+</body>
+</html>

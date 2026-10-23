@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""宝贝积分 — 键盘避让验证脚本
+"""小步成长 — 键盘避让验证脚本
 
 背景：小程序 input/textarea 自带的 adjust-position 只会上推「页面滚动」，
 对两种场景是不够的（真机 iPhone 微信已复现遮挡）：
