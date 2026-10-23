@@ -32,3 +32,6 @@ npm-debug.log*
 # Local environment
 .env.local
 .env.*.local
+
+# HyperFrames 宣传视频项目（独立项目，与小程序无关，不入库）
+promo-video/

@@ -8,7 +8,7 @@ on:
       version:
         description: 'Version number'
         required: true
-        default: '2.1.0'
+        default: '2.1.1'
       desc:
         description: 'Version description'
         required: true
@@ -40,7 +40,7 @@ jobs:
           npx miniprogram-ci upload \
             --appid ${{ secrets.WECHAT_APPID }} \
             --private-key-path ./private_key.pem \
-            --upload-version "${{ github.event.inputs.version || '2.1.0' }}" \
+            --upload-version "${{ github.event.inputs.version || '2.1.1' }}" \
             --upload-description "${{ github.event.inputs.desc || 'fix: 创建任务带 childId + 修复 addDays 未定义' }}" \
             --use-project-config \
             --project-path ./miniprogram
